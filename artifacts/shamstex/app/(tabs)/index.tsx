@@ -3,7 +3,6 @@ import {
   Animated,
   AppState,
   Image,
-  PanResponder,
   Platform,
   Pressable,
   RefreshControl,
@@ -122,36 +121,84 @@ export default function HomeScreen() {
 
   const navGuard = useRef(false);
   const homeBottomArmed = useRef(false);
+  const homeBottomAtDragStart = useRef(false);
+  const homeWheelGestureActive = useRef(false);
+  const homeWheelResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const safePush = useCallback((path: string) => {
     if (navGuard.current) return;
     navGuard.current = true;
     router.push(path as any);
     setTimeout(() => { navGuard.current = false; }, 800);
   }, []);
+  const navigateToProducts = useCallback(() => {
+    if (navGuard.current) return;
+    navGuard.current = true;
+    router.navigate("/(tabs)/products" as any);
+    setTimeout(() => { navGuard.current = false; }, 800);
+  }, []);
+  useEffect(() => {
+    return () => {
+      if (homeWheelResetTimer.current) clearTimeout(homeWheelResetTimer.current);
+    };
+  }, []);
+  const handleHomeWheel = useCallback((event: any) => {
+    if (Platform.OS !== "web") return;
+    const deltaY = event?.nativeEvent?.deltaY ?? event?.deltaY;
+    const target = event?.currentTarget as {
+      scrollTop?: number;
+      scrollHeight?: number;
+      clientHeight?: number;
+    } | undefined;
+    const atBottom =
+      typeof deltaY === "number" &&
+      deltaY > 2 &&
+      typeof target?.scrollTop === "number" &&
+      typeof target.scrollHeight === "number" &&
+      typeof target.clientHeight === "number" &&
+      target.scrollHeight > target.clientHeight &&
+      target.scrollTop + target.clientHeight >= target.scrollHeight - 24;
 
-  const homeSwipeResponder = useMemo(
-    () =>
-      PanResponder.create({
-        onStartShouldSetPanResponder: () => false,
-        onMoveShouldSetPanResponderCapture: (_, gesture) =>
-          homeBottomArmed.current &&
-          gesture.dy < -18 &&
-          Math.abs(gesture.dy) > Math.abs(gesture.dx),
-        onPanResponderRelease: (_, gesture) => {
-          if (homeBottomArmed.current && gesture.dy <= -48) {
-            homeBottomArmed.current = false;
-            safePush("/(tabs)/products");
-          }
-        },
-      }),
-    [safePush],
-  );
+    const isNewWheelGesture = !homeWheelGestureActive.current;
+    homeWheelGestureActive.current = true;
+    if (homeWheelResetTimer.current) clearTimeout(homeWheelResetTimer.current);
+    homeWheelResetTimer.current = setTimeout(() => {
+      homeWheelGestureActive.current = false;
+    }, 220);
+
+    if (isNewWheelGesture && homeBottomArmed.current && atBottom) {
+      homeBottomArmed.current = false;
+      navigateToProducts();
+    }
+  }, [navigateToProducts]);
+  const webScrollProps = Platform.OS === "web" ? ({ onWheel: handleHomeWheel } as any) : {};
 
   const markHomeBottom = useCallback((event: any) => {
     const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
     const atBottom = contentSize.height > layoutMeasurement.height && contentOffset.y + layoutMeasurement.height >= contentSize.height - 24;
     homeBottomArmed.current = atBottom;
   }, []);
+
+  const handleHomeScrollBeginDrag = useCallback((event: any) => {
+    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+    homeBottomAtDragStart.current =
+      contentSize.height > layoutMeasurement.height &&
+      contentOffset.y + layoutMeasurement.height >= contentSize.height - 24;
+  }, []);
+
+  const handleHomeScrollEndDrag = useCallback((event: any) => {
+    const velocityY = event.nativeEvent.velocity?.y;
+    const isDownwardSwipe = typeof velocityY === "number" && velocityY > 0.15;
+
+    if (homeBottomAtDragStart.current && isDownwardSwipe) {
+      homeBottomAtDragStart.current = false;
+      homeBottomArmed.current = false;
+      navigateToProducts();
+      return;
+    }
+
+    homeBottomAtDragStart.current = false;
+    markHomeBottom(event);
+  }, [markHomeBottom, navigateToProducts]);
 
   const { isNotifReadForUser } = useApp();
   const myNotifications = useMemo(
@@ -296,11 +343,12 @@ export default function HomeScreen() {
       </View>
 
       <ScrollView
-        {...homeSwipeResponder.panHandlers}
+        {...webScrollProps}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomPad + 100 }]}
         onScroll={markHomeBottom}
-        onScrollEndDrag={markHomeBottom}
+        onScrollBeginDrag={handleHomeScrollBeginDrag}
+        onScrollEndDrag={handleHomeScrollEndDrag}
         onMomentumScrollEnd={markHomeBottom}
         scrollEventThrottle={16}
         refreshControl={
