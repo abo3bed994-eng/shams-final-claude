@@ -22,7 +22,7 @@ import GoldButton from "@/components/GoldButton";
 export default function ProfileScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { user, setUser, orders, addNotification, updateRegisteredCustomer, theme, setTheme, language, setLanguage, registeredCustomers, settings } = useApp();
+  const { user, setUser, orders, addNotification, updateRegisteredCustomer, deleteRegisteredCustomer, theme, setTheme, language, setLanguage, registeredCustomers, settings } = useApp();
   const { t, isRTL } = useTranslation();
 
   const systemScheme = useColorScheme();
@@ -64,6 +64,42 @@ export default function ProfileScreen() {
       isRTL ? "تم إرسال الطلب" : "Request Sent",
       isRTL ? "سيتم مراجعة طلبك من قبل الإدارة وإبلاغك بالنتيجة." : "Your request will be reviewed by the admin team."
     );
+  };
+
+  
+  const handleDeleteAccount = () => {
+    const title = language === "ar" ? "حذف الحساب نهائياً" : "Delete Account Permanently";
+    const msg = language === "ar"
+      ? "هل أنت متأكد من رغبتك في حذف حسابك وبياناتك نهائياً؟ هذا الإجراء لا يمكن التراجع عنه."
+      : "Are you sure you want to delete your account and personal data permanently? This action cannot be undone.";
+    const confirmText = language === "ar" ? "نعم، احذف حسابي" : "Delete My Account";
+    const cancelText = language === "ar" ? "إلغاء" : "Cancel";
+
+    if (Platform.OS === "web") {
+      if (window.confirm(`${title}\n\n${msg}`)) {
+        if (user?.phone) {
+          deleteRegisteredCustomer(user.phone);
+        }
+        setUser(null).then(() => router.replace("/auth/login"));
+      }
+      return;
+    }
+
+    Alert.alert(title, msg, [
+      { text: cancelText, style: "cancel" },
+      {
+        text: confirmText,
+        style: "destructive",
+        onPress: async () => {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+          if (user?.phone) {
+            deleteRegisteredCustomer(user.phone);
+          }
+          await setUser(null);
+          router.replace("/auth/login");
+        },
+      },
+    ]);
   };
 
   const handleLogout = () => {
@@ -395,6 +431,16 @@ export default function ProfileScreen() {
           variant="outline"
           style={{ borderColor: colors.destructive + "88" }}
         />
+
+        <View style={{ marginTop: 12, marginBottom: 24 }}>
+          <GoldButton
+            label={language === "ar" ? "حذف الحساب نهائياً" : "Delete Account"}
+            onPress={handleDeleteAccount}
+            variant="outline"
+            style={{ borderColor: "#E74C3C66" }}
+            textStyle={{ color: "#E74C3C" }}
+          />
+        </View>
       </ScrollView>
     </View>
   );

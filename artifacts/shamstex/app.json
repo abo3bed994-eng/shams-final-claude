@@ -16,7 +16,8 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.shamstex.app",
-      "icon": "./assets/images/app-icon.png"
+      "icon": "./assets/images/app-icon.png",
+      "buildNumber": "1"
     },
     "android": {
       "package": "com.shamstex.app",
@@ -29,10 +30,9 @@
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.CAMERA",
-        "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.VIBRATE"
-      ]
+      ],
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
@@ -41,7 +41,7 @@
       [
         "expo-router",
         {
-          "origin": "https://replit.com/"
+          "origin": "https://shamstex.app"
         }
       ],
       "expo-font",

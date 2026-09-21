@@ -50,7 +50,7 @@ service cloud.firestore {
          request.resource.data.permissions == resource.data.permissions)
         || isSupervisorOrAdmin()
       );
-      allow delete: if isAdmin();
+      allow delete: if (isAuthed() && phone == userPhone()) || isAdmin();
     }
 
     // -----------------------------------------------------------------
@@ -86,7 +86,7 @@ service cloud.firestore {
     // NOTIFICATIONS — anyone authed can create; read filtered server-side
     // -----------------------------------------------------------------
     match /notifications/{notifId} {
-      allow read: if isAuthed();
+      allow read: if isAuthed() && (resource.data.userId == request.auth.uid || resource.data.phone == userPhone() || isStaff());
       allow create: if isAuthed();
       allow update, delete: if isStaff();
     }

@@ -90,7 +90,7 @@ service cloud.firestore {
         && request.resource.data.role != 'admin'
         && resource.data.role != 'admin';
 
-      allow delete: if isAdmin();
+      allow delete: if (isAuthed() && phone == userPhone()) || isAdmin();
     }
 
     // ============ Products ============
@@ -164,7 +164,7 @@ service cloud.firestore {
           ]);
 
       // Only admin can delete orders
-      allow delete: if isAdmin();
+      allow delete: if (isAuthed() && phone == userPhone()) || isAdmin();
     }
 
     // ============ Notifications ============
@@ -198,7 +198,7 @@ service cloud.firestore {
             && request.resource.data.get('targetRole', '') == 'staff'
             && !('targetUserId' in request.resource.data)
             && !('targetUserPhone' in request.resource.data));
-      allow delete: if isAdmin();
+      allow delete: if (isAuthed() && phone == userPhone()) || isAdmin();
     }
 
     // ============ Settings (Config) ============
@@ -217,7 +217,7 @@ service cloud.firestore {
       allow create: if isSignedIn()
         && request.resource.data.userPhone == userPhone();
       allow update: if isStaff() && (isAdmin() || hasPermission('edit_orders') || hasPermission('cancel_returns'));
-      allow delete: if isAdmin();
+      allow delete: if (isAuthed() && phone == userPhone()) || isAdmin();
     }
 
     // ============ Sessions (single-device login) ============
@@ -244,7 +244,7 @@ service cloud.firestore {
         (request.resource.data.windowStart > resource.data.windowStart
          && request.resource.data.count == 1)
       );
-      allow delete: if isAdmin();
+      allow delete: if (isAuthed() && phone == userPhone()) || isAdmin();
     }
 
     // ============ Push Tokens ============
