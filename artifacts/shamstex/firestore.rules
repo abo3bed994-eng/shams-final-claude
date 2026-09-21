@@ -23,8 +23,16 @@ service cloud.firestore {
       return request.auth.token.phone_number;
     }
 
+    function customerDoc(phone) {
+      return /databases/$(database)/documents/customers/$(phone);
+    }
+
+    function customerExists(phone) {
+      return phone != null && exists(customerDoc(phone));
+    }
+
     function getRole(phone) {
-      return get(/databases/$(database)/documents/customers/$(phone)).data.role;
+      return customerExists(phone) ? get(customerDoc(phone)).data.role : null;
     }
 
     function hasRole(role) {
@@ -45,9 +53,7 @@ service cloud.firestore {
     function isStaff() {
       return isSignedIn() && (
         isOwnerPhone() ||
-        getRole(userPhone()) == 'admin' ||
-        getRole(userPhone()) == 'supervisor' ||
-        getRole(userPhone()) == 'employee'
+        (customerExists(userPhone()) && get(customerDoc(userPhone())).data.role in ['admin', 'supervisor', 'employee'])
       );
     }
 
@@ -262,10 +268,7 @@ service cloud.firestore {
       allow create, update: if isSignedIn()
         && authUid == request.auth.uid
         && request.resource.data.userId is string
-        && request.resource.data.name is string
-        && request.resource.data.role is string
-        && request.resource.data.phone is string
-        && request.resource.data.lastSeen is int;
+        && (request.resource.data.lastSeen is number || request.resource.data.lastSeen is int);
       allow delete: if isSignedIn() && authUid == request.auth.uid;
     }
 

@@ -1080,14 +1080,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
     beat();
     const interval = setInterval(beat, 30_000);
+
+    // Also trigger immediately whenever Firebase Auth state resolves/restores
+    let authUnsub: (() => void) | undefined;
+    try {
+      const { auth } = require("@/lib/firebase");
+      if (typeof auth?.onAuthStateChanged === "function") {
+        authUnsub = auth.onAuthStateChanged((firebaseUser: any) => {
+          if (firebaseUser && !cancelled) {
+            beat();
+          }
+        });
+      }
+    } catch {}
+
     return () => {
       cancelled = true;
       clearInterval(interval);
       if (retryTimer) clearTimeout(retryTimer);
       retryTimer = null;
-      // Do not delete here: the same Firebase account may already be active on
-      // a new phone. The 90-second lastSeen window removes inactive sessions
-      // from the counter without letting the old phone erase the new heartbeat.
+      if (authUnsub) authUnsub();
     };
   }, [user?.id]);
 
@@ -1111,7 +1123,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [user?.role]);
   const onlineCount = useMemo(() => {
     const cutoff = nowTick - ONLINE_WINDOW_MS;
-    return onlineUsers.filter((u) => u.lastSeen >= cutoff).length;
+    const active = onlineUsers.filter((u) => u.lastSeen >= cutoff);
+    const uniqueUsers = new Set(active.map((u) => u.userId || u.phone || "anon"));
+    return uniqueUsers.size;
   }, [onlineUsers, nowTick]);
 
   const syncUserWithRecords = useCallback(() => {

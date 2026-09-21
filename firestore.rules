@@ -110,9 +110,9 @@ service cloud.firestore {
     // -----------------------------------------------------------------
     // PRESENCE — anyone authed reads (for online counter); writes own
     // -----------------------------------------------------------------
-    match /presence/{userId} {
+    match /presence/{authUid} {
       allow read: if isStaff();
-      allow write: if isAuthed() && userId == request.auth.uid;
+      allow write: if isAuthed() && authUid == request.auth.uid;
     }
 
     // -----------------------------------------------------------------
