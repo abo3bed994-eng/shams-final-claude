@@ -255,11 +255,17 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.headerCenter}>
-          <Image
-            source={require("../../assets/images/logo.png")}
-            style={styles.headerLogo}
-            resizeMode="contain"
-          />
+          <Text
+            style={[
+              styles.headerBrandText,
+              {
+                color: colors.gold,
+                fontFamily: "Inter_700Bold",
+              },
+            ]}
+          >
+            Shams Tex
+          </Text>
         </View>
 
         <Pressable
@@ -488,8 +494,13 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderBottomWidth: 1,
   },
-  headerCenter: { flex: 1, alignItems: "center" },
-  headerLogo: { width: 60, height: 60 },
+  headerCenter: { flex: 1, alignItems: "center", justifyContent: "center" },
+  headerBrandText: {
+    fontSize: 21,
+    letterSpacing: 2,
+    fontWeight: "700",
+    textAlign: "center",
+  },
   headerLeft: { flexDirection: "row-reverse", gap: 2 },
   iconBtn: {
     width: 42,
