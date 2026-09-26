@@ -68,7 +68,7 @@ export default function ProfileScreen() {
 
   
   const handleDeleteAccount = () => {
-    const title = language === "ar" ? "حذف الحساب نهائياً" : "Delete Account Permanently";
+    const title = language === "ar" ? "حذف الحساب" : "Delete Account Permanently";
     const msg = language === "ar"
       ? "هل أنت متأكد من رغبتك في حذف حسابك وبياناتك نهائياً؟ هذا الإجراء لا يمكن التراجع عنه."
       : "Are you sure you want to delete your account and personal data permanently? This action cannot be undone.";
@@ -432,14 +432,25 @@ export default function ProfileScreen() {
           style={{ borderColor: colors.destructive + "88" }}
         />
 
-        <View style={{ marginTop: 12, marginBottom: 24 }}>
-          <GoldButton
-            label={language === "ar" ? "حذف الحساب نهائياً" : "Delete Account"}
+        <View style={{ marginTop: 16, marginBottom: 32, alignItems: "center" }}>
+          <Pressable
             onPress={handleDeleteAccount}
-            variant="outline"
-            style={{ borderColor: "#E74C3C66" }}
-            textStyle={{ color: "#E74C3C" }}
-          />
+            style={({ pressed }) => ({
+              paddingVertical: 8,
+              paddingHorizontal: 16,
+              opacity: pressed ? 0.4 : 0.7,
+            })}
+          >
+            <Text
+              style={{
+                fontSize: 13,
+                color: colors.mutedForeground,
+                fontFamily: "Inter_400Regular",
+              }}
+            >
+              {language === "ar" ? "حذف الحساب" : "Delete Account"}
+            </Text>
+          </Pressable>
         </View>
       </ScrollView>
     </View>
