@@ -17,6 +17,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { I18nManager, Platform, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AppProvider, useApp } from "@/context/AppContext";
 import SplashScreenComponent from "@/components/SplashScreenComponent";
@@ -48,6 +49,8 @@ function RootLayoutNav() {
   // Store pending notification navigation until the app is fully ready
   const pendingNotifNav = useRef<string | null>(null);
   const appReady = splashDone && !isLoading && navigated.current;
+  const appReadyRef = useRef(appReady);
+  appReadyRef.current = appReady;
 
   // Register for push notifications whenever a user logs in
   useEffect(() => {
@@ -65,18 +68,33 @@ function RootLayoutNav() {
     (async () => {
       try {
         const Notifications = await import("expo-notifications");
-        sub = Notifications.addNotificationResponseReceivedListener((response) => {
-          const data = response.notification.request.content.data as Record<string, any>;
-          let path = "/notifications";
-          // Any notification carrying an orderId (or linkedOrderId) takes the user straight to the order page.
+        sub = Notifications.addNotificationResponseReceivedListener(async (response) => {
+          const notifId = response?.notification?.request?.identifier;
+          // Prevent re-processing stale responses (e.g. from Android launch intent on cold restart)
+          try {
+            const lastHandled = await AsyncStorage.getItem("@last_handled_notif_response_id");
+            if (lastHandled && lastHandled === notifId) {
+              return;
+            }
+            if (notifId) {
+              await AsyncStorage.setItem("@last_handled_notif_response_id", notifId);
+            }
+          } catch {}
+
+          const data = response?.notification?.request?.content?.data as Record<string, any> | undefined;
+          // Only navigate if there is a specific target (order or return); do not hijack launch to generic notifications
           const orderId = data?.orderId || data?.linkedOrderId;
           const returnId = data?.returnId || data?.linkedReturnId;
+          let path: string | null = null;
           if (orderId) {
             path = `/order/${orderId}`;
           } else if (returnId) {
             path = `/return/${returnId}`;
           }
-          if (appReady) {
+
+          if (!path) return;
+
+          if (appReadyRef.current) {
             router.push(path as any);
           } else {
             pendingNotifNav.current = path;
@@ -85,7 +103,7 @@ function RootLayoutNav() {
       } catch (_) {}
     })();
     return () => { sub?.remove(); };
-  }, [appReady]);
+  }, []);
 
   // Fire pending notification navigation once app is fully ready
   useEffect(() => {
