@@ -30,7 +30,8 @@
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.CAMERA",
-        "android.permission.VIBRATE"
+        "android.permission.VIBRATE",
+        "android.permission.RECORD_AUDIO"
       ],
       "versionCode": 1
     },
@@ -91,9 +92,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "0fabe669-f585-4876-b076-774ecd01c24d"
+        "projectId": "259a6c4c-4501-4ab4-ab35-62ebc9a4ba9d"
       }
     },
-    "owner": "shams_tex"
+    "owner": "shamstex-team"
   }
 }
