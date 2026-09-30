@@ -16,7 +16,19 @@ import React, { useEffect, useRef, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { I18nManager, Platform, View } from "react-native";
+import { I18nManager, Platform, View, Text, TextInput } from "react-native";
+
+// Prevent extreme font scaling from breaking UI while keeping accessibility comfortable
+interface WithDefaultProps {
+  defaultProps?: { maxFontSizeMultiplier?: number };
+}
+((Text as unknown) as WithDefaultProps).defaultProps =
+  ((Text as unknown) as WithDefaultProps).defaultProps || {};
+((Text as unknown) as WithDefaultProps).defaultProps!.maxFontSizeMultiplier = 1.25;
+
+((TextInput as unknown) as WithDefaultProps).defaultProps =
+  ((TextInput as unknown) as WithDefaultProps).defaultProps || {};
+((TextInput as unknown) as WithDefaultProps).defaultProps!.maxFontSizeMultiplier = 1.25;
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AppProvider, useApp } from "@/context/AppContext";
