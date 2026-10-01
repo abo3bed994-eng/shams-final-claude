@@ -50,7 +50,7 @@ service cloud.firestore {
          request.resource.data.permissions == resource.data.permissions)
         || isSupervisorOrAdmin()
       );
-      allow delete: if (isAuthed() && phone == userPhone()) || isAdmin();
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.get('targetUserPhone', '') == userPhone());
     }
 
     // -----------------------------------------------------------------

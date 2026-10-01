@@ -18,6 +18,10 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function isAuthed() {
+      return isSignedIn();
+    }
+
     function userPhone() {
       // We use phone as document ID for customers; the auth token's phone_number must match.
       return request.auth.token.phone_number;
@@ -96,7 +100,7 @@ service cloud.firestore {
         && request.resource.data.role != 'admin'
         && resource.data.role != 'admin';
 
-      allow delete: if (isAuthed() && phone == userPhone()) || isAdmin();
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.get('targetUserPhone', '') == userPhone());
     }
 
     // ============ Products ============
@@ -170,7 +174,7 @@ service cloud.firestore {
           ]);
 
       // Only admin can delete orders
-      allow delete: if (isAuthed() && phone == userPhone()) || isAdmin();
+      allow delete: if isAdmin();
     }
 
     // ============ Notifications ============
@@ -204,7 +208,7 @@ service cloud.firestore {
             && request.resource.data.get('targetRole', '') == 'staff'
             && !('targetUserId' in request.resource.data)
             && !('targetUserPhone' in request.resource.data));
-      allow delete: if (isAuthed() && phone == userPhone()) || isAdmin();
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.userPhone == userPhone());
     }
 
     // ============ Settings (Config) ============
@@ -223,7 +227,7 @@ service cloud.firestore {
       allow create: if isSignedIn()
         && request.resource.data.userPhone == userPhone();
       allow update: if isStaff() && (isAdmin() || hasPermission('edit_orders') || hasPermission('cancel_returns'));
-      allow delete: if (isAuthed() && phone == userPhone()) || isAdmin();
+      allow delete: if isAdmin();
     }
 
     // ============ Sessions (single-device login) ============
