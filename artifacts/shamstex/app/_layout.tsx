@@ -18,17 +18,40 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { I18nManager, Platform, View, Text, TextInput } from "react-native";
 
-// Prevent extreme font scaling from breaking UI while keeping accessibility comfortable
-interface WithDefaultProps {
-  defaultProps?: { maxFontSizeMultiplier?: number };
+// Lock font scaling globally to preserve UI layouts across all device accessibility settings
+interface TextWithRender {
+  render?: Function;
+  prototype?: { render?: Function };
+  defaultProps?: Record<string, any>;
 }
-((Text as unknown) as WithDefaultProps).defaultProps =
-  ((Text as unknown) as WithDefaultProps).defaultProps || {};
-((Text as unknown) as WithDefaultProps).defaultProps!.maxFontSizeMultiplier = 1.25;
 
-((TextInput as unknown) as WithDefaultProps).defaultProps =
-  ((TextInput as unknown) as WithDefaultProps).defaultProps || {};
-((TextInput as unknown) as WithDefaultProps).defaultProps!.maxFontSizeMultiplier = 1.25;
+const patchTextComponent = (Comp: unknown) => {
+  if (!Comp) return;
+  const c = Comp as TextWithRender;
+  c.defaultProps = c.defaultProps || {};
+  c.defaultProps.allowFontScaling = false;
+  c.defaultProps.maxFontSizeMultiplier = 1;
+
+  if (typeof c.render === "function") {
+    const origRender = c.render;
+    c.render = function (props: any, ref: any) {
+      return origRender.call(this, { allowFontScaling: false, maxFontSizeMultiplier: 1, ...props }, ref);
+    };
+  }
+
+  if (c.prototype && typeof c.prototype.render === "function") {
+    const origProtoRender = c.prototype.render;
+    c.prototype.render = function () {
+      const el = origProtoRender.apply(this, arguments);
+      return React.isValidElement(el)
+        ? React.cloneElement(el, { allowFontScaling: false, maxFontSizeMultiplier: 1 } as any)
+        : el;
+    };
+  }
+};
+
+patchTextComponent(Text);
+patchTextComponent(TextInput);
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AppProvider, useApp } from "@/context/AppContext";

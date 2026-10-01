@@ -335,7 +335,11 @@ export default function ProfileScreen() {
               </Text>
             </View>
             <Pressable
-              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setTheme(themeResolved === "dark" ? "light" : "dark"); }}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                const nextTheme = theme === "system" ? "dark" : theme === "dark" ? "light" : "system";
+                setTheme(nextTheme);
+              }}
               style={{
                 flexDirection: "row-reverse",
                 alignItems: "center",
@@ -349,7 +353,7 @@ export default function ProfileScreen() {
               }}
             >
               <Text style={[styles.themeBtnText, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
-                {themeResolved === "dark" ? (isRTL ? "داكن" : "Dark") : (isRTL ? "فاتح" : "Light")}
+                {theme === "system" ? (isRTL ? "تلقائي (مع الجهاز)" : "System") : theme === "dark" ? (isRTL ? "داكن" : "Dark") : (isRTL ? "فاتح" : "Light")}
               </Text>
               <View
                 style={{
