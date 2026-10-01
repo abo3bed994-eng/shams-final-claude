@@ -1289,7 +1289,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const parsed = JSON.parse(settingsData);
         setSettingsState({ ...DEFAULT_SETTINGS, ...parsed });
       }
-      if (themeData) setThemeState(themeData as AppTheme);
+      if (themeData && (themeData === "dark" || themeData === "light" || themeData === "system")) { setThemeState(themeData as AppTheme); } else { setThemeState("system"); }
       const langData = await AsyncStorage.getItem("language");
       if (langData) setLanguageState(langData as AppLanguage);
     } catch (e) {

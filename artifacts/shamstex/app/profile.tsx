@@ -353,7 +353,7 @@ export default function ProfileScreen() {
               }}
             >
               <Text style={[styles.themeBtnText, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
-                {theme === "system" ? (isRTL ? "تلقائي (مع الجهاز)" : "System") : theme === "dark" ? (isRTL ? "داكن" : "Dark") : (isRTL ? "فاتح" : "Light")}
+                {theme === "system" ? (isRTL ? "تلقائي" : "Auto") : theme === "dark" ? (isRTL ? "داكن" : "Dark") : (isRTL ? "فاتح" : "Light")}
               </Text>
               <View
                 style={{

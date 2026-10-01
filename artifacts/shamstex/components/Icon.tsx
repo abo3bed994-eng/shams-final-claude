@@ -1,3 +1,4 @@
+import { View } from "react-native";
 import React from "react";
 import {
   AlertCircle,
@@ -205,5 +206,9 @@ interface IconProps {
 export default function Icon({ name, size = 24, color = "#fff", style }: IconProps) {
   const LucideIcon = iconMap[name];
   if (!LucideIcon) return null;
-  return <LucideIcon size={size} color={color} style={style} />;
+  return (
+    <View style={[{ width: size, height: size, alignItems: "center", justifyContent: "center", flexShrink: 0 }, style]}>
+      <LucideIcon size={size} color={color} />
+    </View>
+  );
 }
