@@ -2302,6 +2302,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const setOrderShipping = useCallback(
     async (orderId: string, data: { providerId?: ShippingProviderId | null; providerName?: string | null; waybillImage?: string | null; waybillNumber?: string | null }) => {
+      const prevOrder = ordersRef.current.find((o) => o.id === orderId);
+      const isNewWaybillImage = !!data.waybillImage && data.waybillImage !== prevOrder?.shippingWaybillImage;
+      const isNewWaybillNumber = !!data.waybillNumber && data.waybillNumber !== prevOrder?.shippingWaybillNumber;
+
       const updated = ordersRef.current.map((o) => {
         if (o.id !== orderId) return o;
         const next = { ...o };
@@ -2327,7 +2331,41 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setOrdersState(updated);
       ordersRef.current = updated;
       await AsyncStorage.setItem("orders", JSON.stringify(updated));
-      if (updatedOrder) await FS.saveOrder(updatedOrder);
+      if (updatedOrder) {
+        await FS.saveOrder(updatedOrder);
+
+        // Notify customer when waybill image or tracking number is uploaded/attached
+        if (isNewWaybillImage || isNewWaybillNumber) {
+          const recipientPhone = resolveRecipientPhone(updatedOrder.userId, updatedOrder.userPhone);
+          const waybillNumStr = data.waybillNumber || updatedOrder.shippingWaybillNumber;
+          const bodyText = waybillNumStr
+            ? `تم إرفاق بوليصة الشحن (رقم: ${waybillNumStr}) لطلبك #${orderId.slice(0, 12)} — يمكنك متابعتها من تفاصيل الطلب`
+            : `تم إرفاق بوليصة الشحن لطلبك #${orderId.slice(0, 12)} — يمكنك الاطلاع عليها من تفاصيل الطلب`;
+
+          const notif: Notification = {
+            id: `notif_waybill_${orderId}_${Date.now()}`,
+            title: "تم إرفاق بوليصة الشحن 📦",
+            body: bodyText,
+            createdAt: new Date().toISOString(),
+            read: false,
+            targetUserId: updatedOrder.userId,
+            targetUserPhone: recipientPhone,
+            linkedOrderId: orderId,
+          };
+          const updatedNotifs = [notif, ...notificationsRef.current];
+          setNotifications(updatedNotifs);
+          AsyncStorage.setItem("notifications", JSON.stringify(updatedNotifs)).catch(() => {});
+          FS.saveNotification(notif).catch(() => {});
+          if (recipientPhone) {
+            notifyUserByPhone(
+              recipientPhone,
+              notif.title,
+              notif.body,
+              { type: "waybill_uploaded", orderId }
+            ).catch(() => {});
+          }
+        }
+      }
     },
     []
   );

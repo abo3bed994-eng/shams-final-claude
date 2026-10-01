@@ -106,11 +106,26 @@ export async function registerForPushNotifications(
 
     let expoPushToken: string | null = null;
     try {
-      const tokenData = await Notifications.getExpoPushTokenAsync();
+      let projectId = "259a6c4c-4501-4ab4-ab35-62ebc9a4ba9d";
+      try {
+        const Constants = (await import("expo-constants")).default;
+        projectId =
+          Constants?.expoConfig?.extra?.eas?.projectId ??
+          Constants?.easConfig?.projectId ??
+          projectId;
+      } catch (_) {}
+
+      const tokenData = await Notifications.getExpoPushTokenAsync({ projectId });
       expoPushToken = tokenData.data;
     } catch (e1) {
-      console.warn("Could not get Expo push token:", e1);
-      return null;
+      console.warn("Could not get Expo push token with projectId, trying without args:", e1);
+      try {
+        const tokenData = await Notifications.getExpoPushTokenAsync();
+        expoPushToken = tokenData.data;
+      } catch (e2) {
+        console.warn("Could not get Expo push token fallback:", e2);
+        return null;
+      }
     }
 
     if (expoPushToken) {
