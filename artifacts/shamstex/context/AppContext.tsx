@@ -923,23 +923,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             // Untargeted broadcasts go to everyone.
             return true;
           });
-          if (forMe.length > 0) {
-            if (Platform.OS !== "web") {
-              import("expo-notifications").then((Notif) => {
-                forMe.slice(0, 5).forEach((n) => {
-                  Notif.scheduleNotificationAsync({
-                    content: {
-                      title: n.title,
-                      body: n.body,
-                      sound: true,
-                      data: { id: n.id, orderId: n.linkedOrderId },
-                    },
-                    trigger: null,
-                  }).catch(() => {});
-                });
-              }).catch(() => {});
-            }
-          }
+          // Notifications already delivered as remote OS push via pushService (sendExpoPush).
+          // We do not schedule a second local notification here to prevent duplicate alerts/banners.
         }
         isFirstNotifLoad = false;
       }
