@@ -368,6 +368,7 @@ export interface AppSettings {
   shippingAllowedPayments?: PaymentMethod[];
   logoUri?: string;
   minVersion?: string;
+  latestVersion?: string;
   updateUrl?: string;
   stealthIconEnabled?: boolean;
   suspendOrdersOutsideHours?: boolean;

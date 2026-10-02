@@ -20,8 +20,11 @@ export function isValidVersion(v: unknown): v is string {
 }
 
 export function isUpdateRequired(minVersion: string | undefined | null): boolean {
-  // A missing OR malformed minVersion must never trigger the force-update gate,
-  // otherwise a typo in the admin panel locks everyone out in a restart loop.
   if (!isValidVersion(minVersion)) return false;
   return compareVersions(APP_VERSION, minVersion.trim()) < 0;
+}
+
+export function isFlexibleUpdateAvailable(latestVersion: string | undefined | null): boolean {
+  if (!isValidVersion(latestVersion)) return false;
+  return compareVersions(APP_VERSION, latestVersion.trim()) < 0;
 }

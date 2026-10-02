@@ -40,6 +40,12 @@ export default function UpdateSettings() {
           </Pressable>
         )}
         <Field
+          label="أحدث إصدار مقترح (تحديث مرن / اختياري)"
+          value={draft.latestVersion ?? ""}
+          onChange={(v) => setDraft((d) => ({ ...d, latestVersion: v.trim() }))}
+          placeholder="مثال: 1.2.0 (يظهر للمستخدم كتنبيه خفيف دون منعه)"
+        />
+        <Field
           label="رابط متجر التحديث"
           value={draft.updateUrl ?? ""}
           onChange={(v) => setDraft((d) => ({ ...d, updateUrl: v.trim() }))}

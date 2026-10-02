@@ -30,6 +30,8 @@ import OfflineGate from "@/components/OfflineGate";
 import LoadingScreen from "@/components/LoadingScreen";
 import RoleSwitchOverlay from "@/components/RoleSwitchOverlay";
 import ForceUpdateScreen from "@/components/ForceUpdateScreen";
+import FlexibleUpdateModal from "@/components/FlexibleUpdateModal";
+import { checkSilentOtaUpdate } from "@/lib/otaUpdates";
 import EditCountdownBar from "@/components/EditCountdownBar";
 import { KeyboardProviderSafe } from "@/components/KeyboardAware";
 import { registerForPushNotifications } from "@/lib/pushService";
@@ -138,13 +140,15 @@ function RootLayoutNav() {
 
   // Force-update gate runs only after settings have loaded, and admins bypass it
   // so they can correct a mistaken minVersion from the admin panel.
-  if (user && user.role !== "admin" && isUpdateRequired((settings as any)?.minVersion)) {
+  const isAdmin = user?.role === "admin";
+  if (!isAdmin && isUpdateRequired((settings as any)?.minVersion)) {
     return <ForceUpdateScreen />;
   }
 
   return (
     <View style={{ flex: 1 }}>
       <EditCountdownBar />
+      <FlexibleUpdateModal />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="auth/login" options={{ headerShown: false }} />
