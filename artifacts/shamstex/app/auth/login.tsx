@@ -59,8 +59,17 @@ export default function LoginScreen() {
   const [pin, setPin] = useState("");
   const [confirmPin, setConfirmPin] = useState("");
   const [pinPurpose, setPinPurpose] = useState<"newUser" | "existingNoPin" | "reset">("newUser");
+  const [resendCountdown, setResendCountdown] = useState(0);
   const confirmRef = useRef<PhoneAuthConfirmation | null>(null);
   const forgotPinModeRef = useRef(false);
+
+  useEffect(() => {
+    if (resendCountdown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCountdown]);
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
@@ -191,6 +200,7 @@ export default function LoginScreen() {
           console.warn("[OTP throttle] record failed:", throttleErr?.message || throttleErr);
         }
       }
+      setResendCountdown(60);
       setStep("otp");
     } catch (e: any) {
       const code = e?.code || "";
@@ -271,6 +281,7 @@ export default function LoginScreen() {
   };
 
   const handleResendOtp = async () => {
+    if (resendCountdown > 0 || loading) return;
     setOtp("");
     setError("");
     await sendOtp();
@@ -370,11 +381,21 @@ export default function LoginScreen() {
     setError("");
     try {
       await setCustomerPin(e164Phone, pin);
-      const existing = findCustomerByPhone(e164Phone);
-      if (existing && existing.pin) {
-        // Pass the freshly-persisted record (with PIN) so finishLogin's
-        // registerCustomer write does not clobber it.
-        await finishLogin(existing.name, existing.role as any, { ...existing, phone: e164Phone });
+      let existing = findCustomerByPhone(e164Phone);
+      if (!existing || !existing.pin) {
+        existing = await lookupCustomer(e164Phone);
+      }
+      if (!existing && name.trim()) {
+        existing = {
+          id: Date.now().toString(),
+          phone: e164Phone,
+          name: name.trim(),
+          role: "customer" as const,
+          registeredAt: new Date().toISOString(),
+        };
+      }
+      if (existing) {
+        await finishLogin(existing.name, (existing.role as any) || "customer", { ...existing, phone: e164Phone });
       } else {
         setError("تعذّر حفظ الرمز السري، حاول مرة أخرى");
       }
@@ -691,9 +712,15 @@ export default function LoginScreen() {
                 style={{ width: "100%" }}
               />
 
-              <Pressable onPress={handleResendOtp} disabled={loading}>
+              <Pressable
+                onPress={handleResendOtp}
+                disabled={loading || resendCountdown > 0}
+                style={{ opacity: (loading || resendCountdown > 0) ? 0.6 : 1 }}
+              >
                 <Text style={{ color: colors.gold, fontFamily: "Inter_500Medium", fontSize: 13, textAlign: "center" }}>
-                  إعادة إرسال الكود
+                  {resendCountdown > 0
+                    ? `إعادة إرسال الكود بعد (${resendCountdown} ثانية)`
+                    : "إعادة إرسال الكود"}
                 </Text>
               </Pressable>
             </>

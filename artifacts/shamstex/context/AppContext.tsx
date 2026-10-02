@@ -1474,6 +1474,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           }
         }
       }
+      registeredCustomersRef.current = updated;
       AsyncStorage.setItem("registered_customers", JSON.stringify(updated)).catch(() => {});
       return updated;
     });
