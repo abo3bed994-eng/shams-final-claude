@@ -78,10 +78,11 @@ export async function registerForPushNotifications(
     if (finalStatus !== "granted") return null;
 
     if (Platform.OS === "android") {
+      const SHAMS_VIBRATION_PATTERN = [0, 150, 100, 150, 100, 450, 100, 150];
       await Notifications.setNotificationChannelAsync("orders", {
         name: "طلبات جديدة",
         importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
+        vibrationPattern: SHAMS_VIBRATION_PATTERN,
         sound: "default",
         lightColor: "#C9A84C",
         enableVibrate: true,
@@ -90,13 +91,25 @@ export async function registerForPushNotifications(
       await Notifications.setNotificationChannelAsync("messages", {
         name: "رسائل",
         importance: Notifications.AndroidImportance.HIGH,
+        vibrationPattern: SHAMS_VIBRATION_PATTERN,
         sound: "default",
+        lightColor: "#C9A84C",
+        enableVibrate: true,
+        showBadge: true,
+      });
+      await Notifications.setNotificationChannelAsync("messages_v2", {
+        name: "رسائل وتحديثات",
+        importance: Notifications.AndroidImportance.HIGH,
+        vibrationPattern: SHAMS_VIBRATION_PATTERN,
+        sound: "default",
+        lightColor: "#C9A84C",
+        enableVibrate: true,
         showBadge: true,
       });
       await Notifications.setNotificationChannelAsync("default", {
         name: "إشعارات عامة",
         importance: Notifications.AndroidImportance.HIGH,
-        vibrationPattern: [0, 250, 250, 250],
+        vibrationPattern: SHAMS_VIBRATION_PATTERN,
         sound: "default",
         lightColor: "#C9A84C",
         enableVibrate: true,
@@ -150,7 +163,7 @@ export async function sendExpoPush(
   title: string,
   body: string,
   data?: Record<string, any>,
-  channelId = "messages"
+  channelId = "messages_v2"
 ): Promise<void> {
   const validTokens = tokens.filter(
     (t) => t && (t.startsWith("ExponentPushToken[") || t.startsWith("ExpoPushToken["))
