@@ -23,6 +23,7 @@ import GoldHeader from "@/components/GoldHeader";
 import GoldButton from "@/components/GoldButton";
 import FabricSpecsEditor from "@/components/FabricSpecsEditor";
 import { CompositionEntry, normalizeComposition, compositionPercentTotal, parseOptionalPositiveNumber } from "@/lib/fabric";
+import { sortColorsByGlobal } from "@/lib/colorUtils";
 import { useAdminGuard } from "@/hooks/useAdminGuard";
 
 export default function AddProductScreen() {
@@ -95,8 +96,8 @@ export default function AddProductScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setSelectedColors((prev) => {
       const exists = prev.find((c) => c.name === color.name);
-      if (exists) return prev.filter((c) => c.name !== color.name);
-      return [...prev, color];
+      const next = exists ? prev.filter((c) => c.name !== color.name) : [...prev, color];
+      return sortColorsByGlobal(next, settings.globalColors);
     });
   };
 
@@ -131,7 +132,7 @@ export default function AddProductScreen() {
       wholesalePrice: Number(wholesalePrice),
       category,
       subcategory: subcategory || undefined,
-      colors: selectedColors,
+      colors: sortColorsByGlobal(selectedColors, settings.globalColors),
       description,
       inStock: true,
       unit,

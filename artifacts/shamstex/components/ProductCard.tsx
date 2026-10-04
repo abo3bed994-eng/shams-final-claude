@@ -5,6 +5,7 @@ import Icon from "@/components/Icon";
 import { cardShadow } from "@/constants/shadows";
 import { useColors } from "@/hooks/useColors";
 import { Product } from "@/context/AppContext";
+import { sortColorsByGlobal } from "@/lib/colorUtils";
 import { useApp } from "@/context/AppContext";
 import { discountPercent, displayPriceFor, isOnOffer } from "@/lib/pricing";
 
@@ -15,7 +16,7 @@ interface ProductCardProps {
 
 export default React.memo(function ProductCard({ product, onPress }: ProductCardProps) {
   const colors = useColors();
-  const { effectivePriceMode, user, favorites, toggleFavorite } = useApp();
+  const { effectivePriceMode, user, favorites, toggleFavorite, settings } = useApp();
   const fav = favorites.includes(product.id);
   const specsText = [
     product.width != null ? `عرض ${product.width}سم` : null,
@@ -137,7 +138,7 @@ export default React.memo(function ProductCard({ product, onPress }: ProductCard
               </View>
 
               <View style={styles.colorsRow}>
-                {product.colors.slice(0, 4).map((c, i) => (
+                {sortColorsByGlobal(product.colors, settings?.globalColors).slice(0, 4).map((c, i) => (
                   <View
                     key={i}
                     style={[

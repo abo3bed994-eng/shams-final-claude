@@ -23,6 +23,7 @@ import GoldHeader from "@/components/GoldHeader";
 import GoldButton from "@/components/GoldButton";
 import FabricSpecsEditor from "@/components/FabricSpecsEditor";
 import { CompositionEntry, normalizeComposition, compositionPercentTotal, parseOptionalPositiveNumber } from "@/lib/fabric";
+import { sortColorsByGlobal } from "@/lib/colorUtils";
 import { useAdminGuard } from "@/hooks/useAdminGuard";
 
 export default function EditProductScreen() {
@@ -46,7 +47,7 @@ export default function EditProductScreen() {
   const [wholesalePrice, setWholesalePrice] = useState(String(product?.wholesalePrice ?? ""));
   const [description, setDescription] = useState(product?.description ?? "");
   const [images, setImages] = useState<string[]>(product?.images ?? []);
-  const [selectedColors, setSelectedColors] = useState<ColorOption[]>(product?.colors ?? []);
+  const [selectedColors, setSelectedColors] = useState<ColorOption[]>(() => sortColorsByGlobal(product?.colors ?? [], settings?.globalColors));
   const [unit, setUnit] = useState<ProductUnit>(product?.unit ?? "meter");
   const [minimumOrderQuantity, setMinimumOrderQuantity] = useState(
     String(product?.minimumOrderQuantity ?? (product?.unit === "kilo" ? 20 : 100))
@@ -91,8 +92,8 @@ export default function EditProductScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setSelectedColors((prev) => {
       const exists = prev.find((c) => c.name === color.name);
-      if (exists) return prev.filter((c) => c.name !== color.name);
-      return [...prev, color];
+      const next = exists ? prev.filter((c) => c.name !== color.name) : [...prev, color];
+      return sortColorsByGlobal(next, allColors);
     });
   };
 
@@ -133,7 +134,7 @@ export default function EditProductScreen() {
       wholesalePrice: Number(wholesalePrice),
       description,
       images,
-      colors: selectedColors.length > 0 ? selectedColors : existing.colors,
+      colors: sortColorsByGlobal(selectedColors.length > 0 ? selectedColors : existing.colors, allColors),
       unit,
       width: parseOptionalPositiveNumber(width),
       gsm: parseOptionalPositiveNumber(gsm),

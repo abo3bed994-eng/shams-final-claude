@@ -20,6 +20,7 @@ import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { useApp, CartItem } from "@/context/AppContext";
+import { sortColorsByGlobal } from "@/lib/colorUtils";
 import { discountPercent, displayPriceFor, isOnOffer } from "@/lib/pricing";
 import { metersPerKg } from "@/lib/fabric";
 import { useCartPulse } from "@/hooks/useCartPulse";
@@ -47,6 +48,11 @@ export default function ProductDetailScreen() {
   const imgScrollRef = useRef<ScrollView>(null);
   const viewerScrollRef = useRef<ScrollView>(null);
   const product = products.find((p) => p.id === id);
+
+  const displayColors = React.useMemo(
+    () => (product?.colors ? sortColorsByGlobal(product.colors, settings?.globalColors) : []),
+    [product?.colors, settings?.globalColors]
+  );
 
   const [selectedColors, setSelectedColors] = useState<Record<string, number>>({});
   const [colorWeights, setColorWeights] = useState<Record<string, number>>({});
@@ -347,8 +353,8 @@ export default function ProductDetailScreen() {
           { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: colors.radius - 4 },
         ]}
       >
-        {product.colors.map((color, idx) => {
-            const isLast = idx === product.colors.length - 1;
+        {displayColors.map((color, idx) => {
+            const isLast = idx === displayColors.length - 1;
 
             if (orderType === "weight") {
               const w = colorWeights[color.name] ?? 0;
