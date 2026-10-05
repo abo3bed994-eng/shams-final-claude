@@ -294,6 +294,8 @@ export interface Notification {
   actionUserId?: string;
   linkedOrderId?: string;
   linkedReturnId?: string;
+  targetBranchId?: string;
+  fulfillmentType?: string;
 }
 
 export interface ContactEntry {
@@ -1132,7 +1134,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       freshRecord.upgradeStatus !== currentUser.upgradeStatus ||
       freshRecord.name !== currentUser.name ||
       JSON.stringify(freshRecord.permissions ?? []) !== JSON.stringify(currentUser.permissions ?? []) ||
-      JSON.stringify(freshRecord.favorites ?? []) !== JSON.stringify(currentUser.favorites ?? []);
+      JSON.stringify(freshRecord.favorites ?? []) !== JSON.stringify(currentUser.favorites ?? []) ||
+      freshRecord.branchId !== currentUser.branchId ||
+      freshRecord.canHandleShipping !== currentUser.canHandleShipping ||
+      freshRecord.supervisorScope !== currentUser.supervisorScope;
     if (changed) {
       const synced: User = { ...currentUser, ...freshRecord };
 
@@ -1756,6 +1761,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             targetRole: "staff",
             sourceUserId: order.userId,
             linkedOrderId: order.id,
+            targetBranchId: order.branchId,
+            fulfillmentType: order.fulfillmentType,
           };
           FS.saveNotification(staffNotif).catch(() => {});
           notifyStaffNewOrder(order.id, order.userName, { branchId: order.branchId, fulfillmentType: order.fulfillmentType }).catch(() => {});
@@ -1814,6 +1821,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         targetRole: "staff",
         sourceUserId: order.userId,
         linkedOrderId: order.id,
+        targetBranchId: order.branchId,
+        fulfillmentType: order.fulfillmentType,
       };
       FS.saveNotification(staffNotif).catch(() => {});
       notifyStaffNewOrder(order.id, order.userName, { branchId: order.branchId, fulfillmentType: order.fulfillmentType }).catch(() => {});

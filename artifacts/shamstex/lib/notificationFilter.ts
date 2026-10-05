@@ -44,6 +44,10 @@ export function filterNotificationsForUser(notifications: Notification[], user: 
 
     if (user.role === "supervisor") {
       if (isDirect) return directMatchesMe;
+      if (user.supervisorScope === "branch" && user.branchId && (n.targetBranchId || n.fulfillmentType)) {
+        if (n.fulfillmentType === "shipping") return !!user.canHandleShipping;
+        return n.targetBranchId === user.branchId;
+      }
       if (n.targetRole === "supervisor" || n.targetRole === "staff") return true;
       if (n.actionType === "upgrade_request") return true;
       if (!n.targetRole) return true;
@@ -52,6 +56,10 @@ export function filterNotificationsForUser(notifications: Notification[], user: 
 
     if (user.role === "employee") {
       if (isDirect) return directMatchesMe;
+      if (n.targetBranchId || n.fulfillmentType) {
+        if (n.fulfillmentType === "shipping") return !!user.canHandleShipping;
+        return !!user.branchId && n.targetBranchId === user.branchId;
+      }
       if (n.targetRole === "employee" || n.targetRole === "staff") return true;
       if (!n.targetRole) return true;
       return false;

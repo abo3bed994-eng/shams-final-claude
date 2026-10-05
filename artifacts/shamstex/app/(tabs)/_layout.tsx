@@ -1,7 +1,7 @@
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
 import Icon from "@/components/Icon";
-import React from "react";
+import React, { useMemo } from "react";
 import { Animated, Platform, Pressable, StyleSheet, Text, View, useColorScheme, useWindowDimensions } from "react-native";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
@@ -105,12 +105,54 @@ export default function TabLayout() {
   const isDark = theme === "system" ? systemScheme !== "light" : theme === "dark";
 
   const isStaff = user?.role === "admin" || user?.role === "employee" || user?.role === "supervisor";
-  const pendingOrdersCount = isStaff
-    ? orders.filter((o) => o.status === "pending").length
-    : 0;
-  const pendingReturnsCount = isStaff
-    ? returnRequests.filter((r) => r.status === "pending").length
-    : 0;
+  const pendingOrdersCount = useMemo(() => {
+    if (!isStaff) return 0;
+    const pendingList = orders.filter((o) => o.status === "pending");
+    if (user?.role === "admin") return pendingList.length;
+    if (user?.role === "supervisor") {
+      if (user.supervisorScope === "branch" && user.branchId) {
+        return pendingList.filter((o) => {
+          if (o.fulfillmentType === "shipping") return !!user.canHandleShipping;
+          return o.branchId === user.branchId;
+        }).length;
+      }
+      return pendingList.length;
+    }
+    if (user?.role === "employee") {
+      return pendingList.filter((o) => {
+        if (o.fulfillmentType === "shipping") return !!user.canHandleShipping;
+        return !!user.branchId && o.branchId === user.branchId;
+      }).length;
+    }
+    return 0;
+  }, [isStaff, orders, user]);
+
+  const pendingReturnsCount = useMemo(() => {
+    if (!isStaff) return 0;
+    const pendingList = returnRequests.filter((r) => r.status === "pending");
+    if (user?.role === "admin") return pendingList.length;
+    if (user?.role === "supervisor") {
+      if (user.supervisorScope === "branch" && user.branchId) {
+        return pendingList.filter((r) => {
+          const ord = orders.find((o) => o.id === r.orderId);
+          if (!ord) return true;
+          if (ord.fulfillmentType === "shipping") return !!user.canHandleShipping;
+          return ord.branchId === user.branchId;
+        }).length;
+      }
+      return pendingList.length;
+    }
+    if (user?.role === "employee") {
+      return pendingList.filter((r) => {
+        const ord = orders.find((o) => o.id === r.orderId);
+        if (!ord) return false;
+        if (ord.fulfillmentType === "shipping") return !!user.canHandleShipping;
+        return !!user.branchId && ord.branchId === user.branchId;
+      }).length;
+    }
+    return 0;
+  }, [isStaff, returnRequests, orders, user]);
+
   const badgeCount = pendingOrdersCount + pendingReturnsCount;
   const isIOS = Platform.OS === "ios";
   const isWeb = Platform.OS === "web";

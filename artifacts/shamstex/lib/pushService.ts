@@ -6,7 +6,7 @@
 
 import { Platform } from "react-native";
 import { FS } from "@/lib/firebase";
-import { migrateLocalToE164 } from "@/lib/phoneUtils";
+import { migrateLocalToE164, samePhone } from "@/lib/phoneUtils";
 
 let _Notifications: typeof import("expo-notifications") | null = null;
 let _Device: typeof import("expo-device") | null = null;
@@ -204,16 +204,15 @@ export async function notifyStaffNewOrder(
     try {
       const customers = await FS.getAllCustomers();
       const tokensSnap = await FS.getAllPushTokens();
-      const tokenMap = new Map<string, string>();
-      for (const t of tokensSnap) {
-        if (t.expoPushToken && t.phone) {
-          tokenMap.set(t.phone, t.expoPushToken);
-        }
-      }
+
+      const getTokenForCustomer = (custPhone: string): string | undefined => {
+        const found = tokensSnap.find((t) => t.expoPushToken && t.phone && samePhone(t.phone, custPhone));
+        return found?.expoPushToken;
+      };
 
       for (const c of customers) {
         if (!c.phone) continue;
-        const token = tokenMap.get(c.phone);
+        const token = getTokenForCustomer(c.phone);
         if (!token) continue;
 
         if (c.role === "admin") {
@@ -240,8 +239,9 @@ export async function notifyStaffNewOrder(
       console.warn("Error filtering staff tokens by branch:", e);
     }
 
+    // Always ensure admin receives order push notifications even if customer matching failed
     if (targetTokens.length === 0) {
-      targetTokens = await FS.getPushTokensByRoles(["admin", "employee", "supervisor"]);
+      targetTokens = await FS.getPushTokensByRoles(["admin"]);
     } else {
       targetTokens = Array.from(new Set(targetTokens));
     }

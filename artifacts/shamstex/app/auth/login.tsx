@@ -476,6 +476,9 @@ export default function LoginScreen() {
       : (existingUser?.role || existingRecord?.role || role);
     const resolvedPerms = existingUser?.permissions ?? existingRecord?.permissions;
     const resolvedVip = existingUser?.vip ?? existingRecord?.vip;
+    const resolvedBranchId = existingUser?.branchId ?? existingRecord?.branchId;
+    const resolvedShipping = existingUser?.canHandleShipping ?? existingRecord?.canHandleShipping;
+    const resolvedScope = existingUser?.supervisorScope ?? existingRecord?.supervisorScope;
 
     const userToSet = {
       ...(existingUser ?? {
@@ -487,6 +490,9 @@ export default function LoginScreen() {
       role: resolvedRole,
       permissions: resolvedPerms,
       vip: resolvedVip,
+      branchId: resolvedBranchId,
+      canHandleShipping: resolvedShipping,
+      supervisorScope: resolvedScope,
       sessionToken,
     };
     // Sessions MUST be keyed by the E.164 phone so firestore.rules
