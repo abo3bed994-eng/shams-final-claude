@@ -65,6 +65,9 @@ export interface User {
   bannedReason?: string;
   addresses?: SavedAddress[];
   favorites?: string[];
+  branchId?: string;
+  canHandleShipping?: boolean;
+  supervisorScope?: "branch" | "all";
 }
 
 export interface ColorOption {
@@ -1755,7 +1758,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             linkedOrderId: order.id,
           };
           FS.saveNotification(staffNotif).catch(() => {});
-          notifyStaffNewOrder(order.id, order.userName).catch(() => {});
+          notifyStaffNewOrder(order.id, order.userName, { branchId: order.branchId, fulfillmentType: order.fulfillmentType }).catch(() => {});
           // Notify customer that work has begun on their order.
           const recipientPhone = resolveRecipientPhone(order.userId, order.userPhone);
           const custNotif: Notification = {
@@ -1813,7 +1816,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         linkedOrderId: order.id,
       };
       FS.saveNotification(staffNotif).catch(() => {});
-      notifyStaffNewOrder(order.id, order.userName).catch(() => {});
+      notifyStaffNewOrder(order.id, order.userName, { branchId: order.branchId, fulfillmentType: order.fulfillmentType }).catch(() => {});
     },
     []
   );

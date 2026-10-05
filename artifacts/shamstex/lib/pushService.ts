@@ -193,12 +193,61 @@ export async function sendExpoPush(
  */
 export async function notifyStaffNewOrder(
   orderId: string,
-  customerName: string
+  customerName: string,
+  orderInfo?: { branchId?: string; fulfillmentType?: string }
 ): Promise<void> {
   try {
-    const tokens = await FS.getPushTokensByRoles(["admin", "employee", "supervisor"]);
+    let targetTokens: string[] = [];
+    const isShipping = orderInfo?.fulfillmentType === "shipping";
+    const orderBranchId = orderInfo?.branchId;
+
+    try {
+      const customers = await FS.getAllCustomers();
+      const tokensSnap = await FS.getAllPushTokens();
+      const tokenMap = new Map<string, string>();
+      for (const t of tokensSnap) {
+        if (t.expoPushToken && t.phone) {
+          tokenMap.set(t.phone, t.expoPushToken);
+        }
+      }
+
+      for (const c of customers) {
+        if (!c.phone) continue;
+        const token = tokenMap.get(c.phone);
+        if (!token) continue;
+
+        if (c.role === "admin") {
+          targetTokens.push(token);
+        } else if (c.role === "supervisor") {
+          if (c.supervisorScope === "branch" && c.branchId) {
+            if (isShipping && c.canHandleShipping) {
+              targetTokens.push(token);
+            } else if (!isShipping && c.branchId === orderBranchId) {
+              targetTokens.push(token);
+            }
+          } else {
+            targetTokens.push(token);
+          }
+        } else if (c.role === "employee") {
+          if (isShipping && c.canHandleShipping) {
+            targetTokens.push(token);
+          } else if (!isShipping && c.branchId && c.branchId === orderBranchId) {
+            targetTokens.push(token);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Error filtering staff tokens by branch:", e);
+    }
+
+    if (targetTokens.length === 0) {
+      targetTokens = await FS.getPushTokensByRoles(["admin", "employee", "supervisor"]);
+    } else {
+      targetTokens = Array.from(new Set(targetTokens));
+    }
+
     await sendExpoPush(
-      tokens,
+      targetTokens,
       "🛍️ طلب جديد!",
       `طلب جديد من ${customerName} — #${orderId.slice(0, 8)}`,
       { type: "new_order", orderId },
@@ -209,9 +258,6 @@ export async function notifyStaffNewOrder(
   }
 }
 
-/**
- * Send push to a user identified by phone.
- */
 export async function notifyUserByPhone(
   phone: string,
   title: string,

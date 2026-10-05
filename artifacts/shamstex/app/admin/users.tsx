@@ -133,7 +133,7 @@ export default function AdminUsersScreen() {
   useAdminGuard("view_users");
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { user, registeredCustomers, updateRegisteredCustomer, deleteRegisteredCustomer, registerCustomer, addNotification, orders } = useApp();
+  const { user, registeredCustomers, updateRegisteredCustomer, deleteRegisteredCustomer, registerCustomer, addNotification, orders, settings } = useApp();
   const [activeTab, setActiveTab] = useState<TabKey>("customers");
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
   const [editingNameId, setEditingNameId] = useState<string | null>(null);
@@ -404,6 +404,27 @@ export default function AdminUsersScreen() {
       });
       notifyUserByPhone(target.phone, "تغيير الدور إلى موظف 🛠️", "تم تغيير دورك إلى موظف.", { type: "role_change", newRole: "employee" }).catch(() => {});
     }
+  };
+
+  const handleSetStaffBranch = (userId: string, branchId?: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const target = staffList.find((u) => u.id === userId);
+    if (!target) return;
+    saveStaffMember({ ...target, branchId: branchId || undefined });
+  };
+
+  const handleToggleStaffShipping = (userId: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const target = staffList.find((u) => u.id === userId);
+    if (!target) return;
+    saveStaffMember({ ...target, canHandleShipping: !target.canHandleShipping });
+  };
+
+  const handleSetSupervisorScope = (userId: string, scope: "all" | "branch") => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const target = staffList.find((u) => u.id === userId);
+    if (!target) return;
+    saveStaffMember({ ...target, supervisorScope: scope });
   };
 
   const handleToggleStaffPermission = (userId: string, permission: EmployeePermission) => {
@@ -897,6 +918,8 @@ export default function AdminUsersScreen() {
     );
   };
 
+  const branchesList = settings.branches ?? [];
+
   const renderStaffCard = (u: User) => {
     const isExpanded = expandedUser === u.id;
     const showPermissions = (u.role === "employee" || u.role === "supervisor");
@@ -919,13 +942,37 @@ export default function AdminUsersScreen() {
               {u.phone}
             </Text>
             {showPermissions && (
-              <View style={styles.userMetaRow}>
+              <View style={[styles.userMetaRow, { flexWrap: "wrap", gap: 6 }]}>
                 <View style={styles.userMetaItem}>
                   <Icon name="key" size={10} color={colors.mutedForeground + "AA"} />
                   <Text style={[styles.userMetaText, { color: colors.mutedForeground + "AA" }]}>
                     {activePermCount} صلاحية
                   </Text>
                 </View>
+                {u.branchId && (
+                  <View style={[styles.userMetaItem, { backgroundColor: colors.gold + "15", paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }]}>
+                    <Icon name="map-pin" size={10} color={colors.gold} />
+                    <Text style={[styles.userMetaText, { color: colors.gold, fontFamily: "Inter_600SemiBold" }]}>
+                      {branchesList.find((b) => b.id === u.branchId)?.name || "فرع مخصص"}
+                    </Text>
+                  </View>
+                )}
+                {u.canHandleShipping && (
+                  <View style={[styles.userMetaItem, { backgroundColor: "#27AE6015", paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }]}>
+                    <Icon name="truck" size={10} color="#27AE60" />
+                    <Text style={[styles.userMetaText, { color: "#27AE60", fontFamily: "Inter_600SemiBold" }]}>
+                      شحن
+                    </Text>
+                  </View>
+                )}
+                {u.role === "supervisor" && (
+                  <View style={[styles.userMetaItem, { backgroundColor: "#8E44AD15", paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }]}>
+                    <Icon name="eye" size={10} color="#8E44AD" />
+                    <Text style={[styles.userMetaText, { color: "#8E44AD", fontFamily: "Inter_600SemiBold" }]}>
+                      {u.supervisorScope === "branch" ? "فرعه فقط" : "كل الفروع"}
+                    </Text>
+                  </View>
+                )}
               </View>
             )}
           </View>
@@ -1002,6 +1049,129 @@ export default function AdminUsersScreen() {
                 </View>
               </View>
             )}
+            {showPermissions && (user?.role === "admin" || (user?.role === "supervisor" && (user.permissions ?? []).includes("manage_staff"))) && (
+              <View style={{ gap: 12, marginTop: 4 }}>
+                {/* Branch Selection */}
+                <View style={{ gap: 6 }}>
+                  <Text style={[styles.expandLabel, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+                    الفرع المخصص
+                  </Text>
+                  <View style={{ flexDirection: "row-reverse", gap: 6, flexWrap: "wrap" }}>
+                    <Pressable
+                      onPress={() => handleSetStaffBranch(u.id, undefined)}
+                      style={[
+                        styles.roleBtn,
+                        {
+                          backgroundColor: !u.branchId ? colors.gold + "33" : colors.surface,
+                          borderColor: !u.branchId ? colors.gold : colors.border,
+                          paddingVertical: 6,
+                          paddingHorizontal: 10,
+                        },
+                      ]}
+                    >
+                      <Text style={{ color: !u.branchId ? colors.gold : colors.foreground, fontSize: 12, fontFamily: !u.branchId ? "Inter_700Bold" : "Inter_400Regular" }}>
+                        بدون تخصيص فرع
+                      </Text>
+                    </Pressable>
+                    {branchesList.map((b) => {
+                      const isSel = u.branchId === b.id;
+                      return (
+                        <Pressable
+                          key={b.id}
+                          onPress={() => handleSetStaffBranch(u.id, b.id)}
+                          style={[
+                            styles.roleBtn,
+                            {
+                              backgroundColor: isSel ? colors.gold + "33" : colors.surface,
+                              borderColor: isSel ? colors.gold : colors.border,
+                              paddingVertical: 6,
+                              paddingHorizontal: 10,
+                            },
+                          ]}
+                        >
+                          <Icon name="map-pin" size={12} color={isSel ? colors.gold : colors.mutedForeground} />
+                          <Text style={{ color: isSel ? colors.gold : colors.foreground, fontSize: 12, fontFamily: isSel ? "Inter_700Bold" : "Inter_400Regular" }}>
+                            {b.name || "فرع"}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                </View>
+
+                {/* Shipping Orders Handling */}
+                <View style={{ gap: 6 }}>
+                  <Text style={[styles.expandLabel, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+                    استلام طلبات الشحن
+                  </Text>
+                  <Pressable
+                    onPress={() => handleToggleStaffShipping(u.id)}
+                    style={{
+                      flexDirection: "row-reverse",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: 10,
+                      borderRadius: colors.radius - 4,
+                      backgroundColor: u.canHandleShipping ? "#27AE6018" : colors.surface,
+                      borderWidth: 1,
+                      borderColor: u.canHandleShipping ? "#27AE6066" : colors.border,
+                    }}
+                  >
+                    <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
+                      <Icon name="truck" size={16} color={u.canHandleShipping ? "#27AE60" : colors.mutedForeground} />
+                      <Text style={{ color: u.canHandleShipping ? "#27AE60" : colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 13 }}>
+                        {u.canHandleShipping ? "مفعل: يستلم ويعالج طلبات الشحن" : "معطل: لا يستلم طلبات الشحن"}
+                      </Text>
+                    </View>
+                    <Icon name={u.canHandleShipping ? "check-circle-2" : "circle"} size={18} color={u.canHandleShipping ? "#27AE60" : colors.mutedForeground} />
+                  </Pressable>
+                </View>
+
+                {/* Supervisor Scope (Only for supervisors) */}
+                {u.role === "supervisor" && (
+                  <View style={{ gap: 6 }}>
+                    <Text style={[styles.expandLabel, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+                      نطاق رؤية وإشراف المشرف
+                    </Text>
+                    <View style={{ flexDirection: "row-reverse", gap: 8 }}>
+                      <Pressable
+                        onPress={() => handleSetSupervisorScope(u.id, "all")}
+                        style={[
+                          styles.roleBtn,
+                          {
+                            flex: 1,
+                            backgroundColor: u.supervisorScope !== "branch" ? "#8E44AD22" : colors.surface,
+                            borderColor: u.supervisorScope !== "branch" ? "#8E44AD" : colors.border,
+                          },
+                        ]}
+                      >
+                        <Icon name="globe" size={13} color={u.supervisorScope !== "branch" ? "#8E44AD" : colors.mutedForeground} />
+                        <Text style={{ color: u.supervisorScope !== "branch" ? "#8E44AD" : colors.foreground, fontSize: 12, fontFamily: u.supervisorScope !== "branch" ? "Inter_700Bold" : "Inter_400Regular" }}>
+                          كل الفروع
+                        </Text>
+                      </Pressable>
+                      <Pressable
+                        onPress={() => handleSetSupervisorScope(u.id, "branch")}
+                        style={[
+                          styles.roleBtn,
+                          {
+                            flex: 1,
+                            backgroundColor: u.supervisorScope === "branch" ? "#8E44AD22" : colors.surface,
+                            borderColor: u.supervisorScope === "branch" ? "#8E44AD" : colors.border,
+                          },
+                        ]}
+                      >
+                        <Icon name="map-pin" size={13} color={u.supervisorScope === "branch" ? "#8E44AD" : colors.mutedForeground} />
+                        <Text style={{ color: u.supervisorScope === "branch" ? "#8E44AD" : colors.foreground, fontSize: 12, fontFamily: u.supervisorScope === "branch" ? "Inter_700Bold" : "Inter_400Regular" }}>
+                          فرعه فقط
+                        </Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                )}
+              </View>
+            )}
+
             {showPermissions && (user?.role === "admin" || (user?.role === "supervisor" && (user.permissions ?? []).includes("manage_staff"))) && renderPermissions(u, allowedPerms, handleToggleStaffPermission)}
 
             {!PROTECTED_PHONES.includes(u.phone) && user?.role === "admin" && (

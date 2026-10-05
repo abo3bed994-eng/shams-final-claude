@@ -39,8 +39,50 @@ export default function OrdersScreen() {
   const canEditStatus = user?.role === "admin" || user?.role === "supervisor" || user?.role === "employee";
   const canDeleteOrders = user?.role === "admin" || (isStaff && (user?.permissions ?? []).includes("delete_orders"));
 
-  const myOrders = useMemo(() => isStaff ? orders : orders.filter((o) => o.userId === user?.id), [isStaff, orders, user?.id]);
-  const myReturns = useMemo(() => isStaff ? returnRequests : returnRequests.filter((r) => r.userId === user?.id), [isStaff, returnRequests, user?.id]);
+  const myOrders = useMemo(() => {
+    if (!isStaff) return orders.filter((o) => o.userId === user?.id);
+    if (user?.role === "admin") return orders;
+    if (user?.role === "supervisor") {
+      if (user.supervisorScope === "branch" && user.branchId) {
+        return orders.filter((o) => {
+          if (o.fulfillmentType === "shipping") return !!user.canHandleShipping;
+          return o.branchId === user.branchId;
+        });
+      }
+      return orders;
+    }
+    if (user?.role === "employee") {
+      return orders.filter((o) => {
+        if (o.fulfillmentType === "shipping") return !!user.canHandleShipping;
+        return !!user.branchId && o.branchId === user.branchId;
+      });
+    }
+    return orders;
+  }, [isStaff, orders, user]);
+  const myReturns = useMemo(() => {
+    if (!isStaff) return returnRequests.filter((r) => r.userId === user?.id);
+    if (user?.role === "admin") return returnRequests;
+    if (user?.role === "supervisor") {
+      if (user.supervisorScope === "branch" && user.branchId) {
+        return returnRequests.filter((r) => {
+          const ord = orders.find((o) => o.id === r.orderId);
+          if (!ord) return true;
+          if (ord.fulfillmentType === "shipping") return !!user.canHandleShipping;
+          return ord.branchId === user.branchId;
+        });
+      }
+      return returnRequests;
+    }
+    if (user?.role === "employee") {
+      return returnRequests.filter((r) => {
+        const ord = orders.find((o) => o.id === r.orderId);
+        if (!ord) return false;
+        if (ord.fulfillmentType === "shipping") return !!user.canHandleShipping;
+        return !!user.branchId && ord.branchId === user.branchId;
+      });
+    }
+    return returnRequests;
+  }, [isStaff, returnRequests, user, orders]);
 
   const stats = useMemo(() => {
     const pending = myOrders.filter((o) => o.status === "pending").length;
