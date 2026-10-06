@@ -44,9 +44,9 @@ export function filterNotificationsForUser(notifications: Notification[], user: 
 
     if (user.role === "supervisor") {
       if (isDirect) return directMatchesMe;
-      if (user.supervisorScope === "branch" && user.branchId && (n.targetBranchId || n.fulfillmentType)) {
+      if (user.supervisorScope === "branch" && (n.targetBranchId || n.fulfillmentType)) {
         if (n.fulfillmentType === "shipping") return !!user.canHandleShipping;
-        return n.targetBranchId === user.branchId;
+        return !!user.branchId && n.targetBranchId === user.branchId;
       }
       if (n.targetRole === "supervisor" || n.targetRole === "staff") return true;
       if (n.actionType === "upgrade_request") return true;

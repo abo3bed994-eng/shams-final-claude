@@ -1139,7 +1139,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       freshRecord.canHandleShipping !== currentUser.canHandleShipping ||
       freshRecord.supervisorScope !== currentUser.supervisorScope;
     if (changed) {
-      const synced: User = { ...currentUser, ...freshRecord };
+      const synced: User = {
+        ...currentUser,
+        ...freshRecord,
+        branchId: freshRecord.branchId,
+        canHandleShipping: freshRecord.canHandleShipping,
+        supervisorScope: freshRecord.supervisorScope,
+      };
 
       if (bannedNow) {
         // Order matters: clear in-memory user FIRST so any concurrent
@@ -1488,7 +1494,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
     const currentUser = userRef.current;
     if (currentUser && samePhone(currentUser.phone, updatedUser.phone)) {
-      const synced = { ...currentUser, ...updatedUser };
+      const synced: User = {
+        ...currentUser,
+        ...updatedUser,
+        branchId: updatedUser.branchId,
+        canHandleShipping: updatedUser.canHandleShipping,
+        supervisorScope: updatedUser.supervisorScope,
+      };
       setUserState(synced);
       persistUserSafe(synced).catch(() => {});
     }

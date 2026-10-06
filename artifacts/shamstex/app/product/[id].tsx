@@ -400,8 +400,8 @@ export default function ProductDetailScreen() {
                       onBlur={() => setWeightTexts((prev) => { const n = { ...prev }; delete n[color.name]; return n; })}
                     />
                   </View>
-                  <View style={[styles.colorRowRight, isLargeFont && { flexDirection: "column", gap: 4 }]}>
-                     <Text numberOfLines={1} maxFontSizeMultiplier={1.15} style={[styles.colorName, { color: colors.foreground, fontFamily: "Inter_500Medium" }, isLargeFont && { textAlign: "center", flex: 0 }]}>
+                  <View style={styles.colorRowRight}>
+                    <Text numberOfLines={1} maxFontSizeMultiplier={1.15} style={[styles.colorName, { color: colors.foreground, fontFamily: "Inter_500Medium" }]}>
                       {color.name}
                     </Text>
                      {companionMaterials.length > 0 && (
@@ -477,8 +477,8 @@ export default function ProductDetailScreen() {
                     </>
                   ) : null}
                 </View>
-                <View style={[styles.colorRowRight, isLargeFont && { flexDirection: "column", gap: 4 }]}>
-                  <Text numberOfLines={1} maxFontSizeMultiplier={1.15} style={[styles.colorName, { color: colors.foreground, fontFamily: "Inter_500Medium" }, isLargeFont && { textAlign: "center", flex: 0 }]}>
+                <View style={styles.colorRowRight}>
+                  <Text numberOfLines={1} maxFontSizeMultiplier={1.15} style={[styles.colorName, { color: colors.foreground, fontFamily: "Inter_500Medium" }]}>
                     {color.name}
                   </Text>
                   {companionMaterials.length > 0 && (

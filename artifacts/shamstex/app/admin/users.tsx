@@ -185,7 +185,14 @@ export default function AdminUsersScreen() {
     const exists = registeredCustomers.find((c) => samePhone(c.phone, updatedUser.phone));
     if (exists) {
       // Use the existing registry phone format as the primary key so we don't fork docs.
-      updateRegisteredCustomer({ ...exists, ...updatedUser, phone: exists.phone });
+      updateRegisteredCustomer({
+        ...exists,
+        ...updatedUser,
+        phone: exists.phone,
+        branchId: updatedUser.branchId,
+        canHandleShipping: updatedUser.canHandleShipping,
+        supervisorScope: updatedUser.supervisorScope,
+      });
     } else {
       registerCustomer(updatedUser);
     }

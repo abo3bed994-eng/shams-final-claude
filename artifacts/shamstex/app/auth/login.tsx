@@ -476,9 +476,9 @@ export default function LoginScreen() {
       : (existingUser?.role || existingRecord?.role || role);
     const resolvedPerms = existingUser?.permissions ?? existingRecord?.permissions;
     const resolvedVip = existingUser?.vip ?? existingRecord?.vip;
-    const resolvedBranchId = existingUser?.branchId ?? existingRecord?.branchId;
-    const resolvedShipping = existingUser?.canHandleShipping ?? existingRecord?.canHandleShipping;
-    const resolvedScope = existingUser?.supervisorScope ?? existingRecord?.supervisorScope;
+    const resolvedBranchId = existingRecord ? existingRecord.branchId : existingUser?.branchId;
+    const resolvedShipping = existingRecord ? existingRecord.canHandleShipping : existingUser?.canHandleShipping;
+    const resolvedScope = existingRecord ? existingRecord.supervisorScope : existingUser?.supervisorScope;
 
     const userToSet = {
       ...(existingUser ?? {

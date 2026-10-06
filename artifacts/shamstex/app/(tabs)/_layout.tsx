@@ -110,10 +110,10 @@ export default function TabLayout() {
     const pendingList = orders.filter((o) => o.status === "pending");
     if (user?.role === "admin") return pendingList.length;
     if (user?.role === "supervisor") {
-      if (user.supervisorScope === "branch" && user.branchId) {
+      if (user.supervisorScope === "branch") {
         return pendingList.filter((o) => {
           if (o.fulfillmentType === "shipping") return !!user.canHandleShipping;
-          return o.branchId === user.branchId;
+          return !!user.branchId && o.branchId === user.branchId;
         }).length;
       }
       return pendingList.length;
@@ -132,12 +132,12 @@ export default function TabLayout() {
     const pendingList = returnRequests.filter((r) => r.status === "pending");
     if (user?.role === "admin") return pendingList.length;
     if (user?.role === "supervisor") {
-      if (user.supervisorScope === "branch" && user.branchId) {
+      if (user.supervisorScope === "branch") {
         return pendingList.filter((r) => {
           const ord = orders.find((o) => o.id === r.orderId);
-          if (!ord) return true;
+          if (!ord) return false;
           if (ord.fulfillmentType === "shipping") return !!user.canHandleShipping;
-          return ord.branchId === user.branchId;
+          return !!user.branchId && ord.branchId === user.branchId;
         }).length;
       }
       return pendingList.length;

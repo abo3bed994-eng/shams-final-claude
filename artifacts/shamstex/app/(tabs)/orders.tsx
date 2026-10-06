@@ -43,10 +43,10 @@ export default function OrdersScreen() {
     if (!isStaff) return orders.filter((o) => o.userId === user?.id);
     if (user?.role === "admin") return orders;
     if (user?.role === "supervisor") {
-      if (user.supervisorScope === "branch" && user.branchId) {
+      if (user.supervisorScope === "branch") {
         return orders.filter((o) => {
           if (o.fulfillmentType === "shipping") return !!user.canHandleShipping;
-          return o.branchId === user.branchId;
+          return !!user.branchId && o.branchId === user.branchId;
         });
       }
       return orders;
@@ -63,12 +63,12 @@ export default function OrdersScreen() {
     if (!isStaff) return returnRequests.filter((r) => r.userId === user?.id);
     if (user?.role === "admin") return returnRequests;
     if (user?.role === "supervisor") {
-      if (user.supervisorScope === "branch" && user.branchId) {
+      if (user.supervisorScope === "branch") {
         return returnRequests.filter((r) => {
           const ord = orders.find((o) => o.id === r.orderId);
-          if (!ord) return true;
+          if (!ord) return false;
           if (ord.fulfillmentType === "shipping") return !!user.canHandleShipping;
-          return ord.branchId === user.branchId;
+          return !!user.branchId && ord.branchId === user.branchId;
         });
       }
       return returnRequests;
