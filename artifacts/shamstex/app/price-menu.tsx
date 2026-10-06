@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Image, Platform, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from "react-native";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
+import * as ScreenCapture from "expo-screen-capture";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "@/components/Icon";
@@ -48,6 +49,35 @@ export default function PriceMenuScreen() {
   useEffect(() => {
     if (user && !canViewPriceMenu) router.replace("/(tabs)" as any);
   }, [canViewPriceMenu, user]);
+
+  useEffect(() => {
+    if (Platform.OS === "web" || !isMerchant) return;
+
+    let isMounted = true;
+    (async () => {
+      try {
+        if (await ScreenCapture.isAvailableAsync()) {
+          await ScreenCapture.preventScreenCaptureAsync("price-menu-merchant");
+        }
+      } catch {
+        // Handled silently to avoid impacting performance
+      }
+    })();
+
+    const sub = ScreenCapture.addScreenshotListener ? ScreenCapture.addScreenshotListener(() => {
+      Alert.alert("تنبيه أمني", "التقاط شاشة لقائمة أسعار التجار غير مسموح به لحماية بيانات الأسعار.");
+    }) : undefined;
+
+    return () => {
+      isMounted = false;
+      sub?.remove();
+      try {
+        ScreenCapture.allowScreenCaptureAsync("price-menu-merchant").catch(() => {});
+      } catch {
+        // Cleanup safely
+      }
+    };
+  }, [isMerchant]);
 
   const orderedProducts = useMemo(() => {
     const rank = new Map(menu.productOrder.map((id, index) => [id, index]));
