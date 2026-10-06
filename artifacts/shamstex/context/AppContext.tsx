@@ -1334,6 +1334,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         "registered_customers",
       ]).catch(() => {});
       await deleteSecureItem("sessionToken");
+      // Remove this device\u2019s push token from Firestore and sign out of
+      // Firebase Auth so status notifications stop reaching a device that is
+      // no longer on the account that received them.
+      try {
+        const { FS } = await import("@/lib/firebase");
+        const prev = userRef.current;
+        if (prev?.phone) {
+          await FS.deletePushToken(migrateLocalToE164(prev.phone));
+        }
+      } catch {}
+      try {
+        const { signOut } = await import("@/lib/phoneAuth");
+        await signOut();
+      } catch {}
       setNotifications([]);
       setOrdersState([]);
       setReturnRequests([]);
