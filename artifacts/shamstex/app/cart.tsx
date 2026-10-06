@@ -758,22 +758,6 @@ export default function CartScreen() {
                   </View>
                 </View>
 
-                {item.companions?.length ? (
-                  <View style={[styles.companionList, { backgroundColor: colors.gold + "0D", borderColor: colors.gold + "33" }]}>
-                    <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 12, textAlign: "right" }}>الخامات المرافقة</Text>
-                    {item.companions.map((companion, index) => (
-                      <View key={`${companion.materialId}-${index}`} style={styles.companionLine}>
-                        <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 12 }}>
-                          {formatQuantity(companionLineTotal(companion))} ج.م
-                        </Text>
-                        <Text style={{ flex: 1, color: colors.foreground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>
-                          {companion.materialName} — {companion.colorName} · {companion.percentage}% · {formatQuantity(companionAmount(companion))} {companion.unit === "meter" ? "متر" : "كغ"}
-                        </Text>
-                      </View>
-                    ))}
-                  </View>
-                ) : null}
-
                 {item.orderType === "weight" ? (() => {
                   const prod = products.find((p) => p.id === item.productId);
                   const unitName = prod?.unit === "meter" ? "متر" : "كغ";
@@ -1004,6 +988,22 @@ export default function CartScreen() {
                   </View>
                   );
                 })()}
+
+                {item.companions?.length ? (
+                  <View style={[styles.companionList, { backgroundColor: colors.gold + "0D", borderColor: colors.gold + "33" }]}>
+                    <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 12, textAlign: "right" }}>الخامات المرافقة</Text>
+                    {item.companions.map((companion, index) => (
+                      <View key={`${companion.materialId}-${index}`} style={styles.companionLine}>
+                        <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 12 }}>
+                          {formatQuantity(companionLineTotal(companion))} ج.م
+                        </Text>
+                        <Text style={{ flex: 1, color: colors.foreground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>
+                          {companion.materialName} — {companion.colorName} · {companion.percentage}% · {formatQuantity(companionAmount(companion))} {companion.unit === "meter" ? "متر" : "كغ"}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                ) : null}
               </View>
             ))}
 
