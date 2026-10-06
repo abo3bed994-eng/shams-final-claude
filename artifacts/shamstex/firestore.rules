@@ -168,7 +168,7 @@ service cloud.firestore {
              .hasOnly(['status', 'editable', 'editableExpiresAt']);
 
       // Staff can update orders (status, assignment, etc.)
-      allow update: if isStaff() && (isAdmin() || isSupervisor() || hasPermission('edit_orders'));
+      allow update: if isStaff() && (isAdmin() || hasPermission('edit_orders'));
 
       // Staff with manage_payments may set payment-override fields even
       // without full edit_orders permission.
@@ -232,7 +232,7 @@ service cloud.firestore {
       );
       allow create: if isSignedIn()
         && request.resource.data.userPhone == userPhone();
-      allow update: if isStaff() && (isAdmin() || isSupervisor() || hasPermission('edit_orders') || hasPermission('cancel_returns'));
+      allow update: if isStaff() && (isAdmin() || hasPermission('edit_orders') || hasPermission('cancel_returns'));
       allow delete: if isAdmin();
     }
 
