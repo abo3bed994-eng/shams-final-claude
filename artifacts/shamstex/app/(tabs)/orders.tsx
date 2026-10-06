@@ -36,7 +36,7 @@ export default function OrdersScreen() {
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const isStaff = user?.role === "admin" || user?.role === "employee" || user?.role === "supervisor";
-  const canEditStatus = user?.role === "admin" || user?.role === "supervisor" || user?.role === "employee";
+  const canEditStatus = user?.role === "admin" || (isStaff && (user?.permissions ?? []).includes("edit_orders"));
   const canDeleteOrders = user?.role === "admin" || (isStaff && (user?.permissions ?? []).includes("delete_orders"));
 
   const myOrders = useMemo(() => {

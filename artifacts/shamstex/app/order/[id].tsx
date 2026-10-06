@@ -197,6 +197,7 @@ export default function OrderDetailScreen() {
 
   const isStaff = user?.role === "admin" || user?.role === "employee" || user?.role === "supervisor";
   const isAdmin = user?.role === "admin";
+  const canEditOrders = isAdmin || (isStaff && (user?.permissions ?? []).includes("edit_orders"));
   const canDeleteOrders = isAdmin || (isStaff && (user?.permissions ?? []).includes("delete_orders"));
   const isCustomer = user?.role === "customer" || user?.role === "merchant";
   const isAssignedToMe = order?.assignedTo === user?.id;
@@ -1508,7 +1509,7 @@ export default function OrderDetailScreen() {
         )}
 
 
-        {isStaff && order.status !== "cancelled" && (() => {
+        {isStaff && canEditOrders && order.status !== "cancelled" && (() => {
           const nextAction = getNextAction(order.status, order.fulfillmentType);
           const prevAction = getPrevAction(order.status, order.fulfillmentType);
           // Final stage (shipping → "shipped", pickup → "delivered") revert is gated:

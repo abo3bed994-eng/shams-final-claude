@@ -1881,6 +1881,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const updateOrderStatus = useCallback(
     async (orderId: string, status: OrderStatus, assignedToId?: string, assignedToName?: string) => {
+      const me = userRef.current;
+      const meIsStaff = me?.role === "admin" || me?.role === "supervisor" || me?.role === "employee";
+      const canEdit = me?.role === "admin" || (meIsStaff && (me?.permissions ?? []).includes("edit_orders"));
+      if (!canEdit) {
+        return;
+      }
+      if (inFlightStatusChangesRef.current.has(orderId)) {
+        return;
+      }
+      inFlightStatusChangesRef.current.add(orderId);
+      setTimeout(() => {
+        inFlightStatusChangesRef.current.delete(orderId);
+      }, 2500);
+
       const prevOrder = ordersRef.current.find((o) => o.id === orderId);
       if (!prevOrder) return;
       // Idempotency: same status, same staff → no-op (prevents double-tap glitches)
@@ -2545,6 +2559,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // device — or an admin's, as a fallback when the customer is offline — to limit
   // duplicate writes; a per-order in-flight guard stops repeated firing.
   const autoAcceptInFlightRef = useRef<Set<string>>(new Set());
+  const inFlightStatusChangesRef = useRef<Set<string>>(new Set());
   const autoAcceptExpiredEdits = useCallback(async () => {
     const now = Date.now();
     const u = userRef.current;

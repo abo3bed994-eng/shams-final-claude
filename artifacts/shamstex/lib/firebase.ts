@@ -516,6 +516,15 @@ export const FS = {
 
   // Push notification tokens — keyed by user phone
   async savePushToken(phone: string, role: string, expoPushToken: string) {
+    try {
+      const snap = await getDocs(query(collection(db, "pushTokens"), where("expoPushToken", "==", expoPushToken)));
+      for (const d of snap.docs) {
+        if (d.id !== phone) {
+          await deleteDoc(d.ref).catch(() => {});
+        }
+      }
+    } catch (_) {}
+
     await setDoc(doc(db, "pushTokens", phone), {
       phone,
       role,
