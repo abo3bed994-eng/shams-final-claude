@@ -533,8 +533,22 @@ export const FS = {
     });
   },
 
-  async deletePushToken(phone: string) {
-    await deleteDoc(doc(db, "pushTokens", phone));
+  async deletePushToken(phone: string, expoPushToken?: string) {
+    if (phone) {
+      await deleteDoc(doc(db, "pushTokens", phone)).catch(() => {});
+      const canonical = migrateLocalToE164(phone);
+      if (canonical !== phone) {
+        await deleteDoc(doc(db, "pushTokens", canonical)).catch(() => {});
+      }
+    }
+    if (expoPushToken) {
+      try {
+        const snap = await getDocs(query(collection(db, "pushTokens"), where("expoPushToken", "==", expoPushToken)));
+        for (const d of snap.docs) {
+          await deleteDoc(d.ref).catch(() => {});
+        }
+      } catch (_) {}
+    }
   },
 
   async getPushTokensByRoles(roles: string[]): Promise<string[]> {

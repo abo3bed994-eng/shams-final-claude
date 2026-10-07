@@ -20,6 +20,7 @@ import { buildInvoiceHtml } from "@/utils/invoiceHtml";
 import { buildPackingSlipHtml } from "@/utils/packingSlipHtml";
 import { EDIT_WINDOW_MS, acceptStaffAvailability, computeItemsTotal } from "@/lib/editOrder";
 import { companionAmount, companionLineTotal, companionTotal } from "@/lib/companion";
+import { samePhone } from "@/lib/phoneUtils";
 import { WebView } from "react-native-webview";
 
 const PICKUP_STEPS: { key: OrderStatus; label: string; icon: string }[] = [
@@ -250,12 +251,55 @@ export default function OrderDetailScreen() {
     setOrderEditExpiry(order.id, new Date(Date.now() + EDIT_WINDOW_MS).toISOString());
   }, [order?.id, order?.editable, order?.editableExpiresAt, order?.status, isCustomer]);
 
+  const canViewOrder = React.useMemo(() => {
+    if (!user || !order) return true;
+    if (isAdmin) return true;
+    if (isCustomer) {
+      return order.userId === user.id || samePhone(order.userPhone, user.phone);
+    }
+    if (user.role === "supervisor") {
+      if (user.supervisorScope === "branch" && user.branchId) {
+        if (order.fulfillmentType === "shipping") return !!user.canHandleShipping;
+        return order.branchId === user.branchId;
+      }
+      return true;
+    }
+    if (user.role === "employee") {
+      if (order.fulfillmentType === "shipping") return !!user.canHandleShipping;
+      return !!user.branchId && order.branchId === user.branchId;
+    }
+    return false;
+  }, [user, order, isAdmin, isCustomer]);
+
   if (!order) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <GoldHeader title="تفاصيل الطلب" onBack={() => router.back()} />
         <View style={styles.notFound}>
           <Text style={{ color: colors.mutedForeground }}>الطلب غير موجود</Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (!canViewOrder) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <GoldHeader title="تفاصيل الطلب" onBack={() => router.back()} />
+        <View style={[styles.notFound, { paddingHorizontal: 24 }]}>
+          <Icon name="lock" size={48} color={colors.gold} />
+          <Text style={{ color: colors.foreground, fontSize: 16, fontFamily: "Inter_600SemiBold", marginTop: 14, textAlign: "center" }}>
+            غير مصرح بعرض هذا الطلب
+          </Text>
+          <Text style={{ color: colors.mutedForeground, fontSize: 13, marginTop: 6, textAlign: "center", lineHeight: 20 }}>
+            هذا الطلب مخصص لفرع آخر أو يتطلب صلاحيات شحن خاصة.
+          </Text>
+          <Pressable
+            onPress={() => router.back()}
+            style={{ marginTop: 22, backgroundColor: colors.gold, paddingVertical: 10, paddingHorizontal: 28, borderRadius: 8 }}
+          >
+            <Text style={{ color: "#000", fontFamily: "Inter_600SemiBold", fontSize: 14 }}>العودة</Text>
+          </Pressable>
         </View>
       </View>
     );

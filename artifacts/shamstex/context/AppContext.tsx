@@ -1340,8 +1340,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       try {
         const { FS } = await import("@/lib/firebase");
         const prev = userRef.current;
+        let tokenToClear: string | undefined;
+        try {
+          const Notifications = await import("expo-notifications");
+          const tokenData = await Notifications.getExpoPushTokenAsync().catch(() => null);
+          if (tokenData?.data) tokenToClear = tokenData.data;
+          await Notifications.dismissAllNotificationsAsync().catch(() => {});
+        } catch {}
         if (prev?.phone) {
-          await FS.deletePushToken(migrateLocalToE164(prev.phone));
+          await FS.deletePushToken(migrateLocalToE164(prev.phone), tokenToClear);
+        } else if (tokenToClear) {
+          await FS.deletePushToken("", tokenToClear);
         }
       } catch {}
       try {
