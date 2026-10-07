@@ -133,14 +133,22 @@ export default function AdminUsersScreen() {
   useAdminGuard("view_users");
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { user, registeredCustomers, updateRegisteredCustomer, deleteRegisteredCustomer, registerCustomer, addNotification, orders, settings } = useApp();
+  const { user, registeredCustomers, updateRegisteredCustomer, deleteRegisteredCustomer, registerCustomer, addNotification, orders, settings, onlineUsers } = useApp();
   const [activeTab, setActiveTab] = useState<TabKey>("customers");
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
   const [editingNameId, setEditingNameId] = useState<string | null>(null);
   const [editingNameValue, setEditingNameValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortKey>("date");
-  const [custFilter, setCustFilter] = useState<"all" | "customers" | "merchants" | "banned">("all");
+  const [custFilter, setCustFilter] = useState<"all" | "customers" | "merchants" | "banned" | "online">("all");
+
+  const ONLINE_WINDOW_MS = 90_000;
+  const isUserOnline = (targetUser: { id?: string; phone?: string }) => {
+    const cutoff = Date.now() - ONLINE_WINDOW_MS;
+    return (onlineUsers ?? []).some(
+      (ou) => (ou.userId === targetUser.id || samePhone(ou.phone, targetUser.phone || "")) && ou.lastSeen >= cutoff
+    );
+  };
   const [confirmAction, setConfirmAction] = useState<{ userId: string; action: string; newRole?: UserRole } | null>(null);
   const [deletedStaffPhones, setDeletedStaffPhones] = useState<string[]>([]);
 
@@ -248,6 +256,8 @@ export default function AdminUsersScreen() {
       list = list.filter((u) => u.role === "merchant" && !(u as any).banned);
     } else if (custFilter === "banned") {
       list = list.filter((u) => (u as any).banned);
+    } else if (custFilter === "online") {
+      list = list.filter((u) => isUserOnline(u));
     }
     list = [...list].sort((a, b) => {
       if (sortBy === "name") return a.name.localeCompare(b.name, "ar");
@@ -722,6 +732,12 @@ export default function AdminUsersScreen() {
               <Text style={[styles.userName, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
                 {u.name}
               </Text>
+              {isUserOnline(u) && (
+                <View style={[styles.vipBadge, { backgroundColor: "#27AE6022", flexDirection: "row", alignItems: "center", gap: 4 }]}>
+                  <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: "#27AE60" }} />
+                  <Text style={{ color: "#27AE60", fontFamily: "Inter_600SemiBold", fontSize: 10 }}>متصل</Text>
+                </View>
+              )}
               {u.vip && (
                 <View style={[styles.vipBadge, { backgroundColor: colors.gold + "33" }]}>
                   <Icon name="star" size={10} color={colors.gold} />
@@ -944,6 +960,12 @@ export default function AdminUsersScreen() {
               <Text style={[styles.userName, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
                 {u.name}
               </Text>
+              {isUserOnline(u) && (
+                <View style={[styles.vipBadge, { backgroundColor: "#27AE6022", flexDirection: "row", alignItems: "center", gap: 4 }]}>
+                  <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: "#27AE60" }} />
+                  <Text style={{ color: "#27AE60", fontFamily: "Inter_600SemiBold", fontSize: 10 }}>متصل</Text>
+                </View>
+              )}
             </View>
             <Text style={[styles.userPhone, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
               {u.phone}
@@ -1279,6 +1301,7 @@ export default function AdminUsersScreen() {
           <View style={styles.sortRow}>
             {([
               { key: "all", label: "الكل" },
+              { key: "online", label: "متصل الآن" },
               { key: "customers", label: "زبائن" },
               { key: "merchants", label: "تجار" },
               { key: "banned", label: "محظور" },

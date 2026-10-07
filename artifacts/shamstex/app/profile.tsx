@@ -190,24 +190,7 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        {user.role !== "customer" && user.role !== "merchant" && (
-          <View style={styles.statsRow}>
-            <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
-              <Text style={[styles.statNum, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
-                {myOrdersCount}
-              </Text>
-              <Text style={[styles.statLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
-                {t("myOrdersCount")}
-              </Text>
-            </View>
-            <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
-              <Icon name={user.vip ? "star" : "user"} size={24} color={user.vip ? colors.gold : colors.mutedForeground} />
-              <Text style={[styles.statLabel, { color: user.vip ? colors.gold : colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
-                {user.vip ? t("vipCustomer") : t("regularCustomer")}
-              </Text>
-            </View>
-          </View>
-        )}
+
 
         {user.role === "customer" && !user.vip && (
           <View style={[styles.upgradeCard, { backgroundColor: colors.card, borderColor: colors.gold + "44", borderRadius: colors.radius }]}>
@@ -278,29 +261,7 @@ export default function ProfileScreen() {
           </Pressable>
         )}
 
-        <View style={[styles.adminSection, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
-          {[
-            { label: "سياسة الخصوصية", labelEn: "Privacy Policy", icon: "shield", route: "/legal/privacy" },
-            { label: "الشروط والأحكام", labelEn: "Terms & Conditions", icon: "file-text", route: "/legal/terms" },
-          ].map((item, idx, arr) => (
-            <Pressable
-              key={item.route}
-              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push(item.route as any); }}
-              style={({ pressed }) => [
-                styles.adminItem,
-                { borderBottomColor: colors.border, borderBottomWidth: idx === arr.length - 1 ? 0 : 1, opacity: pressed ? 0.7 : 1 },
-              ]}
-            >
-              <View style={[styles.adminItemIcon, { backgroundColor: colors.gold + "22" }]}>
-                <Icon name={item.icon as any} size={16} color={colors.gold} />
-              </View>
-              <Text style={[styles.adminItemText, { color: colors.foreground, fontFamily: "Inter_500Medium", textAlign: "right" }]}>
-                {language === "ar" ? item.label : item.labelEn}
-              </Text>
-              <Icon name="chevron-left" size={16} color={colors.mutedForeground} />
-            </Pressable>
-          ))}
-        </View>
+
 
         {(user.role === "admin" || user.role === "employee" || user.role === "supervisor") && adminLinks.length > 0 && (
           <View style={[styles.adminSection, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
@@ -429,6 +390,30 @@ export default function ProfileScreen() {
               </View>
             </Pressable>
           </View>
+        </View>
+
+                <View style={[styles.adminSection, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
+          {[
+            { label: "سياسة الخصوصية", labelEn: "Privacy Policy", icon: "shield", route: "/legal/privacy" },
+            { label: "الشروط والأحكام", labelEn: "Terms & Conditions", icon: "file-text", route: "/legal/terms" },
+          ].map((item, idx, arr) => (
+            <Pressable
+              key={item.route}
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push(item.route as any); }}
+              style={({ pressed }) => [
+                styles.adminItem,
+                { borderBottomColor: colors.border, borderBottomWidth: idx === arr.length - 1 ? 0 : 1, opacity: pressed ? 0.7 : 1 },
+              ]}
+            >
+              <View style={[styles.adminItemIcon, { backgroundColor: colors.gold + "22" }]}>
+                <Icon name={item.icon as any} size={16} color={colors.gold} />
+              </View>
+              <Text style={[styles.adminItemText, { color: colors.foreground, fontFamily: "Inter_500Medium", textAlign: "right" }]}>
+                {language === "ar" ? item.label : item.labelEn}
+              </Text>
+              <Icon name="chevron-left" size={16} color={colors.mutedForeground} />
+            </Pressable>
+          ))}
         </View>
 
         <GoldButton
