@@ -44,18 +44,22 @@ export function filterNotificationsForUser(notifications: Notification[], user: 
 
     if (user.role === "supervisor") {
       if (isDirect) return directMatchesMe;
+      if (n.actionType === "upgrade_request") {
+        const perms: string[] = user.permissions || [];
+        return perms.includes("approve_upgrades");
+      }
       if (user.supervisorScope === "branch" && (n.targetBranchId || n.fulfillmentType)) {
         if (n.fulfillmentType === "shipping") return !!user.canHandleShipping;
         return !!user.branchId && n.targetBranchId === user.branchId;
       }
       if (n.targetRole === "supervisor" || n.targetRole === "staff") return true;
-      if (n.actionType === "upgrade_request") return true;
       if (!n.targetRole) return true;
       return false;
     }
 
     if (user.role === "employee") {
       if (isDirect) return directMatchesMe;
+      if (n.actionType === "upgrade_request") return false;
       if (n.targetBranchId || n.fulfillmentType) {
         if (n.fulfillmentType === "shipping") return !!user.canHandleShipping;
         return !!user.branchId && n.targetBranchId === user.branchId;

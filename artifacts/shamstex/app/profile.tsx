@@ -1,3 +1,4 @@
+import { notifyUpgradeRequest } from "@/lib/pushService";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -55,11 +56,12 @@ export default function ProfileScreen() {
       body: `${user.name} (${user.phone}) يطلب الترقية إلى تاجر`,
       createdAt: new Date().toISOString(),
       read: false,
-      targetRole: "admin",
+      targetRole: "staff",
       actionType: "upgrade_request",
       actionUserId: user.id,
       sourceUserId: user.id,
     });
+    notifyUpgradeRequest(user.name, user.phone, user.id).catch(() => {});
     Alert.alert(
       isRTL ? "تم إرسال الطلب" : "Request Sent",
       isRTL ? "سيتم مراجعة طلبك من قبل الإدارة وإبلاغك بالنتيجة." : "Your request will be reviewed by the admin team."

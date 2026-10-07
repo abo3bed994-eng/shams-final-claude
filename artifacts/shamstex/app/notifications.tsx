@@ -34,7 +34,8 @@ export default function NotificationsScreen() {
 
   const navigatingRef = useRef(false);
   const handleNotifPress = useCallback((notif: Notification) => {
-    if (notif.actionType === "upgrade_request" && notif.actionUserId && (user?.role === "admin" || user?.role === "supervisor")) {
+    const canApprove = user?.role === "admin" || (user?.role === "supervisor" && (user?.permissions ?? []).includes("approve_upgrades"));
+    if (notif.actionType === "upgrade_request" && notif.actionUserId && canApprove) {
       const targetUser = registeredCustomers.find((c) => c.id === notif.actionUserId);
       const userName = targetUser?.name ?? "المستخدم";
 

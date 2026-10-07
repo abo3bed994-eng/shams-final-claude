@@ -258,6 +258,61 @@ export async function notifyStaffNewOrder(
   }
 }
 
+/**
+ * Send push notification to admins and supervisors who have 'approve_upgrades' permission.
+ */
+export async function notifyUpgradeRequest(
+  userName: string,
+  userPhone: string,
+  userId: string
+): Promise<void> {
+  try {
+    let targetTokens: string[] = [];
+    try {
+      const customers = await FS.getAllCustomers();
+      const tokensSnap = await FS.getAllPushTokens();
+
+      const getTokenForCustomer = (custPhone: string): string | undefined => {
+        const found = tokensSnap.find((t) => t.expoPushToken && t.phone && samePhone(t.phone, custPhone));
+        return found?.expoPushToken;
+      };
+
+      for (const c of customers) {
+        if (!c.phone) continue;
+        const token = getTokenForCustomer(c.phone);
+        if (!token) continue;
+
+        if (c.role === "admin") {
+          targetTokens.push(token);
+        } else if (c.role === "supervisor") {
+          const perms: string[] = c.permissions || [];
+          if (perms.includes("approve_upgrades")) {
+            targetTokens.push(token);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Error finding upgrade request tokens:", e);
+    }
+
+    if (targetTokens.length === 0) {
+      targetTokens = await FS.getPushTokensByRoles(["admin"]);
+    } else {
+      targetTokens = Array.from(new Set(targetTokens));
+    }
+
+    await sendExpoPush(
+      targetTokens,
+      "👑 طلب ترقية إلى تاجر",
+      `طلب من ${userName} (${userPhone}) للترقية إلى حساب تاجر`,
+      { type: "upgrade_request", actionType: "upgrade_request", actionUserId: userId },
+      "messages_v3"
+    );
+  } catch (err) {
+    console.warn("notifyUpgradeRequest error:", err);
+  }
+}
+
 export async function notifyUserByPhone(
   phone: string,
   title: string,

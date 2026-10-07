@@ -101,7 +101,7 @@ service cloud.firestore {
       allow create: if isStaff() && hasPermission('manage_staff')
         && phone != userPhone()
         && request.resource.data.role != 'admin';
-      allow update: if isStaff() && hasPermission('manage_staff')
+      allow update: if isStaff() && (hasPermission('manage_staff') || hasPermission('approve_upgrades'))
         && phone != userPhone()
         && request.resource.data.role != 'admin'
         && resource.data.role != 'admin';
@@ -211,7 +211,7 @@ service cloud.firestore {
       // Direct/private notifications (targeting a specific user) are staff-only.
       allow create: if isStaff()
         || (isSignedIn()
-            && request.resource.data.get('targetRole', '') == 'staff'
+            && (request.resource.data.get('targetRole', '') in ['staff', 'admin'] || request.resource.data.get('actionType', '') == 'upgrade_request')
             && !('targetUserId' in request.resource.data)
             && !('targetUserPhone' in request.resource.data));
       allow delete: if isAdmin() || (isSignedIn() && resource.data.userPhone == userPhone());
