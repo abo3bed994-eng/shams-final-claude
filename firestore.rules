@@ -119,7 +119,7 @@ service cloud.firestore {
     // PUSH TOKENS — owner writes own, staff reads for fan-out
     // -----------------------------------------------------------------
     match /pushTokens/{phone} {
-      allow read: if isStaff();
+      allow read: if isAuthed() && (phone == userPhone() || isStaff() || resource.data.role in ["admin", "supervisor", "employee"]);
       allow write: if isAuthed() && phone == userPhone();
     }
 

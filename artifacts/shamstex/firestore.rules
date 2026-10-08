@@ -265,8 +265,12 @@ service cloud.firestore {
 
     // ============ Push Tokens ============
     match /pushTokens/{phone} {
-      // User manages their own token; staff can read all to broadcast
-      allow read: if isSignedIn() && (phone == userPhone() || isStaff());
+      // User manages their own token; staff can read all; any user can read staff tokens for routing order/upgrade push alerts
+      allow read: if isSignedIn() && (
+        phone == userPhone() ||
+        isStaff() ||
+        resource.data.role in ["admin", "supervisor", "employee"]
+      );
       allow write: if isSignedIn() && phone == userPhone();
       allow delete: if isSignedIn() && (phone == userPhone() || isAdmin());
     }

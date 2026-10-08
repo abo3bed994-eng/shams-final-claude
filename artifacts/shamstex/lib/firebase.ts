@@ -515,7 +515,17 @@ export const FS = {
   },
 
   // Push notification tokens — keyed by user phone
-  async savePushToken(phone: string, role: string, expoPushToken: string) {
+  async savePushToken(
+    phone: string,
+    role: string,
+    expoPushToken: string,
+    extra?: {
+      branchId?: string;
+      canHandleShipping?: boolean;
+      supervisorScope?: "branch" | "all";
+      permissions?: string[];
+    }
+  ) {
     try {
       const snap = await getDocs(query(collection(db, "pushTokens"), where("expoPushToken", "==", expoPushToken)));
       for (const d of snap.docs) {
@@ -525,12 +535,18 @@ export const FS = {
       }
     } catch (_) {}
 
-    await setDoc(doc(db, "pushTokens", phone), {
+    const payload: Record<string, any> = {
       phone,
       role,
       expoPushToken,
       updatedAt: new Date().toISOString(),
-    });
+    };
+    if (extra?.branchId) payload.branchId = extra.branchId;
+    if (extra?.canHandleShipping !== undefined) payload.canHandleShipping = extra.canHandleShipping;
+    if (extra?.supervisorScope) payload.supervisorScope = extra.supervisorScope;
+    if (extra?.permissions) payload.permissions = extra.permissions;
+
+    await setDoc(doc(db, "pushTokens", phone), payload, { merge: true });
   },
 
   async deletePushToken(phone: string, expoPushToken?: string) {
@@ -552,11 +568,38 @@ export const FS = {
   },
 
   async getPushTokensByRoles(roles: string[]): Promise<string[]> {
-    const snap = await getDocs(collection(db, "pushTokens"));
-    return snap.docs
-      .map((d) => d.data())
-      .filter((d) => roles.includes(d.role) && d.expoPushToken)
-      .map((d) => d.expoPushToken as string);
+    try {
+      const safeRoles = roles.slice(0, 10);
+      if (safeRoles.length === 0) return [];
+      const snap = await getDocs(query(collection(db, "pushTokens"), where("role", "in", safeRoles)));
+      return snap.docs
+        .map((d) => d.data())
+        .filter((d) => d.expoPushToken)
+        .map((d) => d.expoPushToken as string);
+    } catch (e) {
+      console.warn("getPushTokensByRoles query failed:", e);
+      return [];
+    }
+  },
+
+  async getStaffPushTokens(): Promise<{
+    phone: string;
+    role: string;
+    expoPushToken: string;
+    branchId?: string;
+    canHandleShipping?: boolean;
+    supervisorScope?: "branch" | "all";
+    permissions?: string[];
+  }[]> {
+    try {
+      const snap = await getDocs(
+        query(collection(db, "pushTokens"), where("role", "in", ["admin", "supervisor", "employee"]))
+      );
+      return snap.docs.map((d) => d.data() as any);
+    } catch (e) {
+      console.warn("getStaffPushTokens error:", e);
+      return [];
+    }
   },
 
   async getPushTokenByPhone(phone: string): Promise<string | null> {
@@ -565,8 +608,13 @@ export const FS = {
   },
 
   async getAllPushTokens(): Promise<{ phone: string; role: string; expoPushToken: string }[]> {
-    const snap = await getDocs(collection(db, "pushTokens"));
-    return snap.docs.map((d) => d.data() as any);
+    try {
+      const snap = await getDocs(collection(db, "pushTokens"));
+      return snap.docs.map((d) => d.data() as any);
+    } catch (e) {
+      console.warn("getAllPushTokens error:", e);
+      return [];
+    }
   },
 
   async setPresence(userId: string, info: { name: string; role: string; phone?: string }) {

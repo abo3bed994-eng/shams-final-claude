@@ -61,7 +61,12 @@ function RootLayoutNav() {
   useEffect(() => {
     if (user && pushRegistered.current !== user.phone) {
       pushRegistered.current = user.phone;
-      registerForPushNotifications(user.phone, user.role).catch(() => {});
+      registerForPushNotifications(user.phone, user.role, {
+        branchId: user.branchId,
+        canHandleShipping: user.canHandleShipping,
+        supervisorScope: user.supervisorScope,
+        permissions: user.permissions,
+      }).catch(() => {});
     }
     if (!user) {
       pushRegistered.current = null;

@@ -59,7 +59,13 @@ async function initHandler() {
  */
 export async function registerForPushNotifications(
   phone: string,
-  role: string
+  role: string,
+  extra?: {
+    branchId?: string;
+    canHandleShipping?: boolean;
+    supervisorScope?: "branch" | "all";
+    permissions?: string[];
+  }
 ): Promise<string | null> {
   try {
     const Device = await getDevice();
@@ -136,7 +142,7 @@ export async function registerForPushNotifications(
       // Push-token documents are keyed by phone. Keep the key canonical so
       // status notifications can find the token even when an old order stores
       // the customer's local-format phone.
-      await FS.savePushToken(migrateLocalToE164(phone), role, expoPushToken);
+      await FS.savePushToken(migrateLocalToE164(phone), role, expoPushToken, extra);
     }
     return expoPushToken;
   } catch (err) {
@@ -202,36 +208,28 @@ export async function notifyStaffNewOrder(
     const orderBranchId = orderInfo?.branchId;
 
     try {
-      const customers = await FS.getAllCustomers();
-      const tokensSnap = await FS.getAllPushTokens();
+      const staffTokens = await FS.getStaffPushTokens();
 
-      const getTokenForCustomer = (custPhone: string): string | undefined => {
-        const found = tokensSnap.find((t) => t.expoPushToken && t.phone && samePhone(t.phone, custPhone));
-        return found?.expoPushToken;
-      };
+      for (const st of staffTokens) {
+        if (!st.expoPushToken) continue;
 
-      for (const c of customers) {
-        if (!c.phone) continue;
-        const token = getTokenForCustomer(c.phone);
-        if (!token) continue;
-
-        if (c.role === "admin") {
-          targetTokens.push(token);
-        } else if (c.role === "supervisor") {
-          if (c.supervisorScope === "branch" && c.branchId) {
-            if (isShipping && c.canHandleShipping) {
-              targetTokens.push(token);
-            } else if (!isShipping && c.branchId === orderBranchId) {
-              targetTokens.push(token);
+        if (st.role === "admin") {
+          targetTokens.push(st.expoPushToken);
+        } else if (st.role === "supervisor") {
+          if (st.supervisorScope === "branch" && st.branchId) {
+            if (isShipping && st.canHandleShipping) {
+              targetTokens.push(st.expoPushToken);
+            } else if (!isShipping && st.branchId === orderBranchId) {
+              targetTokens.push(st.expoPushToken);
             }
           } else {
-            targetTokens.push(token);
+            targetTokens.push(st.expoPushToken);
           }
-        } else if (c.role === "employee") {
-          if (isShipping && c.canHandleShipping) {
-            targetTokens.push(token);
-          } else if (!isShipping && c.branchId && c.branchId === orderBranchId) {
-            targetTokens.push(token);
+        } else if (st.role === "employee") {
+          if (isShipping && st.canHandleShipping) {
+            targetTokens.push(st.expoPushToken);
+          } else if (!isShipping && (!st.branchId || st.branchId === orderBranchId)) {
+            targetTokens.push(st.expoPushToken);
           }
         }
       }
@@ -239,9 +237,9 @@ export async function notifyStaffNewOrder(
       console.warn("Error filtering staff tokens by branch:", e);
     }
 
-    // Always ensure admin receives order push notifications even if customer matching failed
+    // Fallback: if no tokens matched, ensure all staff roles receive notification
     if (targetTokens.length === 0) {
-      targetTokens = await FS.getPushTokensByRoles(["admin"]);
+      targetTokens = await FS.getPushTokensByRoles(["admin", "supervisor", "employee"]);
     } else {
       targetTokens = Array.from(new Set(targetTokens));
     }
@@ -269,25 +267,17 @@ export async function notifyUpgradeRequest(
   try {
     let targetTokens: string[] = [];
     try {
-      const customers = await FS.getAllCustomers();
-      const tokensSnap = await FS.getAllPushTokens();
+      const staffTokens = await FS.getStaffPushTokens();
 
-      const getTokenForCustomer = (custPhone: string): string | undefined => {
-        const found = tokensSnap.find((t) => t.expoPushToken && t.phone && samePhone(t.phone, custPhone));
-        return found?.expoPushToken;
-      };
+      for (const st of staffTokens) {
+        if (!st.expoPushToken) continue;
 
-      for (const c of customers) {
-        if (!c.phone) continue;
-        const token = getTokenForCustomer(c.phone);
-        if (!token) continue;
-
-        if (c.role === "admin") {
-          targetTokens.push(token);
-        } else if (c.role === "supervisor") {
-          const perms: string[] = c.permissions || [];
-          if (perms.includes("approve_upgrades")) {
-            targetTokens.push(token);
+        if (st.role === "admin") {
+          targetTokens.push(st.expoPushToken);
+        } else if (st.role === "supervisor") {
+          const perms: string[] = st.permissions || [];
+          if (perms.includes("approve_upgrades") || !st.permissions) {
+            targetTokens.push(st.expoPushToken);
           }
         }
       }
