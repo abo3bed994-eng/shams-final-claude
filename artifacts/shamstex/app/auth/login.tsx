@@ -72,7 +72,7 @@ export default function LoginScreen() {
   }, [resendCountdown]);
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
-  const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
+  const bottomPad = Platform.OS === "web" ? 20 : (insets.bottom > 0 ? insets.bottom : 12);
 
   const e164Phone = toE164(country, phone);
   const phoneValid = isValidLocal(country, phone);
@@ -539,12 +539,13 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: colors.background }]}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
+        style={{ flex: 1, backgroundColor: colors.background }}
         contentContainerStyle={[
           styles.content,
-          { paddingTop: topPad + 12, paddingBottom: bottomPad + 16 },
+          { paddingTop: topPad + 12, paddingBottom: bottomPad },
         ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
