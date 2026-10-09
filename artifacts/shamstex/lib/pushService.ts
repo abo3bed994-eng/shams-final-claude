@@ -162,8 +162,12 @@ export async function sendExpoPush(
   data?: Record<string, any>,
   channelId = "messages_v3"
 ): Promise<void> {
-  const validTokens = tokens.filter(
-    (t) => t && (t.startsWith("ExponentPushToken[") || t.startsWith("ExpoPushToken["))
+  const validTokens = Array.from(
+    new Set(
+      tokens.filter(
+        (t) => t && (t.startsWith("ExponentPushToken[") || t.startsWith("ExpoPushToken["))
+      )
+    )
   );
   if (validTokens.length === 0) return;
 
@@ -178,20 +182,28 @@ export async function sendExpoPush(
     badge: 1,
   }));
 
-  try {
-    const payload = messages.length === 1 ? messages[0] : messages;
-    await fetch("https://exp.host/--/api/v2/push/send", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Accept-Encoding": "gzip, deflate",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-  } catch (err) {
-    console.warn("Expo push send failed:", err);
-  }
+  // Send individually via Promise.allSettled so a token mismatch or error on one
+  // recipient (e.g. PUSH_TOO_MANY_EXPERIENCE_IDS) never blocks other staff members.
+  await Promise.allSettled(
+    messages.map(async (msg) => {
+      try {
+        const res = await fetch("https://exp.host/--/api/v2/push/send", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Accept-Encoding": "gzip, deflate",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(msg),
+        });
+        if (!res.ok) {
+          console.warn("Expo push single recipient error:", res.status, await res.text().catch(() => ""));
+        }
+      } catch (err) {
+        console.warn("Expo push fetch error:", err);
+      }
+    })
+  );
 }
 
 /**
