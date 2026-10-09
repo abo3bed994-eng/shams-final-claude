@@ -213,7 +213,8 @@ export default function LoginScreen() {
       else if (code.includes("invalid-phone") || msg.includes("invalid-phone")) friendly = "رقم الهاتف غير صحيح";
       else if (code.includes("too-many-requests") || msg.includes("too-many-requests")) friendly = "محاولات كثيرة، انتظر قليلاً";
       else if (msg.includes("network") || msg.includes("Network")) friendly = "تعذّر الاتصال بالإنترنت";
-      setError(friendly);
+      const diag = code || (msg ? msg.slice(0, 35) : "");
+      setError(diag ? `${friendly} (${diag})` : friendly);
     } finally {
       setLoading(false);
     }
