@@ -33,7 +33,7 @@ import {
   putFile,
   getDownloadURL,
 } from "@react-native-firebase/storage";
-import rnAuth from "@react-native-firebase/auth";
+import { getAuth } from "@react-native-firebase/auth";
 
 // Native config comes from google-services.json / GoogleService-Info.plist,
 // so no JS config object is required here.
@@ -41,7 +41,7 @@ const app: unknown = undefined;
 const db = getFirestore();
 const storage = getStorage();
 // Same instance used by phone sign-in → carries request.auth on every write.
-const auth = rnAuth();
+const auth = getAuth();
 
 // Upload a local file URI to Storage and return its download URL.
 // Native: stream the file directly with putFile (no in-memory Blob — avoids the

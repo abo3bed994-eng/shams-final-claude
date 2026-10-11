@@ -7,12 +7,15 @@
     "dev": "EXPO_PACKAGER_PROXY_URL=https://$REPLIT_EXPO_DEV_DOMAIN EXPO_PUBLIC_DOMAIN=$REPLIT_DEV_DOMAIN EXPO_PUBLIC_REPL_ID=$REPL_ID REACT_NATIVE_PACKAGER_HOSTNAME=$REPLIT_DEV_DOMAIN pnpm exec expo start --go --localhost --port $PORT",
     "build": "node scripts/build.js",
     "serve": "node server/serve.js",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@expo-google-fonts/inter": "^0.4.0",
     "@expo/cli": "54.0.23",
+    "@expo/config-plugins": "~54.0.5",
     "@expo/ngrok": "^4.1.0",
     "@expo/vector-icons": "^15.0.3",
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -62,10 +65,10 @@
     "@firebase/firestore": "^4.15.0",
     "@firebase/storage": "^0.14.3",
     "@react-native-community/netinfo": "^11.4.1",
-    "@react-native-firebase/app": "^24.1.1",
-    "@react-native-firebase/auth": "^24.1.1",
-    "@react-native-firebase/firestore": "^24.1.1",
-    "@react-native-firebase/storage": "^24.1.1",
+    "@react-native-firebase/app": "^26.4.0",
+    "@react-native-firebase/auth": "^26.4.0",
+    "@react-native-firebase/firestore": "^26.4.0",
+    "@react-native-firebase/storage": "^26.4.0",
     "expo-alternate-app-icons": "^8.0.0",
     "expo-build-properties": "^1.0.10",
     "expo-clipboard": "^8.0.8",
@@ -83,6 +86,9 @@
     "react-native-draggable-flatlist": "^4.0.3",
     "react-native-keyboard-controller": "1.18.5",
     "react-native-webview": "13.15.0",
-    "expo-screen-capture": "~8.0.10"
+    "expo-screen-capture": "~8.0.10",
+    "expo": "~54.0.37",
+    "react": "19.1.0",
+    "react-native": "0.81.5"
   }
 }

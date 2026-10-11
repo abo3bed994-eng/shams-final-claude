@@ -20,7 +20,7 @@ function getNativeAuth() {
   if (nativeAuthModule) return nativeAuthModule;
   try {
     // Lazy require so web bundle never tries to load native module.
-    const mod = require("@react-native-firebase/auth").default;
+    const mod = require("@react-native-firebase/auth");
     nativeAuthModule = mod;
     return mod;
   } catch (e) {
@@ -51,11 +51,25 @@ export async function startPhoneSignIn(
   }
 
   // Native (iOS / Android)
-  const rnAuth = getNativeAuth();
-  if (!rnAuth) {
+  const rnAuthModule = getNativeAuth();
+  if (!rnAuthModule) {
     throw new Error("@react-native-firebase/auth is not available in this build");
   }
-  const confirmation = await rnAuth().signInWithPhoneNumber(e164Phone);
+
+  let confirmation: any;
+  if (typeof rnAuthModule.signInWithPhoneNumber === "function" && typeof rnAuthModule.getAuth === "function") {
+    // Modular API (@react-native-firebase/auth v26+)
+    const auth = rnAuthModule.getAuth();
+    confirmation = await rnAuthModule.signInWithPhoneNumber(auth, e164Phone);
+  } else if (typeof rnAuthModule.default === "function") {
+    // Legacy namespaced API
+    confirmation = await rnAuthModule.default().signInWithPhoneNumber(e164Phone);
+  } else if (typeof rnAuthModule === "function") {
+    confirmation = await rnAuthModule().signInWithPhoneNumber(e164Phone);
+  } else {
+    throw new Error("Unable to initialize native phone auth");
+  }
+
   return {
     confirm: async (code: string) => {
       const cred = await confirmation.confirm(code);
@@ -78,9 +92,18 @@ export function getCurrentAuthPhone(): string | null {
     if (Platform.OS === "web") {
       return webAuth.currentUser?.phoneNumber ?? null;
     }
-    const rnAuth = getNativeAuth();
-    if (!rnAuth) return null;
-    return rnAuth().currentUser?.phoneNumber ?? null;
+    const rnAuthModule = getNativeAuth();
+    if (!rnAuthModule) return null;
+    if (typeof rnAuthModule.getAuth === "function") {
+      return rnAuthModule.getAuth().currentUser?.phoneNumber ?? null;
+    }
+    if (typeof rnAuthModule.default === "function") {
+      return rnAuthModule.default().currentUser?.phoneNumber ?? null;
+    }
+    if (typeof rnAuthModule === "function") {
+      return rnAuthModule().currentUser?.phoneNumber ?? null;
+    }
+    return null;
   } catch {
     return null;
   }
@@ -91,8 +114,15 @@ export async function signOut(): Promise<void> {
     if (Platform.OS === "web") {
       await webAuth.signOut();
     } else {
-      const rnAuth = getNativeAuth();
-      if (rnAuth) await rnAuth().signOut();
+      const rnAuthModule = getNativeAuth();
+      if (!rnAuthModule) return;
+      if (typeof rnAuthModule.signOut === "function" && typeof rnAuthModule.getAuth === "function") {
+        await rnAuthModule.signOut(rnAuthModule.getAuth());
+      } else if (typeof rnAuthModule.default === "function") {
+        await rnAuthModule.default().signOut();
+      } else if (typeof rnAuthModule === "function") {
+        await rnAuthModule().signOut();
+      }
     }
   } catch {}
 }
