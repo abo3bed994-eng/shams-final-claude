@@ -34,10 +34,7 @@ const TYPE_OPTIONS: { key: NotifType; label: string; icon: string; desc: string;
   { key: "private", label: "خاص", icon: "user", desc: "شخص محدد", color: "#E67E22" },
 ];
 
-const STAFF_USERS = [
-  { id: "u3", phone: "0000000003", name: "موظف", role: "employee" as const },
-  { id: "u4", phone: "0000000004", name: "مشرف", role: "supervisor" as const },
-];
+const STAFF_USERS: any[] = [];
 
 const ROLE_LABEL: Record<string, string> = {
   customer: "زبون",
@@ -179,8 +176,8 @@ export default function AdminNotificationsScreen() {
       case "all": return allPickableUsers.length;
       case "customers": return registeredCustomers.filter(c => c.role === "customer").length;
       case "merchants": return registeredCustomers.filter(c => c.role === "merchant").length;
-      case "employees": return STAFF_USERS.filter(u => u.role === "employee").length;
-      case "supervisors": return STAFF_USERS.filter(u => u.role === "supervisor").length;
+      case "employees": return registeredCustomers.filter(u => u.role === "employee").length;
+      case "supervisors": return registeredCustomers.filter(u => u.role === "supervisor").length;
       case "private": return selectedUser ? 1 : 0;
       default: return 0;
     }
