@@ -98,17 +98,17 @@ export default function OrderCard({ order, onPress, isAdmin, onStatusChange, onP
       <View style={styles.header}>
         <View style={[styles.statusBadge, { backgroundColor: statusInfo.color + "22" }]}>
           <Icon name={statusInfo.icon as any} size={12} color={statusInfo.color} />
-          <Text style={[styles.statusText, { color: statusInfo.color, fontFamily: "Inter_600SemiBold" }]}>
+          <Text style={[styles.statusText, { color: statusInfo.color, fontFamily: "Cairo_600SemiBold" }]}>
             {statusInfo.label}
           </Text>
         </View>
-        <Text style={[styles.orderId, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+        <Text style={[styles.orderId, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
           #{order.id.slice(0, 12)}
         </Text>
       </View>
 
       {isAdmin && (
-        <Text style={[styles.customerName, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
+        <Text style={[styles.customerName, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
           {order.userName} - {order.userPhone}
         </Text>
       )}
@@ -116,7 +116,7 @@ export default function OrderCard({ order, onPress, isAdmin, onStatusChange, onP
       {hasReturn && (
         <View style={[styles.assignedRow, { backgroundColor: "#C0392B11", borderColor: "#C0392B44" }]}>
           <Icon name="rotate-ccw" size={12} color="#C0392B" />
-          <Text style={{ color: "#C0392B", fontFamily: "Inter_600SemiBold", fontSize: 12 }}>
+          <Text style={{ color: "#C0392B", fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>
             هذا الطلب عليه طلب استرجاع
           </Text>
         </View>
@@ -125,7 +125,7 @@ export default function OrderCard({ order, onPress, isAdmin, onStatusChange, onP
       {order.edited && (
         <View style={[styles.assignedRow, { backgroundColor: "#F39C1211", borderColor: "#F39C1233" }]}>
           <Icon name="edit-3" size={12} color="#F39C12" />
-          <Text style={{ color: "#F39C12", fontFamily: "Inter_500Medium", fontSize: 12 }}>
+          <Text style={{ color: "#F39C12", fontFamily: "Cairo_500Medium", fontSize: 12 }}>
             تم تعديل الطلب من قبل العميل
           </Text>
         </View>
@@ -135,7 +135,7 @@ export default function OrderCard({ order, onPress, isAdmin, onStatusChange, onP
       {showAssigned && (
         <View style={[styles.assignedRow, { backgroundColor: "#3498DB11", borderColor: "#3498DB33" }]}>
           <Icon name="user" size={12} color="#3498DB" />
-          <Text style={{ color: "#3498DB", fontFamily: "Inter_500Medium", fontSize: 12 }}>
+          <Text style={{ color: "#3498DB", fontFamily: "Cairo_500Medium", fontSize: 12 }}>
             مُستلَم بواسطة: {order.assignedToName}
           </Text>
         </View>
@@ -144,13 +144,13 @@ export default function OrderCard({ order, onPress, isAdmin, onStatusChange, onP
       <View style={styles.details}>
         <View style={styles.detailItem}>
           <Icon name="shopping-bag" size={14} color={colors.mutedForeground} />
-          <Text style={[styles.detailText, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+          <Text style={[styles.detailText, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
             {totalItems} ثوب
           </Text>
         </View>
         <View style={styles.detailItem}>
           <Icon name="calendar" size={14} color={colors.mutedForeground} />
-          <Text style={[styles.detailText, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+          <Text style={[styles.detailText, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
             {date}
           </Text>
         </View>
@@ -158,10 +158,10 @@ export default function OrderCard({ order, onPress, isAdmin, onStatusChange, onP
 
       <View style={styles.footer}>
         <View style={styles.totalWrap}>
-          <Text style={[styles.totalLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+          <Text style={[styles.totalLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
             قيمة الفاتورة النهائية
           </Text>
-          <Text style={[styles.total, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.total, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
             {invoiceTotal > 0 ? `${invoiceTotal.toLocaleString("ar-EG")} ج.م` : "بانتظار التسعير"}
           </Text>
         </View>
@@ -182,7 +182,7 @@ export default function OrderCard({ order, onPress, isAdmin, onStatusChange, onP
               ]}
             >
               <Icon name="chevron-right" size={12} color={colors.mutedForeground} />
-              <Text style={[styles.prevText, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+              <Text style={[styles.prevText, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
                 {prevAction.label}
               </Text>
             </Pressable>
@@ -201,7 +201,7 @@ export default function OrderCard({ order, onPress, isAdmin, onStatusChange, onP
                 },
               ]}
             >
-              <Text style={[styles.actionText, { color: colors.background, fontFamily: "Inter_600SemiBold" }]}>
+              <Text style={[styles.actionText, { color: colors.background, fontFamily: "Cairo_600SemiBold" }]}>
                 {nextAction.label}
               </Text>
             </Pressable>
@@ -211,7 +211,7 @@ export default function OrderCard({ order, onPress, isAdmin, onStatusChange, onP
           {isAdmin && order.assignedTo && !canControl && order.status !== "cancelled" && nextAction && (
             <View style={[styles.lockedBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <Icon name="lock" size={12} color={colors.mutedForeground} />
-              <Text style={[styles.prevText, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+              <Text style={[styles.prevText, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                 مُقفَل
               </Text>
             </View>

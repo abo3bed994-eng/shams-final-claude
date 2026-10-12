@@ -690,7 +690,7 @@ export default function AdminUsersScreen() {
             <Icon name="x" size={14} color={colors.foreground} />
           </Pressable>
           <TextInput
-            style={[styles.nameInput, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.gold, fontFamily: "Inter_500Medium" }]}
+            style={[styles.nameInput, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.gold, fontFamily: "Cairo_500Medium" }]}
             value={editingNameValue}
             onChangeText={setEditingNameValue}
             textAlign="right"
@@ -705,7 +705,7 @@ export default function AdminUsersScreen() {
           style={[styles.editNameBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
         >
           <Icon name="edit-3" size={13} color={colors.gold} />
-          <Text style={{ color: colors.gold, fontFamily: "Inter_500Medium", fontSize: 12 }}>تعديل الاسم</Text>
+          <Text style={{ color: colors.gold, fontFamily: "Cairo_500Medium", fontSize: 12 }}>تعديل الاسم</Text>
         </Pressable>
       )}
     </View>
@@ -713,7 +713,7 @@ export default function AdminUsersScreen() {
 
   const renderPermissions = (u: User, allowedPerms: EmployeePermission[], onToggle: (id: string, p: EmployeePermission) => void) => (
     <View style={{ gap: 8 }}>
-      <Text style={[styles.expandLabel, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+      <Text style={[styles.expandLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
         الصلاحيات
       </Text>
       <View style={styles.permissionsGrid}>
@@ -729,7 +729,7 @@ export default function AdminUsersScreen() {
               ]}
             >
               <Icon name={active ? "check-square" : "square"} size={13} color={active ? colors.gold : colors.mutedForeground} />
-              <Text style={{ color: active ? colors.gold : colors.foreground, fontFamily: active ? "Inter_500Medium" : "Inter_400Regular", fontSize: 11 }}>
+              <Text style={{ color: active ? colors.gold : colors.foreground, fontFamily: active ? "Cairo_500Medium" : "Cairo_400Regular", fontSize: 11 }}>
                 {PERMISSION_LABELS[perm]}
               </Text>
             </Pressable>
@@ -755,29 +755,29 @@ export default function AdminUsersScreen() {
           </View>
           <View style={styles.userDetails}>
             <View style={styles.userNameRow}>
-              <Text style={[styles.userName, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
+              <Text style={[styles.userName, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
                 {u.name}
               </Text>
               {isUserOnline(u) && (
                 <View style={[styles.vipBadge, { backgroundColor: "#27AE6022", flexDirection: "row", alignItems: "center", gap: 4 }]}>
                   <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: "#27AE60" }} />
-                  <Text style={{ color: "#27AE60", fontFamily: "Inter_600SemiBold", fontSize: 10 }}>متصل</Text>
+                  <Text style={{ color: "#27AE60", fontFamily: "Cairo_600SemiBold", fontSize: 10 }}>متصل</Text>
                 </View>
               )}
               {u.vip && (
                 <View style={[styles.vipBadge, { backgroundColor: colors.gold + "33" }]}>
                   <Icon name="star" size={10} color={colors.gold} />
-                  <Text style={{ color: colors.gold, fontFamily: "Inter_600SemiBold", fontSize: 10 }}>مميز</Text>
+                  <Text style={{ color: colors.gold, fontFamily: "Cairo_600SemiBold", fontSize: 10 }}>مميز</Text>
                 </View>
               )}
               {u.banned && (
                 <View style={[styles.vipBadge, { backgroundColor: "#E74C3C33" }]}>
                   <Icon name="slash" size={10} color="#E74C3C" />
-                  <Text style={{ color: "#E74C3C", fontFamily: "Inter_600SemiBold", fontSize: 10 }}>محظور</Text>
+                  <Text style={{ color: "#E74C3C", fontFamily: "Cairo_600SemiBold", fontSize: 10 }}>محظور</Text>
                 </View>
               )}
             </View>
-            <Text style={[styles.userPhone, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+            <Text style={[styles.userPhone, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
               {u.phone}
             </Text>
             <View style={styles.userMetaRow}>
@@ -791,7 +791,7 @@ export default function AdminUsersScreen() {
               )}
               {pendingOrders > 0 && (
                 <View style={[styles.userMetaPill, { backgroundColor: "#F39C12" + "22" }]}>
-                  <Text style={{ color: "#F39C12", fontFamily: "Inter_600SemiBold", fontSize: 9 }}>
+                  <Text style={{ color: "#F39C12", fontFamily: "Cairo_600SemiBold", fontSize: 9 }}>
                     {pendingOrders} قيد التنفيذ
                   </Text>
                 </View>
@@ -809,12 +809,12 @@ export default function AdminUsersScreen() {
           <View style={{ alignItems: "flex-end", gap: 4 }}>
             <View style={[styles.roleChip, { backgroundColor: ROLE_COLORS[u.role] + "22", borderColor: ROLE_COLORS[u.role] + "55" }]}>
               <Icon name={ROLE_ICONS[u.role]} size={11} color={ROLE_COLORS[u.role]} />
-              <Text style={{ color: ROLE_COLORS[u.role], fontFamily: "Inter_600SemiBold", fontSize: 12 }}>
+              <Text style={{ color: ROLE_COLORS[u.role], fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>
                 {ROLE_LABELS[u.role]}
               </Text>
             </View>
             {totalSpent > 0 && (
-              <Text style={{ color: colors.mutedForeground + "99", fontFamily: "Inter_400Regular", fontSize: 10 }}>
+              <Text style={{ color: colors.mutedForeground + "99", fontFamily: "Cairo_400Regular", fontSize: 10 }}>
                 {totalSpent.toLocaleString("ar-EG")} ج.م
               </Text>
             )}
@@ -826,17 +826,17 @@ export default function AdminUsersScreen() {
             {totalOrders > 0 && (
               <View style={[styles.orderStatsBar, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <View style={styles.orderStatItem}>
-                  <Text style={[styles.orderStatNum, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>{totalOrders}</Text>
+                  <Text style={[styles.orderStatNum, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>{totalOrders}</Text>
                   <Text style={[styles.orderStatLabel, { color: colors.mutedForeground }]}>إجمالي الطلبات</Text>
                 </View>
                 <View style={[styles.orderStatDivider, { backgroundColor: colors.border }]} />
                 <View style={styles.orderStatItem}>
-                  <Text style={[styles.orderStatNum, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>{totalSpent.toLocaleString("ar-EG")}</Text>
+                  <Text style={[styles.orderStatNum, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>{totalSpent.toLocaleString("ar-EG")}</Text>
                   <Text style={[styles.orderStatLabel, { color: colors.mutedForeground }]}>ج.م إجمالي</Text>
                 </View>
                 <View style={[styles.orderStatDivider, { backgroundColor: colors.border }]} />
                 <View style={styles.orderStatItem}>
-                  <Text style={[styles.orderStatNum, { color: pendingOrders > 0 ? "#F39C12" : colors.mutedForeground, fontFamily: "Inter_700Bold" }]}>{pendingOrders}</Text>
+                  <Text style={[styles.orderStatNum, { color: pendingOrders > 0 ? "#F39C12" : colors.mutedForeground, fontFamily: "Cairo_700Bold" }]}>{pendingOrders}</Text>
                   <Text style={[styles.orderStatLabel, { color: colors.mutedForeground }]}>قيد التنفيذ</Text>
                 </View>
               </View>
@@ -845,13 +845,13 @@ export default function AdminUsersScreen() {
             {u.registeredAt && (
               <View style={styles.dateRow}>
                 <Icon name="calendar" size={12} color={colors.mutedForeground + "99"} />
-                <Text style={{ color: colors.mutedForeground + "99", fontFamily: "Inter_400Regular", fontSize: 11 }}>
+                <Text style={{ color: colors.mutedForeground + "99", fontFamily: "Cairo_400Regular", fontSize: 11 }}>
                   تسجيل: {formatDate(u.registeredAt)}
                 </Text>
                 {lastOrder && (
                   <>
                     <Text style={{ color: colors.mutedForeground + "55", fontSize: 11 }}>·</Text>
-                    <Text style={{ color: colors.mutedForeground + "99", fontFamily: "Inter_400Regular", fontSize: 11 }}>
+                    <Text style={{ color: colors.mutedForeground + "99", fontFamily: "Cairo_400Regular", fontSize: 11 }}>
                       آخر طلب: {formatRelative(lastOrder)}
                     </Text>
                   </>
@@ -861,13 +861,13 @@ export default function AdminUsersScreen() {
 
             {renderNameEdit(u, handleSaveCustomerName)}
 
-            <Text style={[styles.expandLabel, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+            <Text style={[styles.expandLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
               تغيير الدور
             </Text>
 
             {confirmAction?.userId === u.id ? (
               <View style={[styles.confirmBox, { backgroundColor: "#F39C12" + "11", borderColor: "#F39C12" + "44", borderRadius: colors.radius - 4 }]}>
-                <Text style={{ color: "#F39C12", fontFamily: "Inter_600SemiBold", fontSize: 13, textAlign: "right" }}>
+                <Text style={{ color: "#F39C12", fontFamily: "Cairo_600SemiBold", fontSize: 13, textAlign: "right" }}>
                   {confirmAction.newRole === "merchant"
                     ? `ترقية "${u.name}" إلى تاجر؟`
                     : confirmAction.newRole === "employee"
@@ -876,7 +876,7 @@ export default function AdminUsersScreen() {
                     ? `تعيين "${u.name}" كمشرف؟`
                     : `تغيير "${u.name}" إلى زبون عادي؟`}
                 </Text>
-                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right", lineHeight: 18 }}>
+                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right", lineHeight: 18 }}>
                   سيتم إشعار المستخدم وتحديث حسابه تلقائياً.
                 </Text>
                 <View style={styles.confirmActions}>
@@ -884,14 +884,14 @@ export default function AdminUsersScreen() {
                     onPress={() => setConfirmAction(null)}
                     style={[styles.confirmCancelBtn, { borderColor: colors.border, borderRadius: 8 }]}
                   >
-                    <Text style={{ color: colors.foreground, fontFamily: "Inter_500Medium", fontSize: 13 }}>إلغاء</Text>
+                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_500Medium", fontSize: 13 }}>إلغاء</Text>
                   </Pressable>
                   <Pressable
                     onPress={() => handleChangeCustomerRole(u.id, confirmAction.newRole!)}
                     style={[styles.confirmOkBtn, { backgroundColor: colors.gold, borderRadius: 8 }]}
                   >
                     <Icon name="check" size={14} color={colors.background} />
-                    <Text style={{ color: colors.background, fontFamily: "Inter_700Bold", fontSize: 13 }}>تأكيد</Text>
+                    <Text style={{ color: colors.background, fontFamily: "Cairo_700Bold", fontSize: 13 }}>تأكيد</Text>
                   </Pressable>
                 </View>
               </View>
@@ -916,7 +916,7 @@ export default function AdminUsersScreen() {
                     <Icon name={ROLE_ICONS[role]} size={14} color={u.role === role ? ROLE_COLORS[role] : colors.mutedForeground} />
                     <Text style={{
                       color: u.role === role ? ROLE_COLORS[role] : colors.foreground,
-                      fontFamily: u.role === role ? "Inter_700Bold" : "Inter_400Regular",
+                      fontFamily: u.role === role ? "Cairo_700Bold" : "Cairo_400Regular",
                       fontSize: 13,
                     }}>
                       {ROLE_LABELS[role]}
@@ -932,7 +932,7 @@ export default function AdminUsersScreen() {
                 style={[styles.vipToggleBtn, { backgroundColor: u.vip ? colors.gold + "22" : colors.surface, borderColor: u.vip ? colors.gold : colors.border }]}
               >
                 <Icon name="star" size={14} color={u.vip ? colors.gold : colors.mutedForeground} />
-                <Text style={{ color: u.vip ? colors.gold : colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 13 }}>
+                <Text style={{ color: u.vip ? colors.gold : colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 13 }}>
                   {u.vip ? "إلغاء العميل المميز" : "تعيين عميل مميز"}
                 </Text>
               </Pressable>
@@ -944,7 +944,7 @@ export default function AdminUsersScreen() {
                 style={[styles.deleteUserBtn, { borderColor: u.banned ? "#27AE6044" : "#F39C1244", backgroundColor: u.banned ? "#27AE6011" : "#F39C1211", borderRadius: colors.radius - 4 }]}
               >
                 <Icon name={u.banned ? "unlock" : "slash"} size={14} color={u.banned ? "#27AE60" : "#F39C12"} />
-                <Text style={{ color: u.banned ? "#27AE60" : "#F39C12", fontFamily: "Inter_500Medium", fontSize: 13 }}>
+                <Text style={{ color: u.banned ? "#27AE60" : "#F39C12", fontFamily: "Cairo_500Medium", fontSize: 13 }}>
                   {u.banned ? "إلغاء حظر المستخدم" : "حظر المستخدم"}
                 </Text>
               </Pressable>
@@ -956,7 +956,7 @@ export default function AdminUsersScreen() {
                 style={[styles.deleteUserBtn, { borderColor: "#E74C3C44", backgroundColor: "#E74C3C11", borderRadius: colors.radius - 4 }]}
               >
                 <Icon name="trash-2" size={14} color="#E74C3C" />
-                <Text style={{ color: "#E74C3C", fontFamily: "Inter_500Medium", fontSize: 13 }}>
+                <Text style={{ color: "#E74C3C", fontFamily: "Cairo_500Medium", fontSize: 13 }}>
                   حذف المستخدم نهائياً
                 </Text>
               </Pressable>
@@ -983,17 +983,17 @@ export default function AdminUsersScreen() {
           </View>
           <View style={styles.userDetails}>
             <View style={styles.userNameRow}>
-              <Text style={[styles.userName, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
+              <Text style={[styles.userName, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
                 {u.name}
               </Text>
               {isUserOnline(u) && (
                 <View style={[styles.vipBadge, { backgroundColor: "#27AE6022", flexDirection: "row", alignItems: "center", gap: 4 }]}>
                   <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: "#27AE60" }} />
-                  <Text style={{ color: "#27AE60", fontFamily: "Inter_600SemiBold", fontSize: 10 }}>متصل</Text>
+                  <Text style={{ color: "#27AE60", fontFamily: "Cairo_600SemiBold", fontSize: 10 }}>متصل</Text>
                 </View>
               )}
             </View>
-            <Text style={[styles.userPhone, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+            <Text style={[styles.userPhone, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
               {u.phone}
             </Text>
             {showPermissions && (
@@ -1007,7 +1007,7 @@ export default function AdminUsersScreen() {
                 {u.branchId && (
                   <View style={[styles.userMetaItem, { backgroundColor: colors.gold + "15", paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }]}>
                     <Icon name="map-pin" size={10} color={colors.gold} />
-                    <Text style={[styles.userMetaText, { color: colors.gold, fontFamily: "Inter_600SemiBold" }]}>
+                    <Text style={[styles.userMetaText, { color: colors.gold, fontFamily: "Cairo_600SemiBold" }]}>
                       {branchesList.find((b) => b.id === u.branchId)?.name || "فرع مخصص"}
                     </Text>
                   </View>
@@ -1015,7 +1015,7 @@ export default function AdminUsersScreen() {
                 {u.canHandleShipping && (
                   <View style={[styles.userMetaItem, { backgroundColor: "#27AE6015", paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }]}>
                     <Icon name="truck" size={10} color="#27AE60" />
-                    <Text style={[styles.userMetaText, { color: "#27AE60", fontFamily: "Inter_600SemiBold" }]}>
+                    <Text style={[styles.userMetaText, { color: "#27AE60", fontFamily: "Cairo_600SemiBold" }]}>
                       شحن
                     </Text>
                   </View>
@@ -1023,7 +1023,7 @@ export default function AdminUsersScreen() {
                 {u.role === "supervisor" && (
                   <View style={[styles.userMetaItem, { backgroundColor: "#8E44AD15", paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }]}>
                     <Icon name="eye" size={10} color="#8E44AD" />
-                    <Text style={[styles.userMetaText, { color: "#8E44AD", fontFamily: "Inter_600SemiBold" }]}>
+                    <Text style={[styles.userMetaText, { color: "#8E44AD", fontFamily: "Cairo_600SemiBold" }]}>
                       {u.supervisorScope === "branch" ? "فرعه فقط" : "كل الفروع"}
                     </Text>
                   </View>
@@ -1034,7 +1034,7 @@ export default function AdminUsersScreen() {
           <View style={{ alignItems: "flex-end", gap: 4 }}>
             <View style={[styles.roleChip, { backgroundColor: ROLE_COLORS[u.role] + "22", borderColor: ROLE_COLORS[u.role] + "55" }]}>
               <Icon name={ROLE_ICONS[u.role]} size={11} color={ROLE_COLORS[u.role]} />
-              <Text style={{ color: ROLE_COLORS[u.role], fontFamily: "Inter_600SemiBold", fontSize: 12 }}>
+              <Text style={{ color: ROLE_COLORS[u.role], fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>
                 {ROLE_LABELS[u.role]}
               </Text>
             </View>
@@ -1046,7 +1046,7 @@ export default function AdminUsersScreen() {
             {PROTECTED_PHONES.includes(u.phone) && (
               <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6, padding: 10, backgroundColor: colors.gold + "11", borderRadius: colors.radius - 4, borderWidth: 1, borderColor: colors.gold + "33" }}>
                 <Icon name="lock" size={14} color={colors.gold} />
-                <Text style={{ color: colors.gold, fontFamily: "Inter_500Medium", fontSize: 13, flex: 1, textAlign: "right" }}>
+                <Text style={{ color: colors.gold, fontFamily: "Cairo_500Medium", fontSize: 13, flex: 1, textAlign: "right" }}>
                   المدير الأساسي — محمي من التعديل والحذف
                 </Text>
               </View>
@@ -1054,7 +1054,7 @@ export default function AdminUsersScreen() {
             {!PROTECTED_PHONES.includes(u.phone) && renderNameEdit(u, handleSaveStaffName)}
             {!PROTECTED_PHONES.includes(u.phone) && user?.role === "admin" && (
               <View style={{ gap: 8 }}>
-                <Text style={[styles.expandLabel, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+                <Text style={[styles.expandLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
                   الدور الوظيفي
                 </Text>
                 <View style={{ flexDirection: "row-reverse", gap: 8, flexWrap: "wrap" }}>
@@ -1095,7 +1095,7 @@ export default function AdminUsersScreen() {
                       <Text
                         style={{
                           color: u.role === role ? ROLE_COLORS[role] : colors.foreground,
-                          fontFamily: u.role === role ? "Inter_700Bold" : "Inter_400Regular",
+                          fontFamily: u.role === role ? "Cairo_700Bold" : "Cairo_400Regular",
                           fontSize: 13,
                         }}
                       >
@@ -1110,7 +1110,7 @@ export default function AdminUsersScreen() {
               <View style={{ gap: 12, marginTop: 4 }}>
                 {/* Branch Selection */}
                 <View style={{ gap: 6 }}>
-                  <Text style={[styles.expandLabel, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+                  <Text style={[styles.expandLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
                     الفرع المخصص
                   </Text>
                   <View style={{ flexDirection: "row-reverse", gap: 6, flexWrap: "wrap" }}>
@@ -1126,7 +1126,7 @@ export default function AdminUsersScreen() {
                         },
                       ]}
                     >
-                      <Text style={{ color: !u.branchId ? colors.gold : colors.foreground, fontSize: 12, fontFamily: !u.branchId ? "Inter_700Bold" : "Inter_400Regular" }}>
+                      <Text style={{ color: !u.branchId ? colors.gold : colors.foreground, fontSize: 12, fontFamily: !u.branchId ? "Cairo_700Bold" : "Cairo_400Regular" }}>
                         بدون تخصيص فرع
                       </Text>
                     </Pressable>
@@ -1147,7 +1147,7 @@ export default function AdminUsersScreen() {
                           ]}
                         >
                           <Icon name="map-pin" size={12} color={isSel ? colors.gold : colors.mutedForeground} />
-                          <Text style={{ color: isSel ? colors.gold : colors.foreground, fontSize: 12, fontFamily: isSel ? "Inter_700Bold" : "Inter_400Regular" }}>
+                          <Text style={{ color: isSel ? colors.gold : colors.foreground, fontSize: 12, fontFamily: isSel ? "Cairo_700Bold" : "Cairo_400Regular" }}>
                             {b.name || "فرع"}
                           </Text>
                         </Pressable>
@@ -1158,7 +1158,7 @@ export default function AdminUsersScreen() {
 
                 {/* Shipping Orders Handling */}
                 <View style={{ gap: 6 }}>
-                  <Text style={[styles.expandLabel, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+                  <Text style={[styles.expandLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
                     استلام طلبات الشحن
                   </Text>
                   <Pressable
@@ -1176,7 +1176,7 @@ export default function AdminUsersScreen() {
                   >
                     <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
                       <Icon name="truck" size={16} color={u.canHandleShipping ? "#27AE60" : colors.mutedForeground} />
-                      <Text style={{ color: u.canHandleShipping ? "#27AE60" : colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 13 }}>
+                      <Text style={{ color: u.canHandleShipping ? "#27AE60" : colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>
                         {u.canHandleShipping ? "مفعل: يستلم ويعالج طلبات الشحن" : "معطل: لا يستلم طلبات الشحن"}
                       </Text>
                     </View>
@@ -1187,7 +1187,7 @@ export default function AdminUsersScreen() {
                 {/* Supervisor Scope (Only for supervisors) */}
                 {u.role === "supervisor" && (
                   <View style={{ gap: 6 }}>
-                    <Text style={[styles.expandLabel, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+                    <Text style={[styles.expandLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
                       نطاق رؤية وإشراف المشرف
                     </Text>
                     <View style={{ flexDirection: "row-reverse", gap: 8 }}>
@@ -1203,7 +1203,7 @@ export default function AdminUsersScreen() {
                         ]}
                       >
                         <Icon name="globe" size={13} color={u.supervisorScope !== "branch" ? "#8E44AD" : colors.mutedForeground} />
-                        <Text style={{ color: u.supervisorScope !== "branch" ? "#8E44AD" : colors.foreground, fontSize: 12, fontFamily: u.supervisorScope !== "branch" ? "Inter_700Bold" : "Inter_400Regular" }}>
+                        <Text style={{ color: u.supervisorScope !== "branch" ? "#8E44AD" : colors.foreground, fontSize: 12, fontFamily: u.supervisorScope !== "branch" ? "Cairo_700Bold" : "Cairo_400Regular" }}>
                           كل الفروع
                         </Text>
                       </Pressable>
@@ -1219,7 +1219,7 @@ export default function AdminUsersScreen() {
                         ]}
                       >
                         <Icon name="map-pin" size={13} color={u.supervisorScope === "branch" ? "#8E44AD" : colors.mutedForeground} />
-                        <Text style={{ color: u.supervisorScope === "branch" ? "#8E44AD" : colors.foreground, fontSize: 12, fontFamily: u.supervisorScope === "branch" ? "Inter_700Bold" : "Inter_400Regular" }}>
+                        <Text style={{ color: u.supervisorScope === "branch" ? "#8E44AD" : colors.foreground, fontSize: 12, fontFamily: u.supervisorScope === "branch" ? "Cairo_700Bold" : "Cairo_400Regular" }}>
                           فرعه فقط
                         </Text>
                       </Pressable>
@@ -1237,7 +1237,7 @@ export default function AdminUsersScreen() {
                 style={[styles.deleteUserBtn, { borderColor: "#E67E2244", backgroundColor: "#E67E2211", borderRadius: colors.radius - 4 }]}
               >
                 <Icon name="user-minus" size={14} color="#E67E22" />
-                <Text style={{ color: "#E67E22", fontFamily: "Inter_500Medium", fontSize: 13 }}>
+                <Text style={{ color: "#E67E22", fontFamily: "Cairo_500Medium", fontSize: 13 }}>
                   إزالة من الفريق وإعادته كعميل
                 </Text>
               </Pressable>
@@ -1269,11 +1269,11 @@ export default function AdminUsersScreen() {
               style={[styles.tab, { borderBottomColor: active ? colors.gold : "transparent" }]}
             >
               <Icon name={tab.icon} size={16} color={active ? colors.gold : colors.mutedForeground} />
-              <Text style={[styles.tabText, { color: active ? colors.gold : colors.mutedForeground, fontFamily: active ? "Inter_700Bold" : "Inter_400Regular" }]}>
+              <Text style={[styles.tabText, { color: active ? colors.gold : colors.mutedForeground, fontFamily: active ? "Cairo_700Bold" : "Cairo_400Regular" }]}>
                 {tab.label}
               </Text>
               <View style={[styles.tabCount, { backgroundColor: active ? colors.gold + "33" : colors.border + "66" }]}>
-                <Text style={{ color: active ? colors.gold : colors.mutedForeground, fontSize: 11, fontFamily: "Inter_600SemiBold" }}>
+                <Text style={{ color: active ? colors.gold : colors.mutedForeground, fontSize: 11, fontFamily: "Cairo_600SemiBold" }}>
                   {tab.count}
                 </Text>
               </View>
@@ -1286,7 +1286,7 @@ export default function AdminUsersScreen() {
         <View style={[styles.searchInputContainer, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
           <Icon name="search" size={16} color={colors.mutedForeground} />
           <TextInput
-            style={[styles.searchInput, { color: colors.foreground, fontFamily: "Inter_400Regular" }]}
+            style={[styles.searchInput, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}
             placeholder={activeTab === "customers" ? "بحث بالاسم أو رقم الهاتف..." : "بحث في فريق العمل..."}
             placeholderTextColor={colors.mutedForeground + "88"}
             value={searchQuery}
@@ -1316,7 +1316,7 @@ export default function AdminUsersScreen() {
                 <Icon name={opt.icon} size={11} color={sortBy === opt.key ? colors.gold : colors.mutedForeground + "88"} />
                 <Text style={{
                   color: sortBy === opt.key ? colors.gold : colors.mutedForeground + "88",
-                  fontFamily: sortBy === opt.key ? "Inter_600SemiBold" : "Inter_400Regular",
+                  fontFamily: sortBy === opt.key ? "Cairo_600SemiBold" : "Cairo_400Regular",
                   fontSize: 11,
                 }}>
                   {opt.label}
@@ -1347,7 +1347,7 @@ export default function AdminUsersScreen() {
               >
                 <Text style={{
                   color: custFilter === opt.key ? colors.gold : colors.mutedForeground + "88",
-                  fontFamily: custFilter === opt.key ? "Inter_600SemiBold" : "Inter_400Regular",
+                  fontFamily: custFilter === opt.key ? "Cairo_600SemiBold" : "Cairo_400Regular",
                   fontSize: 11,
                 }}>
                   {opt.label}
@@ -1373,8 +1373,8 @@ export default function AdminUsersScreen() {
               ].map((stat) => (
                 <View key={stat.label} style={[styles.statBox, { backgroundColor: colors.card, borderColor: colors.border }]}>
                   <Icon name={stat.icon} size={14} color={stat.color + "88"} />
-                  <Text style={[styles.statNum, { color: stat.color, fontFamily: "Inter_700Bold" }]}>{stat.value}</Text>
-                  <Text style={[styles.statLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>{stat.label}</Text>
+                  <Text style={[styles.statNum, { color: stat.color, fontFamily: "Cairo_700Bold" }]}>{stat.value}</Text>
+                  <Text style={[styles.statLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>{stat.label}</Text>
                 </View>
               ))}
             </View>
@@ -1383,9 +1383,9 @@ export default function AdminUsersScreen() {
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
                   <View style={[styles.sectionBadge, { backgroundColor: "#C0392B" + "22" }]}>
-                    <Text style={{ color: "#C0392B", fontFamily: "Inter_700Bold", fontSize: 11 }}>{pendingUpgrades.length}</Text>
+                    <Text style={{ color: "#C0392B", fontFamily: "Cairo_700Bold", fontSize: 11 }}>{pendingUpgrades.length}</Text>
                   </View>
-                  <Text style={[styles.sectionTitle, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+                  <Text style={[styles.sectionTitle, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                     طلبات الترقية
                   </Text>
                   <Icon name="arrow-up-circle" size={18} color={colors.gold} />
@@ -1393,10 +1393,10 @@ export default function AdminUsersScreen() {
                 {pendingUpgrades.map((u) => (
                   <View key={u.id} style={[styles.upgradeCard, { backgroundColor: colors.gold + "08", borderColor: colors.gold + "33", borderRadius: colors.radius }]}>
                     <View style={styles.userInfo}>
-                      <Text style={[styles.upgradeUserName, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>{u.name}</Text>
-                      <Text style={[styles.userPhone, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>{u.phone}</Text>
+                      <Text style={[styles.upgradeUserName, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>{u.name}</Text>
+                      <Text style={[styles.userPhone, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>{u.phone}</Text>
                       {u.registeredAt && (
-                        <Text style={{ color: colors.mutedForeground + "88", fontFamily: "Inter_400Regular", fontSize: 10, marginTop: 2 }}>
+                        <Text style={{ color: colors.mutedForeground + "88", fontFamily: "Cairo_400Regular", fontSize: 10, marginTop: 2 }}>
                           مسجل منذ {formatDate(u.registeredAt)}
                         </Text>
                       )}
@@ -1407,7 +1407,7 @@ export default function AdminUsersScreen() {
                       </Pressable>
                       <Pressable onPress={() => handleApproveUpgrade(u.id)} style={[styles.approveBtn, { backgroundColor: colors.gold, borderRadius: 8 }]}>
                         <Icon name="check" size={14} color={colors.background} />
-                        <Text style={{ color: colors.background, fontFamily: "Inter_600SemiBold", fontSize: 13 }}>قبول</Text>
+                        <Text style={{ color: colors.background, fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>قبول</Text>
                       </Pressable>
                     </View>
                   </View>
@@ -1417,14 +1417,14 @@ export default function AdminUsersScreen() {
 
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+                <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                   {searchQuery.trim() ? `نتائج البحث (${filteredCustomers.length})` : `الزبائن والتجار (${activeCustomers.length})`}
                 </Text>
               </View>
               {filteredCustomers.length === 0 && (
                 <View style={[styles.emptyState, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
                   <Icon name="search" size={28} color={colors.mutedForeground + "55"} />
-                  <Text style={{ color: colors.mutedForeground, textAlign: "center", fontFamily: "Inter_400Regular", fontSize: 13 }}>
+                  <Text style={{ color: colors.mutedForeground, textAlign: "center", fontFamily: "Cairo_400Regular", fontSize: 13 }}>
                     {searchQuery.trim() ? "لا توجد نتائج للبحث" : "لا يوجد زبائن مسجلون بعد"}
                   </Text>
                 </View>
@@ -1442,22 +1442,22 @@ export default function AdminUsersScreen() {
               ].map((stat) => (
                 <View key={stat.label} style={[styles.statBox, { backgroundColor: colors.card, borderColor: colors.border }]}>
                   <Icon name={stat.icon} size={14} color={stat.color + "88"} />
-                  <Text style={[styles.statNum, { color: stat.color, fontFamily: "Inter_700Bold" }]}>{stat.value}</Text>
-                  <Text style={[styles.statLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>{stat.label}</Text>
+                  <Text style={[styles.statNum, { color: stat.color, fontFamily: "Cairo_700Bold" }]}>{stat.value}</Text>
+                  <Text style={[styles.statLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>{stat.label}</Text>
                 </View>
               ))}
             </View>
 
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+                <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                   {searchQuery.trim() ? `نتائج البحث (${filteredStaff.length})` : `فريق العمل (${staffList.length})`}
                 </Text>
               </View>
               {filteredStaff.length === 0 && (
                 <View style={[styles.emptyState, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
                   <Icon name="search" size={28} color={colors.mutedForeground + "55"} />
-                  <Text style={{ color: colors.mutedForeground, textAlign: "center", fontFamily: "Inter_400Regular", fontSize: 13 }}>
+                  <Text style={{ color: colors.mutedForeground, textAlign: "center", fontFamily: "Cairo_400Regular", fontSize: 13 }}>
                     لا توجد نتائج للبحث
                   </Text>
                 </View>
@@ -1573,7 +1573,7 @@ const styles = StyleSheet.create({
   userPhone: { fontSize: 12 },
   userMetaRow: { flexDirection: "row-reverse", alignItems: "center", gap: 8, marginTop: 3 },
   userMetaItem: { flexDirection: "row-reverse", alignItems: "center", gap: 3 },
-  userMetaText: { fontFamily: "Inter_400Regular", fontSize: 10 },
+  userMetaText: { fontFamily: "Cairo_400Regular", fontSize: 10 },
   userMetaPill: { paddingHorizontal: 6, paddingVertical: 1, borderRadius: 6 },
   roleChip: {
     flexDirection: "row-reverse",
@@ -1601,7 +1601,7 @@ const styles = StyleSheet.create({
   },
   orderStatItem: { flex: 1, alignItems: "center", gap: 2 },
   orderStatNum: { fontSize: 16 },
-  orderStatLabel: { fontSize: 9, fontFamily: "Inter_400Regular" },
+  orderStatLabel: { fontSize: 9, fontFamily: "Cairo_400Regular" },
   orderStatDivider: { width: 1, height: 28 },
   dateRow: { flexDirection: "row-reverse", alignItems: "center", gap: 6 },
   expandLabel: { fontSize: 12, textAlign: "right" },

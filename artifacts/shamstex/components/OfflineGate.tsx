@@ -332,14 +332,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Cairo_700Bold",
     textAlign: "center",
     letterSpacing: 0.5,
   },
   subtitle: {
     fontSize: 14,
     color: "rgba(255,255,255,0.85)",
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Cairo_500Medium",
     textAlign: "center",
     lineHeight: 22,
   },
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
   },
   retryText: {
     color: "#000",
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Cairo_700Bold",
     fontSize: 14,
   },
 });

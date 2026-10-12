@@ -59,7 +59,7 @@ export default function GoldButton({
             {
               fontSize,
               color: isPrimary ? colors.background : colors.gold,
-              fontFamily: "Inter_600SemiBold",
+              fontFamily: "Cairo_600SemiBold",
             },
           ]}
         >

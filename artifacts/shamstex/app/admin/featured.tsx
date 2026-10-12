@@ -70,10 +70,10 @@ export default function AdminFeaturedScreen() {
         contentContainerStyle={[styles.content, { paddingBottom: bottomPad + 100 }]}
       >
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.cardTitle, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.cardTitle, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
             المنتجات المميزة ({featuredIds.length} مختار)
           </Text>
-          <Text style={[styles.hint, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+          <Text style={[styles.hint, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
             المنتجات المحددة ستظهر في الصفحة الرئيسية ضمن قسم "المنتجات المميزة"
           </Text>
           {products.map((product) => {
@@ -95,10 +95,10 @@ export default function AdminFeaturedScreen() {
                   {selected && <Icon name="check" size={12} color={colors.background} />}
                 </View>
                 <View style={styles.productInfo}>
-                  <Text style={[{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 14, textAlign: "right" }]}>
+                  <Text style={[{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14, textAlign: "right" }]}>
                     {product.name}
                   </Text>
-                  <Text style={[{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }]}>
+                  <Text style={[{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }]}>
                     {product.category} • {product.retailPrice} ج.م
                   </Text>
                 </View>
@@ -115,7 +115,7 @@ export default function AdminFeaturedScreen() {
           {products.length === 0 && (
             <View style={styles.empty}>
               <Icon name="layers" size={36} color={colors.mutedForeground} />
-              <Text style={[{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 13, textAlign: "center" }]}>
+              <Text style={[{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 13, textAlign: "center" }]}>
                 لا توجد منتجات. أضف منتجات من لوحة الأدمن أولاً.
               </Text>
             </View>
@@ -141,7 +141,7 @@ export default function AdminFeaturedScreen() {
           ) : (
             <Icon name="check" size={16} color={dirtyRef.current ? colors.background : colors.mutedForeground} />
           )}
-          <Text style={{ color: dirtyRef.current ? colors.background : colors.mutedForeground, fontFamily: "Inter_700Bold", fontSize: 14 }}>
+          <Text style={{ color: dirtyRef.current ? colors.background : colors.mutedForeground, fontFamily: "Cairo_700Bold", fontSize: 14 }}>
             {saving ? "جاري الحفظ..." : dirtyRef.current ? "حفظ التغييرات" : savedAt ? "تم الحفظ ✓" : "لا توجد تغييرات"}
           </Text>
         </Pressable>
@@ -154,8 +154,8 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   content: { padding: 16, gap: 14 },
   card: { borderWidth: 1, borderRadius: 12, padding: 16, gap: 14 },
-  cardTitle: { fontSize: 15, textAlign: "right" },
-  hint: { fontSize: 12, textAlign: "right", lineHeight: 18 },
+  cardTitle: { fontSize: 15, textAlign: "right", fontFamily: "Cairo_700Bold" },
+  hint: { fontSize: 12, textAlign: "right", lineHeight: 18, fontFamily: "Cairo_400Regular" },
   productRow: { flexDirection: "row-reverse", alignItems: "center", gap: 12, padding: 12, borderRadius: 10, borderWidth: 1 },
   checkbox: { width: 22, height: 22, borderRadius: 6, borderWidth: 2, alignItems: "center", justifyContent: "center" },
   productInfo: { flex: 1, gap: 3 },
@@ -163,5 +163,5 @@ const styles = StyleSheet.create({
   empty: { paddingVertical: 24, alignItems: "center", gap: 10 },
   footer: { paddingHorizontal: 16, paddingTop: 12, borderTopWidth: 1 },
   saveBtn: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 14, borderRadius: 12, borderWidth: 1 },
-  statusText: { fontSize: 13 },
+  statusText: { fontSize: 13, fontFamily: "Cairo_500Medium" },
 });

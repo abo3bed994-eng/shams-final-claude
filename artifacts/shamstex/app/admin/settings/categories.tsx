@@ -53,8 +53,8 @@ export default function CategoriesSettings() {
     <SettingsScreen title="فئات المنتجات" bottomPad={bottomPad} save={save} saving={saving}>
       <Card title="فئات المنتجات">
         <View style={[styles.catFixedRow, { backgroundColor: colors.gold + "22", borderColor: colors.gold + "44" }]}>
-          <Text style={{ color: colors.gold, fontFamily: "Inter_600SemiBold", fontSize: 13 }}>الكل</Text>
-          <Text style={{ color: colors.mutedForeground, fontSize: 11, fontFamily: "Inter_400Regular" }}>ثابت</Text>
+          <Text style={{ color: colors.gold, fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>الكل</Text>
+          <Text style={{ color: colors.mutedForeground, fontSize: 11, fontFamily: "Cairo_400Regular" }}>ثابت</Text>
         </View>
         {editableCategories.map((cat) => {
           const realIdx = draft.categories.indexOf(cat);
@@ -70,7 +70,7 @@ export default function CategoriesSettings() {
                   <Icon name="chevron-down" size={16} color={colors.gold} />
                 </Pressable>
               </View>
-              <Text style={[styles.catListName, { color: colors.foreground, fontFamily: "Inter_500Medium" }]}>{cat}</Text>
+              <Text style={[styles.catListName, { color: colors.foreground, fontFamily: "Cairo_500Medium" }]}>{cat}</Text>
               <Pressable onPress={() => deleteCategory(cat)} style={[styles.deleteCatBtn, { alignSelf: "center" }]}>
                 <Icon name="x" size={14} color={colors.destructive} />
               </Pressable>
@@ -80,7 +80,7 @@ export default function CategoriesSettings() {
         <View style={styles.addRow}>
           <GoldButton label="إضافة" onPress={addCategory} size="sm" style={{ minWidth: 80 }} disabled={!newCategory.trim()} />
           <TextInput
-            style={[styles.addInput, { flex: 1, color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Inter_400Regular" }]}
+            style={[styles.addInput, { flex: 1, color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_400Regular" }]}
             value={newCategory}
             onChangeText={setNewCategory}
             placeholder="اسم الفئة الجديدة"
@@ -94,13 +94,13 @@ export default function CategoriesSettings() {
 
       <Card title="الفئات الفرعية">
         {editableCategories.length === 0 ? (
-          <Text style={{ color: colors.mutedForeground, textAlign: "right", fontSize: 13, fontFamily: "Inter_400Regular" }}>أضف فئات رئيسية أولاً</Text>
+          <Text style={{ color: colors.mutedForeground, textAlign: "right", fontSize: 13, fontFamily: "Cairo_400Regular" }}>أضف فئات رئيسية أولاً</Text>
         ) : (
           editableCategories.map((cat) => {
             const subs = (draft.subcategories ?? {})[cat] ?? [];
             return (
               <View key={cat} style={[styles.subCatGroup, { borderColor: colors.border }]}>
-                <Text style={[styles.subCatGroupTitle, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>{cat}</Text>
+                <Text style={[styles.subCatGroupTitle, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>{cat}</Text>
                 {subs.length > 0 && (
                   <View style={styles.subTagsWrap}>
                     {subs.map((sub) => (
@@ -108,7 +108,7 @@ export default function CategoriesSettings() {
                         <Pressable onPress={() => deleteSubcategory(cat, sub)} style={{ padding: 2 }}>
                           <Icon name="x" size={12} color={colors.mutedForeground} />
                         </Pressable>
-                        <Text style={[styles.subTagText, { color: colors.foreground, fontFamily: "Inter_400Regular" }]}>{sub}</Text>
+                        <Text style={[styles.subTagText, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}>{sub}</Text>
                       </View>
                     ))}
                   </View>
@@ -116,7 +116,7 @@ export default function CategoriesSettings() {
                 <View style={styles.addRow}>
                   <GoldButton label="إضافة" onPress={() => addSubcategory(cat)} size="sm" style={{ minWidth: 80 }} disabled={!(newSubMap[cat] ?? "").trim()} />
                   <TextInput
-                    style={[styles.addInput, { flex: 1, color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Inter_400Regular" }]}
+                    style={[styles.addInput, { flex: 1, color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_400Regular" }]}
                     value={newSubMap[cat] ?? ""}
                     onChangeText={(v) => setNewSubMap((p) => ({ ...p, [cat]: v }))}
                     placeholder={`فئة فرعية من ${cat}`}

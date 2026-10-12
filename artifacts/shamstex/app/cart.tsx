@@ -463,10 +463,10 @@ export default function CartScreen() {
       style={[styles.copyRow, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: colors.radius - 4 }]}
     >
       <View style={styles.copyRowContent}>
-        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>
+        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>
           {label}
         </Text>
-        <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 15, textAlign: "right", letterSpacing: 0.5 }}>
+        <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 15, textAlign: "right", letterSpacing: 0.5 }}>
           {value}
         </Text>
       </View>
@@ -493,7 +493,7 @@ export default function CartScreen() {
               <Pressable onPress={() => setShowPaymentModal(false)} style={styles.modalCloseBtn}>
                 <Icon name="x" size={20} color={colors.mutedForeground} />
               </Pressable>
-              <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 18, flex: 1, textAlign: "right" }}>
+              <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 18, flex: 1, textAlign: "right" }}>
                 {selectedPayment === "bank_transfer" && "بيانات التحويل البنكي"}
                 {selectedPayment === "ewallet" && "بيانات المحفظة الإلكترونية"}
                 {selectedPayment === "instapay" && "بيانات الانستاباي"}
@@ -505,7 +505,7 @@ export default function CartScreen() {
                 <View style={styles.paymentInfoSection}>
                   <View style={[styles.paymentInfoBanner, { backgroundColor: colors.gold + "11", borderColor: colors.gold + "33", borderRadius: colors.radius - 4 }]}>
                     <Icon name="credit-card" size={20} color={colors.gold} />
-                    <Text style={{ color: colors.gold, fontFamily: "Inter_600SemiBold", fontSize: 14, flex: 1, textAlign: "right" }}>
+                    <Text style={{ color: colors.gold, fontFamily: "Cairo_600SemiBold", fontSize: 14, flex: 1, textAlign: "right" }}>
                       قم بالتحويل ثم اضغط "تأكيد الطلب"
                     </Text>
                   </View>
@@ -515,8 +515,8 @@ export default function CartScreen() {
                   {renderCopyRow("IBAN", pm.bankIBAN, "iban")}
 
                   <View style={[styles.amountBox, { backgroundColor: colors.gold + "11", borderColor: colors.gold + "44", borderRadius: colors.radius - 4 }]}>
-                    <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 13 }}>المبلغ المطلوب</Text>
-                    <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 24 }}>{totalPrice.toLocaleString("ar-EG")} ج.م</Text>
+                    <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 13 }}>المبلغ المطلوب</Text>
+                    <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 24 }}>{totalPrice.toLocaleString("ar-EG")} ج.م</Text>
                   </View>
                 </View>
               )}
@@ -529,12 +529,12 @@ export default function CartScreen() {
                 <View style={styles.paymentInfoSection}>
                   <View style={[styles.paymentInfoBanner, { backgroundColor: "#9B59B6" + "15", borderColor: "#9B59B6" + "33", borderRadius: colors.radius - 4 }]}>
                     <Icon name="smartphone" size={20} color="#9B59B6" />
-                    <Text style={{ color: "#9B59B6", fontFamily: "Inter_600SemiBold", fontSize: 14, flex: 1, textAlign: "right" }}>
+                    <Text style={{ color: "#9B59B6", fontFamily: "Cairo_600SemiBold", fontSize: 14, flex: 1, textAlign: "right" }}>
                       اختر رقم المحفظة وحوّل عليه ثم اضغط "تأكيد الطلب"
                     </Text>
                   </View>
                   {wallets.length === 0 && (
-                    <Text style={{ color: colors.mutedForeground, fontSize: 13, textAlign: "center", padding: 16 }}>
+                    <Text style={{ color: colors.mutedForeground, fontSize: 13, textAlign: "center", padding: 16, fontFamily: "Cairo_500Medium" }}>
                       لم يضِف المدير أي رقم محفظة بعد
                     </Text>
                   )}
@@ -542,10 +542,10 @@ export default function CartScreen() {
                     <View key={w.id} style={{ gap: 6, marginBottom: 10, padding: 10, borderWidth: 1, borderColor: "#9B59B6" + "33", backgroundColor: "#9B59B6" + "08", borderRadius: colors.radius - 4 }}>
                       <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
                         <View style={{ paddingHorizontal: 8, paddingVertical: 3, backgroundColor: "#9B59B6" + "22", borderRadius: 6 }}>
-                          <Text style={{ color: "#9B59B6", fontFamily: "Inter_700Bold", fontSize: 11 }}>{idx + 1}</Text>
+                          <Text style={{ color: "#9B59B6", fontFamily: "Cairo_700Bold", fontSize: 11 }}>{idx + 1}</Text>
                         </View>
                         {w.provider ? (
-                          <Text style={{ color: "#9B59B6", fontFamily: "Inter_600SemiBold", fontSize: 13 }}>{w.provider}</Text>
+                          <Text style={{ color: "#9B59B6", fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>{w.provider}</Text>
                         ) : null}
                       </View>
                       {renderCopyRow("رقم المحفظة", w.number, `wallet_${w.id}`)}
@@ -556,17 +556,17 @@ export default function CartScreen() {
                   <View style={[styles.amountBox, { backgroundColor: "#9B59B6" + "11", borderColor: "#9B59B6" + "33", borderRadius: colors.radius - 4 }]}>
                     <View style={styles.feeBreakdown}>
                       <View style={styles.feeRow}>
-                        <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 14 }}>{totalPrice.toLocaleString("ar-EG")} ج.م</Text>
-                        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 13 }}>سعر الطلب</Text>
+                        <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>{totalPrice.toLocaleString("ar-EG")} ج.م</Text>
+                        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 13 }}>سعر الطلب</Text>
                       </View>
                       <View style={styles.feeRow}>
-                        <Text style={{ color: "#E74C3C", fontFamily: "Inter_600SemiBold", fontSize: 14 }}>+{feeAmount.toLocaleString("ar-EG")} ج.م</Text>
-                        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 13 }}>رسوم المحفظة ({ewalletFee}%)</Text>
+                        <Text style={{ color: "#E74C3C", fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>+{feeAmount.toLocaleString("ar-EG")} ج.م</Text>
+                        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 13 }}>رسوم المحفظة ({ewalletFee}%)</Text>
                       </View>
                       <View style={[styles.feeDivider, { backgroundColor: colors.border }]} />
                       <View style={styles.feeRow}>
-                        <Text style={{ color: "#9B59B6", fontFamily: "Inter_700Bold", fontSize: 22 }}>{totalWithFee.toLocaleString("ar-EG")} ج.م</Text>
-                        <Text style={{ color: "#9B59B6", fontFamily: "Inter_600SemiBold", fontSize: 14 }}>الإجمالي</Text>
+                        <Text style={{ color: "#9B59B6", fontFamily: "Cairo_700Bold", fontSize: 22 }}>{totalWithFee.toLocaleString("ar-EG")} ج.م</Text>
+                        <Text style={{ color: "#9B59B6", fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>الإجمالي</Text>
                       </View>
                     </View>
                   </View>
@@ -582,12 +582,12 @@ export default function CartScreen() {
                 <View style={styles.paymentInfoSection}>
                   <View style={[styles.paymentInfoBanner, { backgroundColor: "#2ECC71" + "15", borderColor: "#2ECC71" + "33", borderRadius: colors.radius - 4 }]}>
                     <Icon name="zap" size={20} color="#2ECC71" />
-                    <Text style={{ color: "#2ECC71", fontFamily: "Inter_600SemiBold", fontSize: 14, flex: 1, textAlign: "right" }}>
+                    <Text style={{ color: "#2ECC71", fontFamily: "Cairo_600SemiBold", fontSize: 14, flex: 1, textAlign: "right" }}>
                       اختر حساب انستاباي وحوّل عليه ثم اضغط "تأكيد الطلب"
                     </Text>
                   </View>
                   {instapays.length === 0 && (
-                    <Text style={{ color: colors.mutedForeground, fontSize: 13, textAlign: "center", padding: 16 }}>
+                    <Text style={{ color: colors.mutedForeground, fontSize: 13, textAlign: "center", padding: 16, fontFamily: "Cairo_500Medium" }}>
                       لم يضِف المدير أي حساب انستاباي بعد
                     </Text>
                   )}
@@ -595,7 +595,7 @@ export default function CartScreen() {
                     <View key={ip.id} style={{ gap: 6, marginBottom: 10, padding: 10, borderWidth: 1, borderColor: "#2ECC71" + "33", backgroundColor: "#2ECC71" + "08", borderRadius: colors.radius - 4 }}>
                       <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
                         <View style={{ paddingHorizontal: 8, paddingVertical: 3, backgroundColor: "#2ECC71" + "22", borderRadius: 6 }}>
-                          <Text style={{ color: "#2ECC71", fontFamily: "Inter_700Bold", fontSize: 11 }}>{idx + 1}</Text>
+                          <Text style={{ color: "#2ECC71", fontFamily: "Cairo_700Bold", fontSize: 11 }}>{idx + 1}</Text>
                         </View>
                       </View>
                       {renderCopyRow("الانستاباي", ip.handle, `instapay_${ip.id}`)}
@@ -604,11 +604,11 @@ export default function CartScreen() {
                   ))}
 
                   <View style={[styles.amountBox, { backgroundColor: "#2ECC71" + "11", borderColor: "#2ECC71" + "33", borderRadius: colors.radius - 4 }]}>
-                    <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 13 }}>المبلغ المطلوب</Text>
-                    <Text style={{ color: "#2ECC71", fontFamily: "Inter_700Bold", fontSize: 24 }}>{totalPrice.toLocaleString("ar-EG")} ج.م</Text>
+                    <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 13 }}>المبلغ المطلوب</Text>
+                    <Text style={{ color: "#2ECC71", fontFamily: "Cairo_700Bold", fontSize: 24 }}>{totalPrice.toLocaleString("ar-EG")} ج.م</Text>
                     <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 4 }}>
                       <Icon name="check-circle" size={14} color="#2ECC71" />
-                      <Text style={{ color: "#2ECC71", fontFamily: "Inter_500Medium", fontSize: 12 }}>بدون رسوم إضافية</Text>
+                      <Text style={{ color: "#2ECC71", fontFamily: "Cairo_500Medium", fontSize: 12 }}>بدون رسوم إضافية</Text>
                     </View>
                   </View>
                 </View>
@@ -625,7 +625,7 @@ export default function CartScreen() {
                 size="lg"
               />
               <Pressable onPress={() => setShowPaymentModal(false)} style={styles.modalCancelBtn}>
-                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 14 }}>رجوع</Text>
+                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 14 }}>رجوع</Text>
               </Pressable>
             </View>
           </View>
@@ -697,7 +697,7 @@ export default function CartScreen() {
       {cart.length === 0 ? (
         <View style={styles.empty}>
           <Icon name="shopping-cart" size={56} color={colors.mutedForeground} />
-          <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+          <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
             السلة فارغة
           </Text>
           <GoldButton
@@ -737,11 +737,11 @@ export default function CartScreen() {
                     <Icon name="trash-2" size={16} color={colors.destructive} />
                   </Pressable>
                   <View style={styles.itemInfo}>
-                    <Text style={[styles.itemName, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
+                    <Text style={[styles.itemName, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
                       {item.productName}
                     </Text>
                     <View style={styles.colorInfo}>
-                      <Text style={[styles.colorLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+                      <Text style={[styles.colorLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                         {item.colorName}
                       </Text>
                       <View
@@ -772,16 +772,16 @@ export default function CartScreen() {
                   return (
                     <View style={{ gap: 10 }}>
                       <View style={styles.itemFooter}>
-                        <Text style={[styles.itemPrice, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+                        <Text style={[styles.itemPrice, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                           {fmt(item.unitPrice * (item.weight ?? 1))} ج.م
                         </Text>
-                        <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 17 }}>
+                        <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 17 }}>
                           {fmt(item.weight ?? 1)} {unitName}
                         </Text>
                       </View>
 
                       {cap != null && (
-                        <Text style={{ color: "#F39C12", fontFamily: "Inter_600SemiBold", fontSize: 11, textAlign: "right", paddingHorizontal: 4 }}>
+                        <Text style={{ color: "#F39C12", fontFamily: "Cairo_600SemiBold", fontSize: 11, textAlign: "right", paddingHorizontal: 4 }}>
                           الحد الأقصى المتوفر: {fmt(cap)} {unitName}
                         </Text>
                       )}
@@ -853,7 +853,7 @@ export default function CartScreen() {
                       </View>
 
                       {cap == null && (item.weight ?? 0) < minW && (
-                        <Text style={{ color: "#C0392B", fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right", paddingHorizontal: 4 }}>
+                        <Text style={{ color: "#C0392B", fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right", paddingHorizontal: 4 }}>
                           الحد الأدنى {minW} {unitName} لكل لون
                         </Text>
                       )}
@@ -877,31 +877,31 @@ export default function CartScreen() {
                     <View style={{ gap: 2, alignItems: "flex-end" }}>
                       {isEdit ? (
                         <>
-                          <Text style={[styles.itemPrice, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+                          <Text style={[styles.itemPrice, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                             {fmt(aw * item.unitPrice)} ج.م
                           </Text>
-                          <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 12 }}>
+                          <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 12 }}>
                             {fmt(aw)} {unitName}
                           </Text>
                         </>
                       ) : (
                         <>
-                          <Text style={[styles.itemPrice, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+                          <Text style={[styles.itemPrice, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                             ≈ {item.quantity * perBolt * item.unitPrice} ج.م
                           </Text>
-                          <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 10 }}>
+                          <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 10 }}>
                             تقديري ({item.quantity} × {item.unit === "meter" ? "100م" : "20كغ"} × {item.unitPrice})
                           </Text>
                         </>
                       )}
                     </View>
-                    <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 12 }}>
+                    <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 12 }}>
                       {item.quantity} ثوب
                     </Text>
                   </View>
 
                   {isEdit && maxBolts != null && cap != null && (
-                    <Text style={{ color: "#F39C12", fontFamily: "Inter_600SemiBold", fontSize: 11, textAlign: "right", paddingHorizontal: 4 }}>
+                    <Text style={{ color: "#F39C12", fontFamily: "Cairo_600SemiBold", fontSize: 11, textAlign: "right", paddingHorizontal: 4 }}>
                       الحد الأقصى المتوفر: {maxBolts} ثوب ({fmt(Math.min(maxBolts * perBolt, cap))} {unitName})
                     </Text>
                   )}
@@ -991,13 +991,13 @@ export default function CartScreen() {
 
                 {item.companions?.length ? (
                   <View style={[styles.companionList, { backgroundColor: colors.gold + "0D", borderColor: colors.gold + "33" }]}>
-                    <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 12, textAlign: "right" }}>الخامات المرافقة</Text>
+                    <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 12, textAlign: "right" }}>الخامات المرافقة</Text>
                     {item.companions.map((companion, index) => (
                       <View key={`${companion.materialId}-${index}`} style={styles.companionLine}>
-                        <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 12 }}>
+                        <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 12 }}>
                           {formatQuantity(companionLineTotal(companion))} ج.م
                         </Text>
-                        <Text style={{ flex: 1, color: colors.foreground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>
+                        <Text style={{ flex: 1, color: colors.foreground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>
                           {companion.materialName} — {companion.colorName} · {companion.percentage}% · {formatQuantity(companionAmount(companion))} {companion.unit === "meter" ? "متر" : "كغ"}
                         </Text>
                       </View>
@@ -1008,7 +1008,7 @@ export default function CartScreen() {
             ))}
 
             <View style={[styles.notesSection, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
-              <Text style={[styles.notesLabel, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
+              <Text style={[styles.notesLabel, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
                 ملاحظات
               </Text>
               <TextInput
@@ -1019,7 +1019,7 @@ export default function CartScreen() {
                     backgroundColor: colors.input,
                     borderColor: colors.border,
                     borderRadius: colors.radius - 4,
-                    fontFamily: "Inter_400Regular",
+                    fontFamily: "Cairo_400Regular",
                   },
                 ]}
                 placeholder="أي تفاصيل أو متطلبات خاصة..."
@@ -1039,7 +1039,7 @@ export default function CartScreen() {
                 style={[styles.browseBtn, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: colors.radius - 4 }]}
               >
                 <Icon name="package-plus" size={16} color={colors.gold} />
-                <Text style={{ color: colors.gold, fontFamily: "Inter_600SemiBold", fontSize: 14 }}>
+                <Text style={{ color: colors.gold, fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>
                   اختيار منتجات بديلة
                 </Text>
               </Pressable>
@@ -1049,16 +1049,16 @@ export default function CartScreen() {
               <View style={[styles.salesNote, { backgroundColor: colors.gold + "11", borderColor: colors.gold + "33", borderRadius: colors.radius }]}>
                 <View style={styles.salesNoteInfoRow}>
                   <Icon name="info" size={16} color={colors.gold} />
-                  <Text style={[styles.salesNoteText, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+                  <Text style={[styles.salesNoteText, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                     الوزن/الأمتار التقديرية لكل ثوب
                   </Text>
                 </View>
                 {cart.filter(i => i.orderType === "pieces").map((item, idx) => (
                   <View key={idx} style={{ flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 4, paddingVertical: 2 }}>
-                    <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right", flex: 1 }}>
+                    <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right", flex: 1 }}>
                       {item.productName} ({item.colorName}) × {item.quantity}
                     </Text>
-                    <Text style={{ color: colors.gold, fontFamily: "Inter_600SemiBold", fontSize: 12 }}>
+                    <Text style={{ color: colors.gold, fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>
                       ≈ {item.quantity * (item.unit === "meter" ? 100 : 20) * item.unitPrice} ج.م
                     </Text>
                   </View>
@@ -1070,7 +1070,7 @@ export default function CartScreen() {
               <View style={[styles.paymentSection, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
                 <View style={styles.paymentHeader}>
                   <Icon name="truck" size={18} color={colors.gold} />
-                  <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 16, flex: 1, textAlign: "right" }}>
+                  <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 16, flex: 1, textAlign: "right" }}>
                     طريقة الاستلام
                   </Text>
                 </View>
@@ -1096,8 +1096,8 @@ export default function CartScreen() {
                         >
                           <Icon name={icn as any} size={18} color={isSel ? colors.gold : colors.mutedForeground} />
                           <View style={{ flex: 1 }}>
-                            <Text style={{ color: isSel ? colors.gold : colors.foreground, fontFamily: isSel ? "Inter_700Bold" : "Inter_600SemiBold", fontSize: 13, textAlign: "right" }}>{label}</Text>
-                            <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right", marginTop: 2 }}>{desc}</Text>
+                            <Text style={{ color: isSel ? colors.gold : colors.foreground, fontFamily: isSel ? "Cairo_700Bold" : "Cairo_600SemiBold", fontSize: 13, textAlign: "right" }}>{label}</Text>
+                            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right", marginTop: 2 }}>{desc}</Text>
                           </View>
                           {isSel && (
                             <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: colors.gold, alignItems: "center", justifyContent: "center" }}>
@@ -1109,7 +1109,7 @@ export default function CartScreen() {
                         {/* Branches list appears directly under the pickup-from-branch button when selected */}
                         {ft === "branch" && isSel && branchesList.length > 0 && (
                           <View style={{ gap: 6, marginRight: 12, marginLeft: 4 }}>
-                            <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 12, textAlign: "right" }}>اختر الفرع</Text>
+                            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 12, textAlign: "right" }}>اختر الفرع</Text>
                             {branchesList.map((b) => {
                               const sel = selectedBranchId === b.id;
                               return (
@@ -1120,15 +1120,15 @@ export default function CartScreen() {
                                 >
                                   <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
                                     <Icon name={sel ? "check-circle" : "circle"} size={14} color={sel ? colors.gold : colors.mutedForeground} />
-                                    <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 13, flex: 1, textAlign: "right" }}>{b.name}</Text>
+                                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, flex: 1, textAlign: "right" }}>{b.name}</Text>
                                   </View>
                                   {b.address ? (
-                                    <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right" }}>{b.address}</Text>
+                                    <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>{b.address}</Text>
                                   ) : null}
                                   {b.mapsUrl ? (
                                     <Pressable onPress={() => Linking.openURL(b.mapsUrl!).catch(() => {})} style={{ flexDirection: "row-reverse", alignItems: "center", gap: 4 }}>
                                       <Icon name="map" size={11} color="#3498DB" />
-                                      <Text style={{ color: "#3498DB", fontFamily: "Inter_600SemiBold", fontSize: 11 }}>موقع الفرع</Text>
+                                      <Text style={{ color: "#3498DB", fontFamily: "Cairo_600SemiBold", fontSize: 11 }}>موقع الفرع</Text>
                                     </Pressable>
                                   ) : null}
                                 </Pressable>
@@ -1144,7 +1144,7 @@ export default function CartScreen() {
                 {fulfillmentType === "shipping" && (
                   <>
                     <View style={{ gap: 6, marginTop: 4 }}>
-                      <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 12, textAlign: "right" }}>اختر شركة الشحن</Text>
+                      <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 12, textAlign: "right" }}>اختر شركة الشحن</Text>
                       {shippingProvidersList.filter((p) => p.enabled !== false).map((p) => {
                         const sel = selectedShippingProviderId === p.id;
                         return (
@@ -1154,14 +1154,14 @@ export default function CartScreen() {
                             style={{ padding: 10, borderRadius: 8, borderWidth: 1, borderColor: sel ? colors.gold : colors.border, backgroundColor: sel ? colors.gold + "12" : colors.surface, flexDirection: "row-reverse", alignItems: "center", gap: 8 }}
                           >
                             <Icon name={sel ? "check-circle" : "circle"} size={14} color={sel ? colors.gold : colors.mutedForeground} />
-                            <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 13, flex: 1, textAlign: "right" }}>{p.name}</Text>
+                            <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, flex: 1, textAlign: "right" }}>{p.name}</Text>
                           </Pressable>
                         );
                       })}
                     </View>
                     <View style={{ gap: 8, marginTop: 8 }}>
                       <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
-                        <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 13, textAlign: "right" }}>
+                        <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, textAlign: "right" }}>
                           عنوان الشحن <Text style={{ color: "#E74C3C" }}>*</Text>
                         </Text>
                         {userAddresses.length > 0 && (
@@ -1169,17 +1169,17 @@ export default function CartScreen() {
                             onPress={() => router.push("/profile/addresses" as any)}
                             hitSlop={8}
                           >
-                            <Text style={{ color: colors.gold, fontFamily: "Inter_600SemiBold", fontSize: 11 }}>إدارة العناوين</Text>
+                            <Text style={{ color: colors.gold, fontFamily: "Cairo_600SemiBold", fontSize: 11 }}>إدارة العناوين</Text>
                           </Pressable>
                         )}
                       </View>
 
                       {userAddresses.length === 0 && !showAddAddressForm && (
                         <View style={{ padding: 10, borderRadius: 8, borderWidth: 1, borderColor: "#E74C3C44", backgroundColor: "#E74C3C10", gap: 8 }}>
-                          <Text style={{ color: "#C0392B", fontFamily: "Inter_700Bold", fontSize: 12, textAlign: "right" }}>
+                          <Text style={{ color: "#C0392B", fontFamily: "Cairo_700Bold", fontSize: 12, textAlign: "right" }}>
                             لا توجد لديك عناوين شحن محفوظة
                           </Text>
-                          <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right", lineHeight: 18 }}>
+                          <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right", lineHeight: 18 }}>
                             يرجى إضافة عنوان شحن لمتابعة الطلب.
                           </Text>
                           <Pressable
@@ -1187,7 +1187,7 @@ export default function CartScreen() {
                             style={({ pressed }) => ({ flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 10, borderRadius: 8, backgroundColor: colors.gold, opacity: pressed ? 0.7 : 1 })}
                           >
                             <Icon name="plus" size={14} color="#000" />
-                            <Text style={{ color: "#000", fontFamily: "Inter_700Bold", fontSize: 13 }}>إضافة عنوان شحن</Text>
+                            <Text style={{ color: "#000", fontFamily: "Cairo_700Bold", fontSize: 13 }}>إضافة عنوان شحن</Text>
                           </Pressable>
                         </View>
                       )}
@@ -1204,17 +1204,17 @@ export default function CartScreen() {
                             <View style={{ flex: 1, gap: 2 }}>
                               <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
                                 {a.label ? (
-                                  <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 13, textAlign: "right" }}>{a.label}</Text>
+                                  <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, textAlign: "right" }}>{a.label}</Text>
                                 ) : (
-                                  <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 13, textAlign: "right" }}>{a.city}</Text>
+                                  <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, textAlign: "right" }}>{a.city}</Text>
                                 )}
                                 {a.isDefault && (
                                   <View style={{ backgroundColor: colors.gold + "22", paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
-                                    <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 9 }}>افتراضي</Text>
+                                    <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 9 }}>افتراضي</Text>
                                   </View>
                                 )}
                               </View>
-                              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right", lineHeight: 16 }}>
+                              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right", lineHeight: 16 }}>
                                 {formatAddress(a)}
                               </Text>
                             </View>
@@ -1228,13 +1228,13 @@ export default function CartScreen() {
                           style={({ pressed }) => ({ flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 10, borderRadius: 8, borderWidth: 1, borderColor: colors.gold + "55", borderStyle: "dashed", opacity: pressed ? 0.7 : 1 })}
                         >
                           <Icon name="plus" size={13} color={colors.gold} />
-                          <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 12 }}>إضافة عنوان جديد</Text>
+                          <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 12 }}>إضافة عنوان جديد</Text>
                         </Pressable>
                       )}
 
                       {showAddAddressForm && (
                         <View style={{ padding: 12, borderRadius: 8, borderWidth: 1, borderColor: colors.gold + "55", backgroundColor: colors.surface, gap: 8 }}>
-                          <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 13, textAlign: "right" }}>عنوان جديد</Text>
+                          <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, textAlign: "right" }}>عنوان جديد</Text>
                           <TextInput
                             value={newAddrLabel}
                             onChangeText={setNewAddrLabel}
@@ -1248,7 +1248,7 @@ export default function CartScreen() {
                               padding: 10,
                               color: colors.foreground,
                               textAlign: "right",
-                              fontFamily: "Inter_400Regular",
+                              fontFamily: "Cairo_400Regular",
                               fontSize: 13,
                             }}
                           />
@@ -1284,7 +1284,7 @@ export default function CartScreen() {
                                 padding: 10,
                                 color: colors.foreground,
                                 textAlign: "right",
-                                fontFamily: "Inter_400Regular",
+                                fontFamily: "Cairo_400Regular",
                                 fontSize: 13,
                               }}
                             />
@@ -1296,7 +1296,7 @@ export default function CartScreen() {
                               style={({ pressed }) => ({ flex: 1, flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 11, borderRadius: 8, backgroundColor: colors.gold, opacity: (pressed || savingAddress) ? 0.7 : 1 })}
                             >
                               <Icon name="check" size={14} color="#000" />
-                              <Text style={{ color: "#000", fontFamily: "Inter_700Bold", fontSize: 13 }}>
+                              <Text style={{ color: "#000", fontFamily: "Cairo_700Bold", fontSize: 13 }}>
                                 {savingAddress ? "جاري الحفظ..." : "حفظ العنوان"}
                               </Text>
                             </Pressable>
@@ -1305,7 +1305,7 @@ export default function CartScreen() {
                                 onPress={() => setShowAddAddressForm(false)}
                                 style={({ pressed }) => ({ paddingHorizontal: 14, alignItems: "center", justifyContent: "center", borderRadius: 8, borderWidth: 1, borderColor: colors.border, opacity: pressed ? 0.7 : 1 })}
                               >
-                                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_600SemiBold", fontSize: 12 }}>إلغاء</Text>
+                                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>إلغاء</Text>
                               </Pressable>
                             )}
                           </View>
@@ -1315,7 +1315,7 @@ export default function CartScreen() {
                     {!isStaff && (
                     <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8, padding: 10, backgroundColor: "#F5A62315", borderColor: "#F5A62344", borderWidth: 1, borderRadius: colors.radius - 6, marginTop: 4 }}>
                       <Icon name="alert-triangle" size={14} color="#F5A623" />
-                      <Text style={{ color: "#B5790E", fontFamily: "Inter_700Bold", fontSize: 12, flex: 1, textAlign: "right" }}>
+                      <Text style={{ color: "#B5790E", fontFamily: "Cairo_700Bold", fontSize: 12, flex: 1, textAlign: "right" }}>
                         السعر غير شامل ثمن الشحن
                       </Text>
                     </View>
@@ -1329,11 +1329,11 @@ export default function CartScreen() {
               <View style={[styles.paymentSection, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
                 <View style={styles.paymentHeader}>
                   <Icon name="wallet" size={18} color={colors.gold} />
-                  <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 16, flex: 1, textAlign: "right" }}>
+                  <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 16, flex: 1, textAlign: "right" }}>
                     طريقة الدفع
                   </Text>
                 </View>
-                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right", lineHeight: 18 }}>
+                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right", lineHeight: 18 }}>
                   يرجى سداد قيمة الفاتورة بإحدى الطرق التالية
                 </Text>
 
@@ -1363,14 +1363,14 @@ export default function CartScreen() {
                         </View>
                         <Text style={{
                           color: isSelected ? pmColor : colors.foreground,
-                          fontFamily: isSelected ? "Inter_700Bold" : "Inter_500Medium",
+                          fontFamily: isSelected ? "Cairo_700Bold" : "Cairo_500Medium",
                           fontSize: 13,
                         }}>
                           {pm.short}
                         </Text>
                         <Text style={{
                           color: colors.mutedForeground + (isSelected ? "" : "99"),
-                          fontFamily: "Inter_400Regular",
+                          fontFamily: "Cairo_400Regular",
                           fontSize: 10,
                         }}>
                           {pm.desc}
@@ -1383,7 +1383,7 @@ export default function CartScreen() {
                         {pm.key === "instapay" && isSelected && (
                           <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 3, marginTop: 2 }}>
                             <Icon name="check-circle" size={10} color="#2ECC71" />
-                            <Text style={{ color: "#2ECC71", fontFamily: "Inter_400Regular", fontSize: 9 }}>بدون رسوم</Text>
+                            <Text style={{ color: "#2ECC71", fontFamily: "Cairo_400Regular", fontSize: 9 }}>بدون رسوم</Text>
                           </View>
                         )}
                       </Pressable>
@@ -1411,21 +1411,21 @@ export default function CartScreen() {
             <View style={{ gap: 4 }}>
               {totalPrice > 0 && (
                 <View style={styles.totalRow}>
-                  <Text style={[styles.totalLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+                  <Text style={[styles.totalLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                     {hasPiecesOrder ? "الإجمالي التقديري" : "المجموع الكلي"}
                   </Text>
                   <View style={{ alignItems: "flex-start" }}>
                     {selectedPayment === "ewallet" && feeAmount > 0 ? (
                       <>
-                        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textDecorationLine: "line-through" }}>
+                        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textDecorationLine: "line-through" }}>
                           {hasPiecesOrder ? "≈ " : ""}{totalPrice.toLocaleString("ar-EG")} ج.م
                         </Text>
-                        <Text style={[styles.totalPrice, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+                        <Text style={[styles.totalPrice, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                           {hasPiecesOrder ? "≈ " : ""}{totalWithFee.toLocaleString("ar-EG")} ج.م
                         </Text>
                       </>
                     ) : (
-                      <Text style={[styles.totalPrice, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+                      <Text style={[styles.totalPrice, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                         {hasPiecesOrder ? "≈ " : ""}{totalPrice.toLocaleString("ar-EG")} ج.م
                       </Text>
                     )}
@@ -1436,7 +1436,7 @@ export default function CartScreen() {
             {selectedPayment && !editOrderId && (
               <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6, paddingVertical: 2 }}>
                 <Icon name={PAYMENT_METHOD_ICONS[selectedPayment]} size={14} color={PAYMENT_COLORS[selectedPayment]} />
-                <Text style={{ color: PAYMENT_COLORS[selectedPayment], fontFamily: "Inter_500Medium", fontSize: 12 }}>
+                <Text style={{ color: PAYMENT_COLORS[selectedPayment], fontFamily: "Cairo_500Medium", fontSize: 12 }}>
                   {PAYMENT_METHODS.find(p => p.key === selectedPayment)?.short}
                 </Text>
               </View>
@@ -1465,7 +1465,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 20,
   },
-  emptyText: { fontSize: 18 },
+  emptyText: { fontSize: 18, fontFamily: "Cairo_700Bold" },
   list: { padding: 16, gap: 12 },
   cartItem: { borderWidth: 1, padding: 14, gap: 12 },
   itemHeader: {
@@ -1476,13 +1476,13 @@ const styles = StyleSheet.create({
   companionList: { borderWidth: 1, borderRadius: 10, padding: 10, gap: 8 },
   companionLine: { flexDirection: "row-reverse", alignItems: "center", gap: 8 },
   itemInfo: { flex: 1, gap: 4, alignItems: "flex-end" },
-  itemName: { fontSize: 15, textAlign: "right" },
+  itemName: { fontSize: 15, textAlign: "right", fontFamily: "Cairo_600SemiBold" },
   colorInfo: {
     flexDirection: "row-reverse",
     alignItems: "center",
     gap: 6,
   },
-  colorLabel: { fontSize: 13 },
+  colorLabel: { fontSize: 13, fontFamily: "Cairo_400Regular" },
   colorDot: { width: 16, height: 16, borderRadius: 8 },
   deleteBtn: {
     width: 32,
@@ -1495,8 +1495,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  itemPrice: { fontSize: 15 },
-  contactSales: { fontSize: 12, flex: 1, textAlign: "right" },
+  itemPrice: { fontSize: 15, fontFamily: "Cairo_700Bold" },
+  contactSales: { fontSize: 12, flex: 1, textAlign: "right", fontFamily: "Cairo_600SemiBold" },
   qtyControls: {
     flexDirection: "row-reverse",
     alignItems: "center",
@@ -1510,31 +1510,32 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderWidth: 1,
   },
-  qty: { fontSize: 16, minWidth: 24, textAlign: "center" },
+  qty: { fontSize: 16, minWidth: 24, textAlign: "center", fontFamily: "Cairo_700Bold" },
   editRow: {
     flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 4,
   },
-  editRowLabel: { fontFamily: "Inter_500Medium", fontSize: 12, textAlign: "right" },
+  editRowLabel: { fontFamily: "Cairo_500Medium", fontSize: 12, textAlign: "right" },
   stepperGroup: { flexDirection: "row-reverse", alignItems: "center", gap: 8 },
   stepperInput: {
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Cairo_700Bold",
     fontSize: 14,
     minWidth: 50,
     textAlign: "center",
     borderBottomWidth: 1,
     paddingVertical: 2,
   },
-  stepperUnit: { fontFamily: "Inter_400Regular", fontSize: 12, minWidth: 30, textAlign: "center" },
+  stepperUnit: { fontFamily: "Cairo_400Regular", fontSize: 12, minWidth: 30, textAlign: "center" },
   notesSection: { borderWidth: 1, padding: 14, gap: 10 },
-  notesLabel: { fontSize: 15, textAlign: "right" },
+  notesLabel: { fontSize: 15, textAlign: "right", fontFamily: "Cairo_700Bold" },
   notesInput: {
     borderWidth: 1,
     padding: 12,
     minHeight: 80,
     fontSize: 14,
+    fontFamily: "Cairo_400Regular",
   },
   browseBtn: {
     flexDirection: "row-reverse",
@@ -1554,7 +1555,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     gap: 10,
   },
-  salesNoteText: { flex: 1, fontSize: 13, textAlign: "right", lineHeight: 20 },
+  salesNoteText: { flex: 1, fontSize: 13, textAlign: "right", lineHeight: 20, fontFamily: "Cairo_400Regular" },
   callSalesBtn: {
     flexDirection: "row-reverse",
     alignItems: "center",
@@ -1616,8 +1617,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  totalLabel: { fontSize: 14 },
-  totalPrice: { fontSize: 20 },
+  totalLabel: { fontSize: 14, fontFamily: "Cairo_600SemiBold" },
+  totalPrice: { fontSize: 20, fontFamily: "Cairo_700Bold" },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.7)",

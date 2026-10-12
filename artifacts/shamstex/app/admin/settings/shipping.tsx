@@ -50,7 +50,7 @@ export default function ShippingSettings() {
   return (
     <SettingsScreen title="شركات الشحن" bottomPad={bottomPad} save={save} saving={saving}>
       <Card title="💳 طرق الدفع المتاحة عند الشحن">
-        <Text style={{ color: colors.mutedForeground, fontSize: 12, textAlign: "right", marginBottom: 8 }}>
+        <Text style={{ color: colors.mutedForeground, fontSize: 12, textAlign: "right", marginBottom: 8, fontFamily: "Cairo_400Regular" }}>
           تُطبَّق هذه الإعدادات على جميع شركات الشحن. اختر طريقة دفع واحدة على الأقل.
         </Text>
         <View style={{ flexDirection: "row-reverse", flexWrap: "wrap", gap: 8 }}>
@@ -73,7 +73,7 @@ export default function ShippingSettings() {
                 }}
               >
                 <Icon name={on ? "check-square" : "square"} size={14} color={on ? colors.gold : colors.mutedForeground} />
-                <Text style={{ color: on ? colors.gold : colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 12 }}>
+                <Text style={{ color: on ? colors.gold : colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>
                   {PAYMENT_METHOD_LABELS[m]}
                 </Text>
               </Pressable>
@@ -83,12 +83,12 @@ export default function ShippingSettings() {
       </Card>
 
       <Card title="🚚 شركات الشحن">
-        <Text style={{ color: colors.mutedForeground, fontSize: 12, textAlign: "right", marginBottom: 8 }}>
+        <Text style={{ color: colors.mutedForeground, fontSize: 12, textAlign: "right", marginBottom: 8, fontFamily: "Cairo_400Regular" }}>
           أضف/عدّل/احذف شركات الشحن المتاحة للعميل. ثمن الشحن لا يُحسب داخل التطبيق ويُتفق عليه خارجياً.
         </Text>
         <View style={{ gap: 8 }}>
           {current.length === 0 ? (
-            <Text style={{ color: colors.mutedForeground, fontSize: 12, textAlign: "center", padding: 12 }}>لا توجد شركات شحن. أضف شركة جديدة لتفعيل خيار الشحن.</Text>
+            <Text style={{ color: colors.mutedForeground, fontSize: 12, textAlign: "center", padding: 12, fontFamily: "Cairo_400Regular" }}>لا توجد شركات شحن. أضف شركة جديدة لتفعيل خيار الشحن.</Text>
           ) : null}
           {current.map((p) => {
             const enabled = p.enabled !== false;
@@ -101,12 +101,12 @@ export default function ShippingSettings() {
                     onChangeText={(v) => updateProvider(p.id, { name: v })}
                     placeholder="اسم شركة الشحن"
                     placeholderTextColor={colors.mutedForeground}
-                    style={{ flex: 1, color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 13, textAlign: "right", borderWidth: 1, borderColor: colors.border, borderRadius: 8, padding: 8, backgroundColor: colors.background }}
+                    style={{ flex: 1, color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 13, textAlign: "right", borderWidth: 1, borderColor: colors.border, borderRadius: 8, padding: 8, backgroundColor: colors.background }}
                   />
                 </View>
                 <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
                   <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
-                    <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>{enabled ? "مفعّلة" : "معطّلة"}</Text>
+                    <Text style={{ color: colors.mutedForeground, fontSize: 12, fontFamily: "Cairo_500Medium" }}>{enabled ? "مفعّلة" : "معطّلة"}</Text>
                     <Switch
                       value={enabled}
                       onValueChange={(v) => updateProvider(p.id, { enabled: v })}
@@ -116,7 +116,7 @@ export default function ShippingSettings() {
                   </View>
                   <Pressable onPress={() => removeProvider(p.id)} style={{ flexDirection: "row-reverse", alignItems: "center", gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: "#E74C3C44" }}>
                     <Icon name="trash-2" size={13} color="#E74C3C" />
-                    <Text style={{ color: "#E74C3C", fontFamily: "Inter_600SemiBold", fontSize: 12 }}>حذف</Text>
+                    <Text style={{ color: "#E74C3C", fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>حذف</Text>
                   </Pressable>
                 </View>
               </View>

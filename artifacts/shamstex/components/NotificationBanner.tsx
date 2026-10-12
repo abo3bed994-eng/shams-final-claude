@@ -98,10 +98,10 @@ export default function NotificationBanner() {
           <Icon name="bell" size={18} color={colors.gold} />
         </View>
         <View style={styles.textWrap}>
-          <Text style={[styles.title, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]} numberOfLines={1}>
+          <Text style={[styles.title, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]} numberOfLines={1}>
             {current.title}
           </Text>
-          <Text style={[styles.body, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]} numberOfLines={1}>
+          <Text style={[styles.body, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]} numberOfLines={1}>
             {current.body}
           </Text>
         </View>

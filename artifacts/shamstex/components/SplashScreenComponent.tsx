@@ -22,7 +22,7 @@ export default function SplashScreenComponent({ onFinish }: { onFinish: () => vo
       taglineText={
         language === "ar" ? "تعانق الجودة كل خيط" : "Quality embraces every thread"
       }
-      taglineFontFamily={language === "ar" ? "Amiri_700Bold" : "Inter_700Bold"}
+      taglineFontFamily={language === "ar" ? "Cairo_700Bold" : "Cairo_700Bold"}
       logoSize={240}
     />
   );

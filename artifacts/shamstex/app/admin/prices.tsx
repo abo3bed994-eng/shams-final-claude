@@ -79,13 +79,13 @@ export default function AdminPricesScreen() {
         contentContainerStyle={[styles.content, { paddingBottom: bottomPad + 40 }]}
       >
         <View style={[styles.headerRow, { borderBottomColor: colors.border }]}>
-          <Text style={[styles.colHeader, { color: colors.mutedForeground, fontFamily: "Inter_600SemiBold", flex: 1 }]}>
+          <Text style={[styles.colHeader, { color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold", flex: 1 }]}>
             سعر التاجر
           </Text>
-          <Text style={[styles.colHeader, { color: colors.mutedForeground, fontFamily: "Inter_600SemiBold", flex: 1 }]}>
+          <Text style={[styles.colHeader, { color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold", flex: 1 }]}>
             سعر الزبون
           </Text>
-          <Text style={[styles.colHeader, { color: colors.mutedForeground, fontFamily: "Inter_600SemiBold", flex: 2 }]}>
+          <Text style={[styles.colHeader, { color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold", flex: 2 }]}>
             اسم الخامة
           </Text>
         </View>
@@ -106,21 +106,21 @@ export default function AdminPricesScreen() {
             >
               {editing !== product.id ? (
                 <>
-                  <Text style={[styles.priceCell, { color: colors.gold, fontFamily: "Inter_700Bold", flex: 1 }]}>
+                  <Text style={[styles.priceCell, { color: colors.gold, fontFamily: "Cairo_700Bold", flex: 1 }]}>
                     {product.wholesalePrice} ج.م
                   </Text>
-                  <Text style={[styles.priceCell, { color: colors.foreground, fontFamily: "Inter_600SemiBold", flex: 1 }]}>
+                  <Text style={[styles.priceCell, { color: colors.foreground, fontFamily: "Cairo_600SemiBold", flex: 1 }]}>
                     {product.retailPrice} ج.م
                   </Text>
                    <View style={{ flex: 2, flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
                      {product.priceMenuNew && (
                        <View style={[styles.newBadge, { backgroundColor: colors.gold }]}>
-                         <Text style={[styles.newBadgeText, { color: colors.background, fontFamily: "Inter_700Bold" }]}>NEW</Text>
+                         <Text style={[styles.newBadgeText, { color: colors.background, fontFamily: "Cairo_700Bold" }]}>NEW</Text>
                        </View>
                      )}
                      {product.priceTrend === "up" && <Icon name="chevron-up" size={17} color="#27AE60" />}
                      {product.priceTrend === "down" && <Icon name="chevron-down" size={17} color="#E74C3C" />}
-                    <Text style={[styles.nameCell, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
+                    <Text style={[styles.nameCell, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
                       {product.name}
                     </Text>
                   </View>
@@ -136,7 +136,7 @@ export default function AdminPricesScreen() {
                         backgroundColor: colors.input,
                         borderColor: colors.border,
                         borderRadius: 8,
-                        fontFamily: "Inter_400Regular",
+                        fontFamily: "Cairo_400Regular",
                       },
                     ]}
                     value={editValues.name}
@@ -147,7 +147,7 @@ export default function AdminPricesScreen() {
                   />
                   <View style={styles.priceInputsRow}>
                     <View style={styles.priceInputWrapper}>
-                      <Text style={[styles.priceInputLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+                      <Text style={[styles.priceInputLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                         سعر التاجر
                       </Text>
                       <TextInput
@@ -158,7 +158,7 @@ export default function AdminPricesScreen() {
                             backgroundColor: colors.input,
                             borderColor: colors.border,
                             borderRadius: 8,
-                            fontFamily: "Inter_600SemiBold",
+                            fontFamily: "Cairo_600SemiBold",
                           },
                         ]}
                         value={editTexts.wholesale}
@@ -168,7 +168,7 @@ export default function AdminPricesScreen() {
                       />
                     </View>
                     <View style={styles.priceInputWrapper}>
-                      <Text style={[styles.priceInputLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+                      <Text style={[styles.priceInputLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                         سعر الزبون
                       </Text>
                       <TextInput
@@ -179,7 +179,7 @@ export default function AdminPricesScreen() {
                             backgroundColor: colors.input,
                             borderColor: colors.border,
                             borderRadius: 8,
-                            fontFamily: "Inter_600SemiBold",
+                            fontFamily: "Cairo_600SemiBold",
                           },
                         ]}
                         value={editTexts.retail}
@@ -195,12 +195,12 @@ export default function AdminPricesScreen() {
                        style={[styles.markerBtn, { backgroundColor: priceMenuNew ? colors.gold + "22" : colors.surface, borderColor: priceMenuNew ? colors.gold : colors.border }]}
                      >
                        <View style={[styles.newBadge, { backgroundColor: priceMenuNew ? colors.gold : colors.mutedForeground }]}>
-                         <Text style={[styles.newBadgeText, { color: priceMenuNew ? colors.background : colors.card, fontFamily: "Inter_700Bold" }]}>NEW</Text>
+                         <Text style={[styles.newBadgeText, { color: priceMenuNew ? colors.background : colors.card, fontFamily: "Cairo_700Bold" }]}>NEW</Text>
                        </View>
-                       <Text style={{ color: colors.foreground, fontFamily: "Inter_500Medium", fontSize: 12 }}>شارة خامة جديدة</Text>
+                       <Text style={{ color: colors.foreground, fontFamily: "Cairo_500Medium", fontSize: 12 }}>شارة خامة جديدة</Text>
                      </Pressable>
                      <View style={styles.trendGroup}>
-                       <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11 }}>إشارة السعر</Text>
+                       <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11 }}>إشارة السعر</Text>
                        <View style={styles.trendButtons}>
                          {([
                            { value: undefined, label: "بدون", icon: "minus" },
@@ -213,7 +213,7 @@ export default function AdminPricesScreen() {
                              style={[styles.trendBtn, { backgroundColor: priceTrend === item.value ? colors.gold + "22" : colors.surface, borderColor: priceTrend === item.value ? colors.gold : colors.border }]}
                            >
                              <Icon name={item.icon} size={14} color={priceTrend === item.value ? colors.gold : colors.mutedForeground} />
-                             <Text style={{ color: priceTrend === item.value ? colors.gold : colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 10 }}>{item.label}</Text>
+                             <Text style={{ color: priceTrend === item.value ? colors.gold : colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 10 }}>{item.label}</Text>
                            </Pressable>
                          ))}
                        </View>

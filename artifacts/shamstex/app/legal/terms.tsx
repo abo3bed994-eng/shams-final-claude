@@ -60,15 +60,15 @@ export default function TermsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.content, { paddingBottom: bottomPad + 40 }]}
       >
-        <Text style={[styles.updated, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+        <Text style={[styles.updated, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
           آخر تحديث: يونيو 2026
         </Text>
         {SECTIONS.map((s, i) => (
           <View key={i} style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
-            <Text style={[styles.title, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+            <Text style={[styles.title, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
               {s.title}
             </Text>
-            <Text style={[styles.body, { color: colors.foreground, fontFamily: "Inter_400Regular" }]}>
+            <Text style={[styles.body, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}>
               {s.body}
             </Text>
           </View>

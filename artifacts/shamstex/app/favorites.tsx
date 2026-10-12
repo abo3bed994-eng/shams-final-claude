@@ -35,10 +35,10 @@ export default function FavoritesScreen() {
         {favProducts.length === 0 ? (
           <View style={styles.empty}>
             <Icon name="heart" size={48} color={colors.mutedForeground} />
-            <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+            <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
               لا توجد منتجات في المفضّلة
             </Text>
-            <Text style={[styles.emptyHint, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+            <Text style={[styles.emptyHint, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
               اضغط على القلب في أي منتج لإضافته هنا
             </Text>
           </View>

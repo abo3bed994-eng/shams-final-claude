@@ -28,7 +28,7 @@ export default function SocialsSettings() {
               <Field label="الاسم" value={item.label} onChange={(v) => updateSocial(item.id, "label", v)} placeholder="مثال: إنستغرام" />
               <Field label="الرابط" value={item.url} onChange={(v) => updateSocial(item.id, "url", v)} placeholder="https://..." keyboardType="url" />
               <View style={{ gap: 5 }}>
-                <Text style={{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Inter_400Regular" }}>الأيقونة</Text>
+                <Text style={{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Cairo_400Regular" }}>الأيقونة</Text>
                 <View style={styles.iconRow}>
                   {SOCIAL_ICONS.map((ic) => (
                     <Pressable

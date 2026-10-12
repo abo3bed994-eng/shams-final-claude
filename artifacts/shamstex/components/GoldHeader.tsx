@@ -41,12 +41,12 @@ export default function GoldHeader({ title, onBack, rightElement, subtitle }: Go
         )}
 
         <View style={styles.titleContainer}>
-          <Text style={[styles.title, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.title, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
             {title}
           </Text>
           {subtitle && (
             <Text
-              style={[styles.subtitle, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}
+              style={[styles.subtitle, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}
             >
               {subtitle}
             </Text>

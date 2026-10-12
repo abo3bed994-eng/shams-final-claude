@@ -326,7 +326,7 @@ export default function AdminNotificationsScreen() {
               style={[styles.tab, { borderBottomColor: active ? colors.gold : "transparent" }]}
             >
               <Icon name={tab.icon as any} size={16} color={active ? colors.gold : colors.mutedForeground} />
-              <Text style={[styles.tabText, { color: active ? colors.gold : colors.mutedForeground, fontFamily: active ? "Inter_700Bold" : "Inter_400Regular" }]}>
+              <Text style={[styles.tabText, { color: active ? colors.gold : colors.mutedForeground, fontFamily: active ? "Cairo_700Bold" : "Cairo_400Regular" }]}>
                 {tab.label}
               </Text>
             </Pressable>
@@ -353,7 +353,7 @@ export default function AdminNotificationsScreen() {
       {isSupervisor && !supervisorCanSend && (
         <View style={[styles.warningBanner, { backgroundColor: "#C0392B22", borderColor: "#C0392B55", margin: 16, borderRadius: colors.radius }]}>
           <Icon name="alert-triangle" size={18} color="#C0392B" />
-          <Text style={[styles.warningText, { color: "#C0392B", fontFamily: "Inter_500Medium" }]}>
+          <Text style={[styles.warningText, { color: "#C0392B", fontFamily: "Cairo_500Medium" }]}>
             لا تملك صلاحية إرسال الإشعارات. تواصل مع المدير لمنحك الإذن.
           </Text>
         </View>
@@ -368,7 +368,7 @@ export default function AdminNotificationsScreen() {
           <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
             <View style={styles.sectionHeader}>
               <Icon name="send" size={16} color={colors.gold} />
-              <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+              <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                 إرسال إلى
               </Text>
             </View>
@@ -394,7 +394,7 @@ export default function AdminNotificationsScreen() {
                     ]}
                   >
                     <Icon name={opt.icon as any} size={16} color={active ? opt.color : colors.mutedForeground} />
-                    <Text style={[styles.typeLabel, { color: active ? opt.color : colors.foreground, fontFamily: active ? "Inter_700Bold" : "Inter_500Medium" }]}>
+                    <Text style={[styles.typeLabel, { color: active ? opt.color : colors.foreground, fontFamily: active ? "Cairo_700Bold" : "Cairo_500Medium" }]}>
                       {opt.label}
                     </Text>
                   </Pressable>
@@ -405,7 +405,7 @@ export default function AdminNotificationsScreen() {
             {notifType !== "private" && (
               <View style={[styles.targetInfo, { backgroundColor: colors.surface, borderRadius: colors.radius - 4 }]}>
                 <Icon name="users" size={14} color={colors.gold} />
-                <Text style={{ color: colors.foreground, fontFamily: "Inter_500Medium", fontSize: 13 }}>
+                <Text style={{ color: colors.foreground, fontFamily: "Cairo_500Medium", fontSize: 13 }}>
                   سيصل إلى {getTargetCount()} مستخدم
                 </Text>
               </View>
@@ -416,7 +416,7 @@ export default function AdminNotificationsScreen() {
             <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
               <View style={styles.sectionHeader}>
                 <Icon name="user" size={16} color={colors.gold} />
-                <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+                <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                   اختر المستخدم
                 </Text>
               </View>
@@ -424,7 +424,7 @@ export default function AdminNotificationsScreen() {
               <View style={[styles.searchBox, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="search" size={16} color={colors.mutedForeground} />
                 <TextInput
-                  style={[styles.searchInput, { color: colors.foreground, fontFamily: "Inter_400Regular" }]}
+                  style={[styles.searchInput, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}
                   value={searchQuery}
                   onChangeText={setSearchQuery}
                   placeholder="بحث بالاسم أو الرقم..."
@@ -436,15 +436,15 @@ export default function AdminNotificationsScreen() {
               {selectedUser && (
                 <View style={[styles.selectedUserCard, { backgroundColor: colors.gold + "15", borderColor: colors.gold + "44", borderRadius: colors.radius - 4 }]}>
                   <View style={[styles.userAvatar, { backgroundColor: (ROLE_COLOR[selectedUser.role] ?? "#888") + "33" }]}>
-                    <Text style={{ color: ROLE_COLOR[selectedUser.role] ?? "#888", fontFamily: "Inter_700Bold", fontSize: 16 }}>
+                    <Text style={{ color: ROLE_COLOR[selectedUser.role] ?? "#888", fontFamily: "Cairo_700Bold", fontSize: 16 }}>
                       {selectedUser.name.charAt(0)}
                     </Text>
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 14, textAlign: "right" }}>
+                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14, textAlign: "right" }}>
                       {selectedUser.name}
                     </Text>
-                    <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>
+                    <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>
                       {selectedUser.phone} · {ROLE_LABEL[selectedUser.role] ?? selectedUser.role}
                     </Text>
                   </View>
@@ -459,7 +459,7 @@ export default function AdminNotificationsScreen() {
                   {filteredUsers.length === 0 ? (
                     <View style={styles.noResults}>
                       <Icon name="search" size={24} color={colors.mutedForeground} />
-                      <Text style={[styles.noResultsText, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+                      <Text style={[styles.noResultsText, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                         لا يوجد نتائج
                       </Text>
                     </View>
@@ -479,22 +479,22 @@ export default function AdminNotificationsScreen() {
                             style={[styles.userItem, { borderBottomColor: colors.border }]}
                           >
                             <View style={[styles.userAvatar, { backgroundColor: roleColor + "33" }]}>
-                              <Text style={{ color: roleColor, fontFamily: "Inter_700Bold", fontSize: 13 }}>
+                              <Text style={{ color: roleColor, fontFamily: "Cairo_700Bold", fontSize: 13 }}>
                                 {c.name.charAt(0)}
                               </Text>
                             </View>
                             <View style={{ flex: 1 }}>
                               <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
-                                <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 13, textAlign: "right" }}>
+                                <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 13, textAlign: "right" }}>
                                   {c.name}
                                 </Text>
                                 <View style={{ backgroundColor: roleColor + "22", borderRadius: 4, paddingHorizontal: 5, paddingVertical: 1 }}>
-                                  <Text style={{ color: roleColor, fontFamily: "Inter_600SemiBold", fontSize: 10 }}>
+                                  <Text style={{ color: roleColor, fontFamily: "Cairo_600SemiBold", fontSize: 10 }}>
                                     {ROLE_LABEL[c.role] ?? c.role}
                                   </Text>
                                 </View>
                               </View>
-                              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right" }}>
+                              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>
                                 {c.phone}
                               </Text>
                             </View>
@@ -511,13 +511,13 @@ export default function AdminNotificationsScreen() {
           <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
             <View style={styles.sectionHeader}>
               <Icon name="file-text" size={16} color={colors.gold} />
-              <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+              <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                 محتوى الإشعار
               </Text>
             </View>
 
             <View style={styles.fieldGroup}>
-              <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+              <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
                 العنوان
               </Text>
               <TextInput
@@ -528,7 +528,7 @@ export default function AdminNotificationsScreen() {
                     backgroundColor: colors.input,
                     borderColor: title.trim() ? colors.gold + "66" : colors.border,
                     borderRadius: colors.radius - 4,
-                    fontFamily: "Inter_500Medium",
+                    fontFamily: "Cairo_500Medium",
                   },
                 ]}
                 value={title}
@@ -540,7 +540,7 @@ export default function AdminNotificationsScreen() {
             </View>
 
             <View style={styles.fieldGroup}>
-              <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+              <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
                 الرسالة
               </Text>
               <TextInput
@@ -551,7 +551,7 @@ export default function AdminNotificationsScreen() {
                     backgroundColor: colors.input,
                     borderColor: body.trim() ? colors.gold + "66" : colors.border,
                     borderRadius: colors.radius - 4,
-                    fontFamily: "Inter_400Regular",
+                    fontFamily: "Cairo_400Regular",
                   },
                 ]}
                 value={body}
@@ -563,7 +563,7 @@ export default function AdminNotificationsScreen() {
                 textAlignVertical="top"
                 textAlign="right"
               />
-              <Text style={[styles.charCount, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+              <Text style={[styles.charCount, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                 {body.length} حرف
               </Text>
             </View>
@@ -573,7 +573,7 @@ export default function AdminNotificationsScreen() {
             <View style={[styles.sectionHeader, { justifyContent: "space-between" }]}>
               <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
                 <Icon name="zap" size={16} color={colors.gold} />
-                <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+                <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                   قوالب جاهزة
                 </Text>
               </View>
@@ -588,14 +588,14 @@ export default function AdminNotificationsScreen() {
                 })}
               >
                 <Icon name="plus" size={14} color={colors.gold} />
-                <Text style={{ color: colors.gold, fontFamily: "Inter_600SemiBold", fontSize: 12 }}>
+                <Text style={{ color: colors.gold, fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>
                   قالب جديد
                 </Text>
               </Pressable>
             </View>
             <View style={styles.templatesGrid}>
               {templates.length === 0 && (
-                <Text style={{ color: colors.mutedForeground, fontSize: 12, textAlign: "center", fontFamily: "Inter_400Regular", paddingVertical: 12 }}>
+                <Text style={{ color: colors.mutedForeground, fontSize: 12, textAlign: "center", fontFamily: "Cairo_400Regular", paddingVertical: 12 }}>
                   لا توجد قوالب — اضغط "قالب جديد" لإنشاء واحد
                 </Text>
               )}
@@ -612,10 +612,10 @@ export default function AdminNotificationsScreen() {
                   ]}
                 >
                   <Pressable onPress={() => handleTemplate(tmpl)} style={{ flex: 1, gap: 4 }}>
-                    <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 12, textAlign: "right" }} numberOfLines={1}>
+                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 12, textAlign: "right" }} numberOfLines={1}>
                       {tmpl.title}
                     </Text>
-                    <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right", lineHeight: 16 }} numberOfLines={2}>
+                    <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right", lineHeight: 16 }} numberOfLines={2}>
                       {tmpl.body}
                     </Text>
                   </Pressable>
@@ -630,7 +630,7 @@ export default function AdminNotificationsScreen() {
                       })}
                     >
                       <Icon name="edit-2" size={11} color="#3498DB" />
-                      <Text style={{ color: "#3498DB", fontFamily: "Inter_600SemiBold", fontSize: 11 }}>تعديل</Text>
+                      <Text style={{ color: "#3498DB", fontFamily: "Cairo_600SemiBold", fontSize: 11 }}>تعديل</Text>
                     </Pressable>
                     <Pressable
                       onPress={() => deleteTemplate(tmpl)}
@@ -642,7 +642,7 @@ export default function AdminNotificationsScreen() {
                       })}
                     >
                       <Icon name="trash-2" size={11} color="#E74C3C" />
-                      <Text style={{ color: "#E74C3C", fontFamily: "Inter_600SemiBold", fontSize: 11 }}>حذف</Text>
+                      <Text style={{ color: "#E74C3C", fontFamily: "Cairo_600SemiBold", fontSize: 11 }}>حذف</Text>
                     </Pressable>
                   </View>
                 </View>
@@ -677,7 +677,7 @@ export default function AdminNotificationsScreen() {
           {sentCount > 0 && (
             <View style={[styles.sentStats, { backgroundColor: colors.surface, borderRadius: colors.radius - 4 }]}>
               <Icon name="check-circle" size={14} color="#27AE60" />
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12 }}>
+              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12 }}>
                 تم إرسال {sentCount} إشعار في هذه الجلسة
               </Text>
             </View>
@@ -688,7 +688,7 @@ export default function AdminNotificationsScreen() {
           {recentNotifs.length === 0 ? (
             <View style={styles.emptyHistory}>
               <Icon name="bell-off" size={48} color={colors.mutedForeground} />
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 16 }}>
+              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 16 }}>
                 لا توجد إشعارات مرسلة
               </Text>
             </View>
@@ -709,22 +709,22 @@ export default function AdminNotificationsScreen() {
                   <View style={[styles.historyCard, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
                     <View style={styles.historyHeader}>
                       <View style={[styles.historyBadge, { backgroundColor: badge.color + "22", borderColor: badge.color + "44" }]}>
-                        <Text style={{ color: badge.color, fontFamily: "Inter_600SemiBold", fontSize: 10 }}>{badge.label}</Text>
+                        <Text style={{ color: badge.color, fontFamily: "Cairo_600SemiBold", fontSize: 10 }}>{badge.label}</Text>
                       </View>
-                      <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, flex: 1, textAlign: "right" }}>
+                      <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, flex: 1, textAlign: "right" }}>
                         {new Date(n.createdAt).toLocaleDateString("ar-EG", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                       </Text>
                     </View>
-                    <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 14, textAlign: "right" }}>
+                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14, textAlign: "right" }}>
                       {n.title}
                     </Text>
-                    <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 13, textAlign: "right", lineHeight: 20 }} numberOfLines={3}>
+                    <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 13, textAlign: "right", lineHeight: 20 }} numberOfLines={3}>
                       {n.body}
                     </Text>
                     {targetUser && (
                       <View style={[styles.targetUserInfo, { backgroundColor: colors.surface, borderRadius: 8 }]}>
                         <Icon name="user" size={12} color={colors.mutedForeground} />
-                        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11 }}>
+                        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11 }}>
                           {targetUser.name} · {targetUser.phone}
                         </Text>
                       </View>
@@ -746,11 +746,11 @@ export default function AdminNotificationsScreen() {
             onPress={(e) => e.stopPropagation()}
             style={{ backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: colors.radius, padding: 20, gap: 14 }}
           >
-            <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 16, textAlign: "right" }}>
+            <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 16, textAlign: "right" }}>
               {tmplEditing ? "تعديل القالب" : "قالب جديد"}
             </Text>
             <View style={{ gap: 6 }}>
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>العنوان</Text>
+              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>العنوان</Text>
               <TextInput
                 value={tmplTitle}
                 onChangeText={setTmplTitle}
@@ -760,12 +760,12 @@ export default function AdminNotificationsScreen() {
                 style={{
                   borderWidth: 1, borderColor: colors.border, borderRadius: 8,
                   paddingHorizontal: 12, paddingVertical: 10, fontSize: 14,
-                  color: colors.foreground, backgroundColor: colors.input, fontFamily: "Inter_400Regular",
+                  color: colors.foreground, backgroundColor: colors.input, fontFamily: "Cairo_400Regular",
                 }}
               />
             </View>
             <View style={{ gap: 6 }}>
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>النص</Text>
+              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>النص</Text>
               <TextInput
                 value={tmplBody}
                 onChangeText={setTmplBody}
@@ -778,7 +778,7 @@ export default function AdminNotificationsScreen() {
                 style={{
                   borderWidth: 1, borderColor: colors.border, borderRadius: 8,
                   paddingHorizontal: 12, paddingVertical: 10, fontSize: 14,
-                  color: colors.foreground, backgroundColor: colors.input, fontFamily: "Inter_400Regular",
+                  color: colors.foreground, backgroundColor: colors.input, fontFamily: "Cairo_400Regular",
                   minHeight: 90,
                 }}
               />
@@ -792,7 +792,7 @@ export default function AdminNotificationsScreen() {
                   alignItems: "center",
                 })}
               >
-                <Text style={{ color: colors.background, fontFamily: "Inter_700Bold", fontSize: 14 }}>حفظ</Text>
+                <Text style={{ color: colors.background, fontFamily: "Cairo_700Bold", fontSize: 14 }}>حفظ</Text>
               </Pressable>
               <Pressable
                 onPress={() => setTmplModalOpen(false)}
@@ -802,7 +802,7 @@ export default function AdminNotificationsScreen() {
                   borderWidth: 1, borderColor: colors.border, alignItems: "center",
                 })}
               >
-                <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 14 }}>إلغاء</Text>
+                <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>إلغاء</Text>
               </Pressable>
             </View>
           </Pressable>
@@ -913,7 +913,7 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingVertical: 16,
   },
-  sendBtnText: { fontFamily: "Inter_700Bold", fontSize: 16 },
+  sendBtnText: { fontFamily: "Cairo_700Bold", fontSize: 16 },
   sentStats: {
     flexDirection: "row-reverse",
     alignItems: "center",
@@ -941,7 +941,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
   },
-  successText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 15 },
+  successText: { color: "#fff", fontFamily: "Cairo_700Bold", fontSize: 15 },
   historyContent: { padding: 16, gap: 10 },
   historyCard: { padding: 14, borderWidth: 1, gap: 6 },
   historyHeader: { flexDirection: "row-reverse", alignItems: "center", gap: 8 },

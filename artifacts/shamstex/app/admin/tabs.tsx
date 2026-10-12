@@ -123,7 +123,7 @@ export default function AdminTabsScreen() {
         contentContainerStyle={[styles.content, { paddingBottom: bottomPad + 40 }]}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={[styles.hint, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+        <Text style={[styles.hint, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
           يمكنك إضافة وحذف وترتيب وإخفاء التبويبات في شريط التنقل
         </Text>
 
@@ -150,7 +150,7 @@ export default function AdminTabsScreen() {
                       backgroundColor: colors.input,
                       borderColor: colors.border,
                       borderRadius: 8,
-                      fontFamily: "Inter_400Regular",
+                      fontFamily: "Cairo_400Regular",
                     },
                   ]}
                   value={editLabel}
@@ -182,10 +182,10 @@ export default function AdminTabsScreen() {
                 </View>
 
                 <View style={styles.tabInfo}>
-                  <Text style={[styles.tabLabel, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
+                  <Text style={[styles.tabLabel, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
                     {tab.label}
                   </Text>
-                  <Text style={[styles.tabType, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+                  <Text style={[styles.tabType, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                     {TAB_TYPES.find((t) => t.value === tab.type)?.label ?? tab.type}
                   </Text>
                 </View>
@@ -208,7 +208,7 @@ export default function AdminTabsScreen() {
 
         {showAddForm ? (
           <View style={[styles.addForm, { backgroundColor: colors.card, borderColor: colors.gold + "44", borderRadius: colors.radius }]}>
-            <Text style={[styles.addTitle, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+            <Text style={[styles.addTitle, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
               تبويب جديد
             </Text>
             <TextInput
@@ -219,7 +219,7 @@ export default function AdminTabsScreen() {
                   backgroundColor: colors.input,
                   borderColor: colors.border,
                   borderRadius: 8,
-                  fontFamily: "Inter_400Regular",
+                  fontFamily: "Cairo_400Regular",
                 },
               ]}
               value={newLabel}
@@ -241,7 +241,7 @@ export default function AdminTabsScreen() {
                     },
                   ]}
                 >
-                  <Text style={[{ color: newType === t.value ? colors.background : colors.foreground, fontSize: 12, fontFamily: "Inter_400Regular" }]}>
+                  <Text style={[{ color: newType === t.value ? colors.background : colors.foreground, fontSize: 12, fontFamily: "Cairo_400Regular" }]}>
                     {t.label}
                   </Text>
                 </Pressable>

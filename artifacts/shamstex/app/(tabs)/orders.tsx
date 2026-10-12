@@ -185,7 +185,7 @@ export default function OrdersScreen() {
       <View style={[styles.emptyIcon, { backgroundColor: filter === "returns" ? "#C0392B11" : colors.gold + "11" }]}>
         <Icon name={filter === "returns" ? "rotate-ccw" : "package"} size={32} color={filter === "returns" ? "#C0392B44" : colors.gold + "44"} />
       </View>
-      <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+      <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
         {filter === "returns"
           ? t("noReturns")
           : search.trim()
@@ -203,7 +203,7 @@ export default function OrdersScreen() {
           ]}
         >
           <Icon name="shopping-bag" size={16} color={colors.background} />
-          <Text style={[styles.shopBtnText, { color: colors.background, fontFamily: "Inter_600SemiBold" }]}>
+          <Text style={[styles.shopBtnText, { color: colors.background, fontFamily: "Cairo_600SemiBold" }]}>
             {t("browseProducts")}
           </Text>
         </Pressable>
@@ -233,15 +233,15 @@ export default function OrdersScreen() {
               <Icon name={isCancelled ? "x-circle" : "rotate-ccw"} size={16} color={isCancelled ? "#E74C3C" : "#C0392B"} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 14, textAlign: "right" }}>
+              <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 14, textAlign: "right" }}>
                 {t("returnRequestLabel")}
               </Text>
               {isStaff && (
-                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>
+                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>
                   {ret.userName} — {ret.userPhone}
                 </Text>
               )}
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right" }}>
+              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>
                 {t("orderNum")} #{ret.orderId.slice(0, 12)}
               </Text>
             </View>
@@ -251,7 +251,7 @@ export default function OrdersScreen() {
           }]}>
             <Text style={{
               color: isCancelled ? "#E74C3C" : ret.status === "settled" ? "#27AE60" : ret.status === "returned" ? "#F39C12" : "#C0392B",
-              fontFamily: "Inter_600SemiBold", fontSize: 10,
+              fontFamily: "Cairo_600SemiBold", fontSize: 10,
             }}>
               {isCancelled ? t("cancelled") : ret.status === "settled" ? t("settled") : ret.status === "returned" ? t("returned") : t("pendingReview")}
             </Text>
@@ -277,7 +277,7 @@ export default function OrdersScreen() {
                     <Text style={{
                       fontSize: 9, textAlign: "center", lineHeight: 12,
                       color: isCompleted ? "#C0392B" : colors.mutedForeground,
-                      fontFamily: isCompleted ? "Inter_600SemiBold" : "Inter_400Regular",
+                      fontFamily: isCompleted ? "Cairo_600SemiBold" : "Cairo_400Regular",
                     }} numberOfLines={2}>
                       {step.label}
                     </Text>
@@ -294,13 +294,13 @@ export default function OrdersScreen() {
         {isCancelled && (
           <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6, marginTop: 6, backgroundColor: "#E74C3C11", paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}>
             <Icon name="info" size={12} color="#E74C3C" />
-            <Text style={{ color: "#E74C3C", fontFamily: "Inter_400Regular", fontSize: 11, flex: 1, textAlign: "right" }}>
+            <Text style={{ color: "#E74C3C", fontFamily: "Cairo_400Regular", fontSize: 11, flex: 1, textAlign: "right" }}>
               {t("returnCancelled")}
             </Text>
           </View>
         )}
 
-        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right", marginTop: 6 }}>
+        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right", marginTop: 6 }}>
           {t("reason")}: {ret.reason}
         </Text>
 
@@ -309,7 +309,7 @@ export default function OrdersScreen() {
             {ret.items.slice(0, 4).map((item, idx) => (
               <View key={idx} style={{ flexDirection: "row-reverse", alignItems: "center", gap: 4 }}>
                 <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: item.colorHex, borderWidth: 1, borderColor: colors.border }} />
-                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 10 }}>
+                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 10 }}>
                   {item.colorName}
                 </Text>
               </View>
@@ -318,11 +318,11 @@ export default function OrdersScreen() {
         )}
 
         <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginTop: 6 }}>
-          <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 10 }}>
+          <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 10 }}>
             {new Date(ret.createdAt).toLocaleDateString("ar-EG")}
           </Text>
           <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 4 }}>
-            <Text style={{ color: colors.gold, fontFamily: "Inter_500Medium", fontSize: 11 }}>{t("details")}</Text>
+            <Text style={{ color: colors.gold, fontFamily: "Cairo_500Medium", fontSize: 11 }}>{t("details")}</Text>
             <Icon name="chevron-left" size={12} color={colors.gold} />
           </View>
         </View>
@@ -374,7 +374,7 @@ export default function OrdersScreen() {
             ]}
           >
             <Icon name="trash-2" size={14} color="#E74C3C" />
-            <Text style={[{ color: "#E74C3C", fontFamily: "Inter_500Medium", fontSize: 13 }]}>
+            <Text style={[{ color: "#E74C3C", fontFamily: "Cairo_500Medium", fontSize: 13 }]}>
               حذف الطلب نهائياً
             </Text>
           </Pressable>
@@ -389,11 +389,11 @@ export default function OrdersScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { paddingTop: topPad + 8, borderBottomColor: colors.border }]}>
         <View style={{ flex: 1 }}>
-          <Text style={[styles.title, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.title, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
             {isStaff ? t("manageOrders") : t("myOrders")}
           </Text>
           {!isStaff && myOrders.length > 0 && (
-            <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, marginTop: 2 }}>
+            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, marginTop: 2 }}>
               {myOrders.length} {t("orders")}
             </Text>
           )}
@@ -407,7 +407,7 @@ export default function OrdersScreen() {
               <Icon name="shopping-cart" size={22} color={colors.foreground} />
               {cartCount > 0 && (
                 <View style={[styles.cartBadge, { backgroundColor: "#E74C3C" }]}>
-                  <Text style={[styles.cartBadgeText, { color: "#fff", fontFamily: "Inter_700Bold" }]}>
+                  <Text style={[styles.cartBadgeText, { color: "#fff", fontFamily: "Cairo_700Bold" }]}>
                     {cartCount > 99 ? "99+" : cartCount}
                   </Text>
                 </View>
@@ -421,20 +421,20 @@ export default function OrdersScreen() {
       {user?.role === "admin" && myOrders.length > 0 && (
         <View style={[styles.statsRow, { borderBottomColor: colors.border }]}>
           <View style={[styles.statBox, { backgroundColor: "#9B59B611", borderColor: "#9B59B633" }]}>
-            <Text style={{ color: "#9B59B6", fontFamily: "Inter_700Bold", fontSize: 18 }}>{stats.pending}</Text>
-            <Text style={{ color: "#9B59B6", fontFamily: "Inter_500Medium", fontSize: 10 }}>{t("newOrder")}</Text>
+            <Text style={{ color: "#9B59B6", fontFamily: "Cairo_700Bold", fontSize: 18 }}>{stats.pending}</Text>
+            <Text style={{ color: "#9B59B6", fontFamily: "Cairo_500Medium", fontSize: 10 }}>{t("newOrder")}</Text>
           </View>
           <View style={[styles.statBox, { backgroundColor: "#F39C1211", borderColor: "#F39C1233" }]}>
-            <Text style={{ color: "#F39C12", fontFamily: "Inter_700Bold", fontSize: 18 }}>{stats.preparing}</Text>
-            <Text style={{ color: "#F39C12", fontFamily: "Inter_500Medium", fontSize: 10 }}>{t("inPreparation")}</Text>
+            <Text style={{ color: "#F39C12", fontFamily: "Cairo_700Bold", fontSize: 18 }}>{stats.preparing}</Text>
+            <Text style={{ color: "#F39C12", fontFamily: "Cairo_500Medium", fontSize: 10 }}>{t("inPreparation")}</Text>
           </View>
           <View style={[styles.statBox, { backgroundColor: "#27AE6011", borderColor: "#27AE6033" }]}>
-            <Text style={{ color: "#27AE60", fontFamily: "Inter_700Bold", fontSize: 18 }}>{stats.delivered}</Text>
-            <Text style={{ color: "#27AE60", fontFamily: "Inter_500Medium", fontSize: 10 }}>{t("delivered")}</Text>
+            <Text style={{ color: "#27AE60", fontFamily: "Cairo_700Bold", fontSize: 18 }}>{stats.delivered}</Text>
+            <Text style={{ color: "#27AE60", fontFamily: "Cairo_500Medium", fontSize: 10 }}>{t("delivered")}</Text>
           </View>
           <View style={[styles.statBox, { backgroundColor: colors.gold + "11", borderColor: colors.gold + "33" }]}>
-            <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 14 }}>{stats.totalRevenue > 0 ? `${(stats.totalRevenue / 1000).toFixed(1)}k` : "0"}</Text>
-            <Text style={{ color: colors.gold, fontFamily: "Inter_500Medium", fontSize: 10 }}>{t("revenue")}</Text>
+            <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 14 }}>{stats.totalRevenue > 0 ? `${(stats.totalRevenue / 1000).toFixed(1)}k` : "0"}</Text>
+            <Text style={{ color: colors.gold, fontFamily: "Cairo_500Medium", fontSize: 10 }}>{t("revenue")}</Text>
           </View>
         </View>
       )}
@@ -452,7 +452,7 @@ export default function OrdersScreen() {
                     onChangeText={setSearch}
                     placeholder={t("searchOrders")}
                     placeholderTextColor={colors.mutedForeground}
-                    style={[styles.searchInput, { color: colors.foreground, fontFamily: "Inter_400Regular", textAlign: "right" }]}
+                    style={[styles.searchInput, { color: colors.foreground, fontFamily: "Cairo_400Regular", textAlign: "right" }]}
                     returnKeyType="search"
                   />
                   {search.length > 0 && (
@@ -485,7 +485,7 @@ export default function OrdersScreen() {
                       <Text
                         style={{
                           color: isActive ? activeColor : colors.mutedForeground,
-                          fontFamily: isActive ? "Inter_600SemiBold" : "Inter_400Regular",
+                          fontFamily: isActive ? "Cairo_600SemiBold" : "Cairo_400Regular",
                           fontSize: 11,
                         }}
                         numberOfLines={1}
@@ -503,7 +503,7 @@ export default function OrdersScreen() {
                         }}>
                           <Text style={{
                             color: isActive ? activeColor : colors.mutedForeground,
-                            fontFamily: "Inter_700Bold",
+                            fontFamily: "Cairo_700Bold",
                             fontSize: 9,
                           }}>
                             {count}

@@ -1,15 +1,12 @@
 import "@/lib/lockFontScaling";
 import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
+  Cairo_400Regular,
+  Cairo_500Medium,
+  Cairo_600SemiBold,
+  Cairo_700Bold,
+  Cairo_800ExtraBold,
   useFonts,
-} from "@expo-google-fonts/inter";
-import {
-  Amiri_400Regular,
-  Amiri_700Bold,
-} from "@expo-google-fonts/amiri";
+} from "@expo-google-fonts/cairo";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -200,12 +197,19 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-    Amiri_400Regular,
-    Amiri_700Bold,
+    Cairo_400Regular,
+    Cairo_500Medium,
+    Cairo_600SemiBold,
+    Cairo_700Bold,
+    Cairo_800ExtraBold,
+    // Compatibility aliases:
+    Inter_400Regular: Cairo_400Regular,
+    Inter_500Medium: Cairo_500Medium,
+    Inter_600SemiBold: Cairo_600SemiBold,
+    Inter_700Bold: Cairo_700Bold,
+    Inter_800ExtraBold: Cairo_800ExtraBold,
+    Amiri_400Regular: Cairo_400Regular,
+    Amiri_700Bold: Cairo_700Bold,
   });
 
   useEffect(() => {

@@ -163,19 +163,19 @@ export default function ProfileScreen() {
       >
         <View style={[styles.profileCard, { backgroundColor: colors.card, borderColor: colors.gold + "33", borderRadius: 20 }]}>
           <View style={[styles.avatar, { backgroundColor: colors.gold + "22", borderColor: colors.gold + "44" }]}>
-            <Text style={[styles.avatarText, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+            <Text style={[styles.avatarText, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
               {user.name.charAt(0)}
             </Text>
           </View>
-          <Text style={[styles.name, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.name, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
             {user.name}
           </Text>
-          <Text style={[styles.phone, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+          <Text style={[styles.phone, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
             {user.phone}
           </Text>
           {user.role !== "customer" && (
             <View style={[styles.roleBadge, { backgroundColor: colors.isDark ? colors.gold + "22" : colors.gold }]}>
-              <Text style={[styles.roleText, { color: colors.isDark ? colors.gold : colors.primaryForeground, fontFamily: "Inter_600SemiBold" }]}>
+              <Text style={[styles.roleText, { color: colors.isDark ? colors.gold : colors.primaryForeground, fontFamily: "Cairo_600SemiBold" }]}>
                 {ROLE_LABELS[user.role] ?? user.role}
               </Text>
             </View>
@@ -183,7 +183,7 @@ export default function ProfileScreen() {
           {user.vip && (
             <View style={[styles.vipBadge, { backgroundColor: colors.gold + "33", borderColor: colors.gold + "44" }]}>
               <Icon name="star" size={13} color={colors.gold} />
-              <Text style={[{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 12 }]}>
+              <Text style={[{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 12 }]}>
                 {t("vipCustomer")}
               </Text>
             </View>
@@ -196,17 +196,17 @@ export default function ProfileScreen() {
           <View style={[styles.upgradeCard, { backgroundColor: colors.card, borderColor: colors.gold + "44", borderRadius: colors.radius }]}>
             <View style={styles.upgradeHeader}>
               <Icon name="award" size={22} color={colors.gold} />
-              <Text style={[styles.upgradeTitle, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+              <Text style={[styles.upgradeTitle, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                 {t("joinAsMerchant")}
               </Text>
             </View>
-            <Text style={[styles.upgradeDesc, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+            <Text style={[styles.upgradeDesc, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
               {t("merchantDesc")}
             </Text>
             {requestSent || user.upgradeStatus === "pending" ? (
               <View style={[styles.pendingBadge, { backgroundColor: colors.gold + "22" }]}>
                 <Icon name="clock" size={14} color={colors.gold} />
-                <Text style={[styles.pendingText, { color: colors.gold, fontFamily: "Inter_500Medium" }]}>
+                <Text style={[styles.pendingText, { color: colors.gold, fontFamily: "Cairo_500Medium" }]}>
                   {t("upgradeUnderReview")}
                 </Text>
               </View>
@@ -248,10 +248,10 @@ export default function ProfileScreen() {
               <Icon name="map-pin" size={18} color={colors.gold} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 14, textAlign: "right" }}>
+              <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 14, textAlign: "right" }}>
                 عناويني
               </Text>
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right", marginTop: 2 }}>
+              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right", marginTop: 2 }}>
                 {(user.addresses ?? []).length > 0
                   ? `${(user.addresses ?? []).length} عنوان محفوظ`
                   : "لا توجد عناوين بعد"}
@@ -265,7 +265,7 @@ export default function ProfileScreen() {
 
         {(user.role === "admin" || user.role === "employee" || user.role === "supervisor") && adminLinks.length > 0 && (
           <View style={[styles.adminSection, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
-            <Text style={[styles.adminTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+            <Text style={[styles.adminTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
               {t("adminPanel")}
             </Text>
             {adminLinks.map((item) => (
@@ -278,7 +278,7 @@ export default function ProfileScreen() {
                 ]}
               >
                 <Icon name="chevron-left" size={16} color={colors.mutedForeground} />
-                <Text style={[styles.adminItemText, { color: colors.foreground, fontFamily: "Inter_500Medium" }]}>
+                <Text style={[styles.adminItemText, { color: colors.foreground, fontFamily: "Cairo_500Medium" }]}>
                   {item.label}
                 </Text>
                 <View style={[styles.adminItemIcon, { backgroundColor: colors.gold + "22" }]}>
@@ -293,7 +293,7 @@ export default function ProfileScreen() {
           <View style={[styles.themeCard, { flex: 1, backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
             <View style={styles.themeHeader}>
               <Icon name={themeResolved === "dark" ? "moon" : "sun"} size={20} color={colors.gold} />
-              <Text style={[styles.themeTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+              <Text style={[styles.themeTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                 {isRTL ? "المظهر" : "Appearance"}
               </Text>
             </View>
@@ -315,7 +315,7 @@ export default function ProfileScreen() {
                 paddingVertical: 12,
               }}
             >
-              <Text style={[styles.themeBtnText, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
+              <Text style={[styles.themeBtnText, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
                 {theme === "system" ? (isRTL ? "تلقائي" : "Auto") : theme === "dark" ? (isRTL ? "داكن" : "Dark") : (isRTL ? "فاتح" : "Light")}
               </Text>
               <View
@@ -339,7 +339,7 @@ export default function ProfileScreen() {
           <View style={[styles.themeCard, { flex: 1, backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
             <View style={styles.themeHeader}>
               <Icon name="globe" size={20} color={colors.gold} />
-              <Text style={[styles.themeTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+              <Text style={[styles.themeTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                 {language === "ar" ? "اللغة" : "Language"}
               </Text>
             </View>
@@ -368,7 +368,7 @@ export default function ProfileScreen() {
                 paddingVertical: 12,
               }}
             >
-              <Text style={[styles.themeBtnText, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
+              <Text style={[styles.themeBtnText, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
                 {language === "ar" ? "العربية" : "English"}
               </Text>
               <View
@@ -383,7 +383,7 @@ export default function ProfileScreen() {
                 }}
               >
                 <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: colors.gold, alignItems: "center", justifyContent: "center" }}>
-                  <Text style={{ fontSize: 9, fontFamily: "Inter_700Bold", color: colors.background }}>
+                  <Text style={{ fontSize: 9, fontFamily: "Cairo_700Bold", color: colors.background }}>
                     {language === "ar" ? "ع" : "EN"}
                   </Text>
                 </View>
@@ -408,7 +408,7 @@ export default function ProfileScreen() {
               <View style={[styles.adminItemIcon, { backgroundColor: colors.gold + "22" }]}>
                 <Icon name={item.icon as any} size={16} color={colors.gold} />
               </View>
-              <Text style={[styles.adminItemText, { color: colors.foreground, fontFamily: "Inter_500Medium", textAlign: "right" }]}>
+              <Text style={[styles.adminItemText, { color: colors.foreground, fontFamily: "Cairo_500Medium", textAlign: "right" }]}>
                 {language === "ar" ? item.label : item.labelEn}
               </Text>
               <Icon name="chevron-left" size={16} color={colors.mutedForeground} />
@@ -436,7 +436,7 @@ export default function ProfileScreen() {
               style={{
                 fontSize: 13,
                 color: colors.mutedForeground,
-                fontFamily: "Inter_400Regular",
+                fontFamily: "Cairo_400Regular",
               }}
             >
               {language === "ar" ? "حذف الحساب" : "Delete Account"}

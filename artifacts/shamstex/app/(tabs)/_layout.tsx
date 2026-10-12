@@ -201,7 +201,7 @@ export default function TabLayout() {
                       </View>
                     )}
                   </View>
-                  <Text style={[styles.tabLabel, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>السلة</Text>
+                  <Text style={[styles.tabLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>السلة</Text>
                 </View>
               </AnimatedTabItem>
             );
@@ -237,7 +237,7 @@ export default function TabLayout() {
               <Text style={[
                 styles.tabLabel,
                 focused && styles.activeTabLabel,
-                { color: focused ? colors.background : color, fontFamily: focused ? "Inter_700Bold" : "Inter_500Medium" },
+                { color: focused ? colors.background : color, fontFamily: focused ? "Cairo_700Bold" : "Cairo_500Medium" },
               ]}>
                 {descriptor.options.title ?? route.name}
               </Text>
@@ -257,7 +257,7 @@ export default function TabLayout() {
         headerShown: false,
         tabBarStyle: { position: "absolute" },
         tabBarLabelStyle: {
-          fontFamily: "Inter_500Medium",
+          fontFamily: "Cairo_500Medium",
           fontSize: 11,
         },
       }}
@@ -350,9 +350,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  cartTabBadgeText: { color: "#fff", fontSize: 9, fontFamily: "Inter_700Bold" },
-  tabLabel: { fontSize: 11 },
-  activeTabLabel: { fontSize: 10, maxWidth: 56 },
+  cartTabBadgeText: { color: "#fff", fontSize: 9, fontFamily: "Cairo_700Bold" },
+  tabLabel: { fontSize: 11, fontFamily: "Cairo_500Medium" },
+  activeTabLabel: { fontSize: 10, maxWidth: 56, fontFamily: "Cairo_700Bold" },
   badge: {
     position: "absolute",
     right: -10,
@@ -365,5 +365,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  badgeText: { color: "#fff", fontSize: 9, fontFamily: "Inter_700Bold" },
+  badgeText: { color: "#fff", fontSize: 9, fontFamily: "Cairo_700Bold" },
 });

@@ -115,10 +115,10 @@ export default function AddressesScreen() {
         {addresses.length === 0 && !showForm && (
           <View style={{ alignItems: "center", padding: 24, gap: 10, borderRadius: colors.radius, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border }}>
             <Icon name="map-pin" size={36} color={colors.gold} />
-            <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 15, textAlign: "center" }}>
+            <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 15, textAlign: "center" }}>
               لا توجد عناوين محفوظة
             </Text>
-            <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "center", lineHeight: 18 }}>
+            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "center", lineHeight: 18 }}>
               أضف عنوان شحن مرة واحدة واستخدمه في طلباتك القادمة.
             </Text>
           </View>
@@ -131,16 +131,16 @@ export default function AddressesScreen() {
           >
             <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
               <Icon name="map-pin" size={16} color={colors.gold} />
-              <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 14, flex: 1, textAlign: "right" }}>
+              <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 14, flex: 1, textAlign: "right" }}>
                 {a.label || a.city}
               </Text>
               {a.isDefault && (
                 <View style={{ backgroundColor: colors.gold + "22", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
-                  <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 10 }}>افتراضي</Text>
+                  <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 10 }}>افتراضي</Text>
                 </View>
               )}
             </View>
-            <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right", lineHeight: 18 }}>
+            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right", lineHeight: 18 }}>
               {formatAddress(a)}
             </Text>
             <View style={{ flexDirection: "row-reverse", gap: 8, flexWrap: "wrap" }}>
@@ -150,7 +150,7 @@ export default function AddressesScreen() {
                   style={({ pressed }) => ({ flexDirection: "row-reverse", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 7, borderRadius: 7, borderWidth: 1, borderColor: colors.gold + "55", opacity: pressed ? 0.7 : 1 })}
                 >
                   <Icon name="star" size={12} color={colors.gold} />
-                  <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 11 }}>افتراضي</Text>
+                  <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 11 }}>افتراضي</Text>
                 </Pressable>
               )}
               <Pressable
@@ -158,14 +158,14 @@ export default function AddressesScreen() {
                 style={({ pressed }) => ({ flexDirection: "row-reverse", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 7, borderRadius: 7, borderWidth: 1, borderColor: colors.border, opacity: pressed ? 0.7 : 1 })}
               >
                 <Icon name="edit-2" size={12} color={colors.foreground} />
-                <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 11 }}>تعديل</Text>
+                <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 11 }}>تعديل</Text>
               </Pressable>
               <Pressable
                 onPress={() => confirmDelete(a)}
                 style={({ pressed }) => ({ flexDirection: "row-reverse", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 7, borderRadius: 7, borderWidth: 1, borderColor: colors.destructive + "55", opacity: pressed ? 0.7 : 1 })}
               >
                 <Icon name="trash-2" size={12} color={colors.destructive} />
-                <Text style={{ color: colors.destructive, fontFamily: "Inter_600SemiBold", fontSize: 11 }}>حذف</Text>
+                <Text style={{ color: colors.destructive, fontFamily: "Cairo_600SemiBold", fontSize: 11 }}>حذف</Text>
               </Pressable>
             </View>
           </View>
@@ -177,13 +177,13 @@ export default function AddressesScreen() {
             style={({ pressed }) => ({ flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 14, borderRadius: colors.radius, backgroundColor: colors.gold, opacity: pressed ? 0.7 : 1 })}
           >
             <Icon name="plus" size={16} color="#000" />
-            <Text style={{ color: "#000", fontFamily: "Inter_700Bold", fontSize: 14 }}>إضافة عنوان جديد</Text>
+            <Text style={{ color: "#000", fontFamily: "Cairo_700Bold", fontSize: 14 }}>إضافة عنوان جديد</Text>
           </Pressable>
         )}
 
         {showForm && (
           <View style={{ padding: 14, borderRadius: colors.radius, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.gold + "55", gap: 10 }}>
-            <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 14, textAlign: "right" }}>
+            <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 14, textAlign: "right" }}>
               {editingId ? "تعديل العنوان" : "عنوان جديد"}
             </Text>
             <TextInput
@@ -199,7 +199,7 @@ export default function AddressesScreen() {
                 padding: 11,
                 color: colors.foreground,
                 textAlign: "right",
-                fontFamily: "Inter_400Regular",
+                fontFamily: "Cairo_400Regular",
                 fontSize: 13,
               }}
             />
@@ -235,7 +235,7 @@ export default function AddressesScreen() {
                   padding: 11,
                   color: colors.foreground,
                   textAlign: "right",
-                  fontFamily: "Inter_400Regular",
+                  fontFamily: "Cairo_400Regular",
                   fontSize: 13,
                 }}
               />
@@ -247,7 +247,7 @@ export default function AddressesScreen() {
                 style={({ pressed }) => ({ flex: 1, flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 12, borderRadius: 8, backgroundColor: colors.gold, opacity: (pressed || saving) ? 0.7 : 1 })}
               >
                 <Icon name="check" size={14} color="#000" />
-                <Text style={{ color: "#000", fontFamily: "Inter_700Bold", fontSize: 13 }}>
+                <Text style={{ color: "#000", fontFamily: "Cairo_700Bold", fontSize: 13 }}>
                   {saving ? "جاري الحفظ..." : editingId ? "حفظ التعديلات" : "حفظ العنوان"}
                 </Text>
               </Pressable>
@@ -255,7 +255,7 @@ export default function AddressesScreen() {
                 onPress={closeForm}
                 style={({ pressed }) => ({ paddingHorizontal: 16, alignItems: "center", justifyContent: "center", borderRadius: 8, borderWidth: 1, borderColor: colors.border, opacity: pressed ? 0.7 : 1 })}
               >
-                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_600SemiBold", fontSize: 12 }}>إلغاء</Text>
+                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>إلغاء</Text>
               </Pressable>
             </View>
           </View>

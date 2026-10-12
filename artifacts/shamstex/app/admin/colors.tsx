@@ -126,7 +126,7 @@ export default function AdminColorsScreen() {
                   color: colors.foreground,
                   backgroundColor: colors.input,
                   borderColor: colors.border,
-                  fontFamily: "Inter_400Regular",
+                  fontFamily: "Cairo_400Regular",
                 }]}
                 value={color.name}
                  onChangeText={(v) => handleUpdateName(color.id!, v)}
@@ -141,7 +141,7 @@ export default function AdminColorsScreen() {
                     color: colors.foreground,
                     backgroundColor: colors.input,
                     borderColor: colors.border,
-                    fontFamily: "Inter_400Regular",
+                    fontFamily: "Cairo_400Regular",
                   }]}
                   value={color.hex}
                    onChangeText={(v) => handleUpdateHex(color.id!, v)}
@@ -204,13 +204,13 @@ export default function AdminColorsScreen() {
                 marginBottom: 14,
               }]}
             >
-              <Text style={[styles.cardTitle, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+              <Text style={[styles.cardTitle, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                 إضافة لون جديد
               </Text>
               <View style={styles.hexRow}>
                 <View style={[styles.colorPreview, { backgroundColor: newHex.match(/^#[0-9A-Fa-f]{6}$/) ? newHex : "#444" }]} />
                 <TextInput
-                  style={[styles.hexInput, { flex: 1, color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Inter_400Regular" }]}
+                  style={[styles.hexInput, { flex: 1, color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_400Regular" }]}
                   value={newHex}
                   onChangeText={setNewHex}
                   placeholder="#FFFFFF"
@@ -220,7 +220,7 @@ export default function AdminColorsScreen() {
                   textAlign="right"
                 />
                 <TextInput
-                  style={[styles.hexInput, { flex: 2, color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Inter_400Regular" }]}
+                  style={[styles.hexInput, { flex: 2, color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_400Regular" }]}
                   value={newName}
                   onChangeText={setNewName}
                   placeholder="اسم اللون (مثال: أبيض)"
@@ -237,7 +237,7 @@ export default function AdminColorsScreen() {
                 disabled={!newName.trim() || !newHex.match(/^#[0-9A-Fa-f]{6}$/)}
               />
             </View>
-            <Text style={[styles.listHeader, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+            <Text style={[styles.listHeader, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
               الألوان الحالية ({colorList.length})
             </Text>
           </View>

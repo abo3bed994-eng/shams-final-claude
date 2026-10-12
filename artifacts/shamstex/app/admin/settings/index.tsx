@@ -54,7 +54,7 @@ export default function SettingsHub() {
             <View style={{ width: 38, height: 38, borderRadius: 10, backgroundColor: colors.gold + "22", alignItems: "center", justifyContent: "center" }}>
               <Icon name={it.icon} size={18} color={colors.gold} />
             </View>
-            <Text style={{ flex: 1, color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 14, textAlign: "right" }}>{it.title}</Text>
+            <Text style={{ flex: 1, color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 14, textAlign: "right" }}>{it.title}</Text>
             <Icon name="chevron-left" size={18} color={colors.mutedForeground} />
           </Pressable>
         ))}

@@ -41,10 +41,10 @@ function ReturnCard({ ret, isStaff, colors, onUpdateStatus }: {
             <Icon name="rotate-ccw" size={18} color="#C0392B" />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 14, textAlign: "right" }}>
+            <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 14, textAlign: "right" }}>
               طلب استرجاع
             </Text>
-            <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right" }}>
+            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>
               طلب #{ret.orderId.slice(0, 12)}
             </Text>
           </View>
@@ -54,7 +54,7 @@ function ReturnCard({ ret, isStaff, colors, onUpdateStatus }: {
         }]}>
           <Text style={{
             color: ret.status === "settled" ? "#27AE60" : ret.status === "returned" ? "#F39C12" : "#C0392B",
-            fontFamily: "Inter_600SemiBold",
+            fontFamily: "Cairo_600SemiBold",
             fontSize: 11,
           }}>
             {ret.status === "settled" ? "تمت المخالصة" : ret.status === "returned" ? "تم الاسترجاع" : "قيد المراجعة"}
@@ -64,7 +64,7 @@ function ReturnCard({ ret, isStaff, colors, onUpdateStatus }: {
 
       {isStaff && (
         <View style={styles.customerInfo}>
-          <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>
+          <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>
             العميل: {ret.userName} ({ret.userPhone})
           </Text>
         </View>
@@ -88,7 +88,7 @@ function ReturnCard({ ret, isStaff, colors, onUpdateStatus }: {
                 <Text style={{
                   fontSize: 9, textAlign: "center", lineHeight: 13,
                   color: isCompleted ? "#C0392B" : colors.mutedForeground,
-                  fontFamily: isCompleted ? "Inter_600SemiBold" : "Inter_400Regular",
+                  fontFamily: isCompleted ? "Cairo_600SemiBold" : "Cairo_400Regular",
                 }} numberOfLines={2}>
                   {step.label}
                 </Text>
@@ -101,7 +101,7 @@ function ReturnCard({ ret, isStaff, colors, onUpdateStatus }: {
         })}
       </View>
 
-      <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right", marginTop: 8 }}>
+      <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right", marginTop: 8 }}>
         السبب: {ret.reason}
       </Text>
 
@@ -110,20 +110,20 @@ function ReturnCard({ ret, isStaff, colors, onUpdateStatus }: {
           {ret.items.slice(0, 3).map((item, idx) => (
             <View key={idx} style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
               <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: item.colorHex, borderWidth: 1, borderColor: colors.border }} />
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, flex: 1, textAlign: "right" }}>
+              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, flex: 1, textAlign: "right" }}>
                 {item.productName} — {item.colorName}
               </Text>
             </View>
           ))}
           {ret.items.length > 3 && (
-            <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 10, textAlign: "right" }}>
+            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 10, textAlign: "right" }}>
               +{ret.items.length - 3} أصناف أخرى
             </Text>
           )}
         </View>
       )}
 
-      <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 10, textAlign: "right", marginTop: 6 }}>
+      <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 10, textAlign: "right", marginTop: 6 }}>
         {new Date(ret.createdAt).toLocaleDateString("ar-EG")}
       </Text>
 
@@ -186,7 +186,7 @@ export default function ReturnsScreen() {
         {sorted.length === 0 ? (
           <View style={styles.empty}>
             <Icon name="rotate-ccw" size={48} color={colors.mutedForeground} />
-            <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+            <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
               لا توجد طلبات استرجاع
             </Text>
           </View>

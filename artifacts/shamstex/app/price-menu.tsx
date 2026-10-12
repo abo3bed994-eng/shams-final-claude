@@ -165,8 +165,8 @@ export default function PriceMenuScreen() {
           <Icon name="arrow-right" size={22} color={colors.foreground} />
         </Pressable>
         <View style={styles.headerTitle}>
-          <Text style={[styles.title, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>قائمة الأسعار</Text>
-          <Text style={[styles.subtitle, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>{priceLabel}</Text>
+          <Text style={[styles.title, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>قائمة الأسعار</Text>
+          <Text style={[styles.subtitle, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>{priceLabel}</Text>
         </View>
         {!isMerchant && (
           <View style={styles.headerActions}>
@@ -206,8 +206,8 @@ export default function PriceMenuScreen() {
           )}
           <View style={styles.heroOverlay}>
             <Icon name="file-text" size={28} color={colors.gold} />
-            <Text style={[styles.heroTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>قائمة أسعار شمس تكس</Text>
-            <Text style={[styles.heroCaption, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+            <Text style={[styles.heroTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>قائمة أسعار شمس تكس</Text>
+            <Text style={[styles.heroCaption, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
               {priceLabel}
             </Text>
           </View>
@@ -215,7 +215,7 @@ export default function PriceMenuScreen() {
 
         {canTogglePricing && (
           <View style={[styles.pricingToggleCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.pricingToggleLabel, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+            <Text style={[styles.pricingToggleLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
               عرض الأسعار
             </Text>
             <View style={[styles.pricingToggleOptions, { borderColor: colors.border }]}>
@@ -245,7 +245,7 @@ export default function PriceMenuScreen() {
                         styles.pricingToggleText,
                         {
                           color: active ? colors.gold : colors.mutedForeground,
-                          fontFamily: active ? "Inter_700Bold" : "Inter_400Regular",
+                          fontFamily: active ? "Cairo_700Bold" : "Cairo_400Regular",
                         },
                       ]}
                     >
@@ -267,7 +267,7 @@ export default function PriceMenuScreen() {
             placeholderTextColor={colors.mutedForeground}
             textAlign="right"
             returnKeyType="search"
-            style={[styles.searchInput, { color: colors.foreground, fontFamily: "Inter_400Regular" }]}
+            style={[styles.searchInput, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}
             accessibilityLabel="البحث في قائمة الأسعار"
           />
           {!!searchQuery && (
@@ -282,29 +282,29 @@ export default function PriceMenuScreen() {
         </View>
 
         {visibleGroups.length === 0 ? (
-          <Text style={[styles.empty, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+          <Text style={[styles.empty, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
             {normalizedSearch ? "لا توجد خامات مطابقة للبحث" : "لا توجد خامات في القائمة"}
           </Text>
         ) : visibleGroups.map(([category, items]) => (
           <View key={category} style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <View style={[styles.sectionTitleRow, { borderBottomColor: colors.gold + "66" }]}>
               <Icon name="layers" size={18} color={colors.gold} />
-              <Text style={[styles.sectionTitle, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>{category}</Text>
+              <Text style={[styles.sectionTitle, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>{category}</Text>
             </View>
             {items.map((product) => (
               <View key={product.id} style={[styles.priceRow, { borderBottomColor: colors.border }]}>
                 <View style={styles.nameWrap}>
-                  <Text style={[styles.productName, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>{product.name}</Text>
+                  <Text style={[styles.productName, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>{product.name}</Text>
                   {product.priceMenuNew && (
                     <View style={[styles.newBadge, { backgroundColor: colors.gold }]}>
-                      <Text style={[styles.newBadgeText, { color: colors.background, fontFamily: "Inter_700Bold" }]}>NEW</Text>
+                      <Text style={[styles.newBadgeText, { color: colors.background, fontFamily: "Cairo_700Bold" }]}>NEW</Text>
                     </View>
                   )}
                 </View>
                 <View style={styles.priceWrap}>
-                  {product.priceTrend === "up" && <Text style={{ color: "#27AE60", fontSize: 17, lineHeight: 18, fontFamily: "Inter_700Bold" }}>▲</Text>}
-                  {product.priceTrend === "down" && <Text style={{ color: "#E74C3C", fontSize: 17, lineHeight: 18, fontFamily: "Inter_700Bold" }}>▼</Text>}
-                  <Text style={[styles.price, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>{displayPriceFor(product, effectivePriceMode)} ج.م</Text>
+                  {product.priceTrend === "up" && <Text style={{ color: "#27AE60", fontSize: 17, lineHeight: 18, fontFamily: "Cairo_700Bold" }}>▲</Text>}
+                  {product.priceTrend === "down" && <Text style={{ color: "#E74C3C", fontSize: 17, lineHeight: 18, fontFamily: "Cairo_700Bold" }}>▼</Text>}
+                  <Text style={[styles.price, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>{displayPriceFor(product, effectivePriceMode)} ج.م</Text>
                 </View>
               </View>
             ))}

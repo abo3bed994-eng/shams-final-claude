@@ -68,12 +68,12 @@ export default React.memo(function ProductCard({ product, onPress }: ProductCard
 
           {product.priceMenuNew && (
             <View style={styles.newBadge} pointerEvents="none">
-              <Text style={[styles.newBadgeText, { fontFamily: "Inter_700Bold" }]}>NEW</Text>
+              <Text style={[styles.newBadgeText, { fontFamily: "Cairo_700Bold" }]}>NEW</Text>
             </View>
           )}
 
           <View style={[styles.categoryBadge, product.priceMenuNew && styles.categoryBadgeBelowNew]}>
-            <Text style={[styles.categoryText, { color: colors.goldLight, fontFamily: "Inter_600SemiBold" }]}>
+            <Text style={[styles.categoryText, { color: colors.goldLight, fontFamily: "Cairo_600SemiBold" }]}>
               {product.category}
             </Text>
           </View>
@@ -81,7 +81,7 @@ export default React.memo(function ProductCard({ product, onPress }: ProductCard
           {isOutOfStock && (
             <View style={styles.outOfStockBadge}>
               <Icon name="x-circle" size={12} color="#fff" />
-              <Text style={[styles.outOfStockText, { fontFamily: "Inter_700Bold" }]}>نفذ المخزون</Text>
+              <Text style={[styles.outOfStockText, { fontFamily: "Cairo_700Bold" }]}>نفذ المخزون</Text>
             </View>
           )}
 
@@ -89,7 +89,7 @@ export default React.memo(function ProductCard({ product, onPress }: ProductCard
             <View style={styles.offerTagWrap} pointerEvents="none">
               <View style={styles.offerTag}>
                 <Icon name="tag" size={11} color="#fff" />
-                <Text style={[styles.offerTagText, { fontFamily: "Inter_700Bold" }]}>
+                <Text style={[styles.offerTagText, { fontFamily: "Cairo_700Bold" }]}>
                   خصم {offerPct}%
                 </Text>
               </View>
@@ -105,7 +105,7 @@ export default React.memo(function ProductCard({ product, onPress }: ProductCard
 
           <View style={styles.infoOverlay}>
             <Text
-              style={[styles.name, { color: "#fff", fontFamily: "Inter_700Bold" }]}
+              style={[styles.name, { color: "#fff", fontFamily: "Cairo_700Bold" }]}
               numberOfLines={1}
             >
               {product.name}
@@ -113,24 +113,24 @@ export default React.memo(function ProductCard({ product, onPress }: ProductCard
 
             <View style={styles.bottomRow}>
               <View style={styles.priceWrap}>
-                <Text style={[styles.priceLabel, { fontFamily: "Inter_400Regular" }]}>{priceLabel}</Text>
+                <Text style={[styles.priceLabel, { fontFamily: "Cairo_400Regular" }]}>{priceLabel}</Text>
                 <View style={styles.priceLine}>
                   {onOffer ? (
                     <View style={styles.offerPriceRow}>
-                      <Text style={[styles.oldPrice, { fontFamily: "Inter_500Medium" }]}>
+                      <Text style={[styles.oldPrice, { fontFamily: "Cairo_500Medium" }]}>
                         {product.retailPrice}
                       </Text>
-                      <Text style={[styles.price, { color: colors.goldLight, fontFamily: "Inter_700Bold" }]}>
+                      <Text style={[styles.price, { color: colors.goldLight, fontFamily: "Cairo_700Bold" }]}>
                         {displayPrice} ج.م
                       </Text>
                     </View>
                   ) : (
-                    <Text style={[styles.price, { color: colors.goldLight, fontFamily: "Inter_700Bold" }]}>
+                    <Text style={[styles.price, { color: colors.goldLight, fontFamily: "Cairo_700Bold" }]}>
                       {displayPrice} ج.م
                     </Text>
                   )}
                   {!!specsText && (
-                    <Text style={[styles.specsInline, { fontFamily: "Inter_500Medium" }]} numberOfLines={1}>
+                    <Text style={[styles.specsInline, { fontFamily: "Cairo_500Medium" }]} numberOfLines={1}>
                       {specsText}
                     </Text>
                   )}

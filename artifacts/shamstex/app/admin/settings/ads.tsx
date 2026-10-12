@@ -87,7 +87,7 @@ export default function AdsSettings() {
               <View key={uri} style={[styles.videoBadge, { backgroundColor: colors.gold + "22", borderColor: colors.gold + "44" }]}>
                 <View style={{ flex: 1, flexDirection: "row-reverse", alignItems: "center", gap: 10 }}>
                   <Icon name="film" size={20} color={colors.gold} />
-                  <Text style={{ color: colors.gold, fontFamily: "Inter_500Medium", fontSize: 12, flex: 1, textAlign: "right" }} numberOfLines={1}>فيديو {idx + 1}</Text>
+                  <Text style={{ color: colors.gold, fontFamily: "Cairo_500Medium", fontSize: 12, flex: 1, textAlign: "right" }} numberOfLines={1}>فيديو {idx + 1}</Text>
                 </View>
                 <Pressable onPress={() => removeVideo(idx)} style={[styles.clearBannerBtn, { backgroundColor: colors.destructive, position: "relative", top: 0, right: 0 }]}>
                   <Icon name="x" size={14} color="#FFF" />
@@ -103,7 +103,7 @@ export default function AdsSettings() {
             style={({ pressed }) => [styles.bannerBtn, { backgroundColor: colors.gold + "22", borderColor: colors.gold + "44", opacity: (pressed || busy || (draft.bannerVideoUris ?? []).length >= 3) ? 0.5 : 1 }]}
           >
             {videoLoading ? <ActivityIndicator size="small" color={colors.gold} /> : <Icon name="film" size={18} color={colors.gold} />}
-            <Text style={{ color: colors.gold, fontFamily: "Inter_600SemiBold", fontSize: 13 }}>
+            <Text style={{ color: colors.gold, fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>
               {videoLoading ? "جاري الرفع..." : (draft.bannerVideoUris ?? []).length >= 3 ? "اكتملت الفيديوهات" : `رفع فيديو (${(draft.bannerVideoUris ?? []).length}/3)`}
             </Text>
           </Pressable>
@@ -113,12 +113,12 @@ export default function AdsSettings() {
             style={({ pressed }) => [styles.bannerBtn, { backgroundColor: colors.surface, borderColor: colors.border, opacity: (pressed || busy || bannerImages.length >= MAX_BANNER_IMAGES) ? 0.5 : 1 }]}
           >
             {imageLoading ? <ActivityIndicator size="small" color={colors.foreground} /> : <Icon name="image" size={18} color={colors.foreground} />}
-            <Text style={{ color: colors.foreground, fontFamily: "Inter_500Medium", fontSize: 13 }}>
+            <Text style={{ color: colors.foreground, fontFamily: "Cairo_500Medium", fontSize: 13 }}>
               {imageLoading ? "جاري الرفع..." : bannerImages.length >= MAX_BANNER_IMAGES ? "اكتملت الصور" : `رفع صورة (${bannerImages.length}/${MAX_BANNER_IMAGES})`}
             </Text>
           </Pressable>
         </View>
-        <Text style={{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Inter_400Regular" }}>
+        <Text style={{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Cairo_400Regular" }}>
           يمكن رفع حتى 3 فيديوهات وحتى {MAX_BANNER_IMAGES} صور في البانر الرئيسي. تظهر الصور كشرائح متتابعة عندما لا يوجد فيديو.
         </Text>
       </Card>
@@ -129,7 +129,7 @@ export default function AdsSettings() {
           onChange={(text) => setDraft((d) => ({ ...d, bannerCaption: text }))}
           placeholder="مثال: تعانق الجودة كل خيط"
         />
-        <Text style={{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Inter_400Regular" }}>
+        <Text style={{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Cairo_400Regular" }}>
           تظهر هذه الجملة في الصفحة الرئيسية أسفل اسم العميل مباشرة. اتركها فارغة لإخفائها.
         </Text>
       </Card>

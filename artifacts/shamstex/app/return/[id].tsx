@@ -112,10 +112,10 @@ export default function ReturnDetailScreen() {
           borderRadius: colors.radius,
         }]}>
           <Icon name={isCancelled ? "x-circle" : "rotate-ccw"} size={28} color={isCancelled ? "#E74C3C" : stepColor} />
-          <Text style={[styles.statusLabel, { color: isCancelled ? "#E74C3C" : stepColor, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.statusLabel, { color: isCancelled ? "#E74C3C" : stepColor, fontFamily: "Cairo_700Bold" }]}>
             {isCancelled ? "تم إلغاء الاسترجاع" : RETURN_STEPS[retStep]?.label}
           </Text>
-          <Text style={[styles.orderDate, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+          <Text style={[styles.orderDate, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
             {date}
           </Text>
         </View>
@@ -144,7 +144,7 @@ export default function ReturnDetailScreen() {
                         styles.stepLabel,
                         {
                           color: isCompleted ? colors.foreground : colors.mutedForeground,
-                          fontFamily: isCompleted ? "Inter_600SemiBold" : "Inter_400Regular",
+                          fontFamily: isCompleted ? "Cairo_600SemiBold" : "Cairo_400Regular",
                         },
                       ]}
                       numberOfLines={2}
@@ -168,18 +168,18 @@ export default function ReturnDetailScreen() {
 
         {isStaff && (
           <View style={[styles.infoCard, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
-            <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
               معلومات العميل
             </Text>
             <View style={styles.infoRow}>
               <Icon name="user" size={15} color={colors.mutedForeground} />
-              <Text style={[styles.infoText, { color: colors.foreground, fontFamily: "Inter_500Medium" }]}>
+              <Text style={[styles.infoText, { color: colors.foreground, fontFamily: "Cairo_500Medium" }]}>
                 {ret.userName}
               </Text>
             </View>
             <View style={styles.infoRow}>
               <Icon name="phone" size={15} color={colors.mutedForeground} />
-              <Text style={[styles.infoText, { color: colors.foreground, fontFamily: "Inter_500Medium" }]}>
+              <Text style={[styles.infoText, { color: colors.foreground, fontFamily: "Cairo_500Medium" }]}>
                 {ret.userPhone}
               </Text>
             </View>
@@ -187,17 +187,17 @@ export default function ReturnDetailScreen() {
         )}
 
         <View style={[styles.infoCard, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
             سبب الاسترجاع
           </Text>
-          <Text style={{ color: colors.foreground, fontFamily: "Inter_400Regular", fontSize: 14, textAlign: "right", lineHeight: 22 }}>
+          <Text style={{ color: colors.foreground, fontFamily: "Cairo_400Regular", fontSize: 14, textAlign: "right", lineHeight: 22 }}>
             {ret.reason}
           </Text>
         </View>
 
         {ret.problemImage && (
           <View style={[styles.infoCard, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
-            <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
               صورة المشكلة
             </Text>
             <Image
@@ -216,15 +216,15 @@ export default function ReturnDetailScreen() {
           }]}>
             <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
               <Icon name="x-circle" size={16} color="#E74C3C" />
-              <Text style={{ color: "#E74C3C", fontFamily: "Inter_700Bold", fontSize: 15, textAlign: "right" }}>
+              <Text style={{ color: "#E74C3C", fontFamily: "Cairo_700Bold", fontSize: 15, textAlign: "right" }}>
                 سبب إلغاء طلب الاسترجاع
               </Text>
             </View>
-            <Text style={{ color: colors.foreground, fontFamily: "Inter_500Medium", fontSize: 14, textAlign: "right", lineHeight: 22 }}>
+            <Text style={{ color: colors.foreground, fontFamily: "Cairo_500Medium", fontSize: 14, textAlign: "right", lineHeight: 22 }}>
               {ret.cancelReason}
             </Text>
             {ret.cancelledByName && (
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>
+              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>
                 بواسطة: {ret.cancelledByName}
                 {ret.cancelledAt
                   ? ` — ${new Date(ret.cancelledAt).toLocaleDateString("ar-EG", { day: "numeric", month: "long", year: "numeric" })}`
@@ -236,7 +236,7 @@ export default function ReturnDetailScreen() {
 
         {ret.items && ret.items.length > 0 && (
           <View style={[styles.infoCard, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
-            <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
               الأصناف المسترجعة
             </Text>
             {ret.items.map((item, index) => (
@@ -247,10 +247,10 @@ export default function ReturnDetailScreen() {
                 <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 10, flex: 1 }}>
                   <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: item.colorHex, borderWidth: 1, borderColor: colors.border }} />
                   <View style={{ flex: 1 }}>
-                    <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 14, textAlign: "right" }}>
+                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14, textAlign: "right" }}>
                       {item.productName}
                     </Text>
-                    <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>
+                    <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>
                       {item.colorName} — {item.quantity} ثوب{(() => {
                         const measure = item.orderType === "weight" ? item.weight : (item.actualWeight ?? item.weight);
                         const unitLabel = (item as any).unit === "meter" || products.find(p => p.id === item.productId)?.unit === "meter" ? "متر" : "كغ";
@@ -259,7 +259,7 @@ export default function ReturnDetailScreen() {
                     </Text>
                   </View>
                 </View>
-                <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 14 }}>
+                <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 14 }}>
                   {(() => {
                     const amount = item.orderType === "weight" ? (item.weight ?? item.quantity) : (item.actualWeight ?? item.weight ?? item.quantity);
                     return item.unitPrice > 0 ? `${(item.unitPrice * amount).toFixed(0)} ج.م` : "";
@@ -276,7 +276,7 @@ export default function ReturnDetailScreen() {
             style={({ pressed }) => [styles.viewOrderBtn, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: colors.radius, opacity: pressed ? 0.8 : 1 }]}
           >
             <Icon name="file-text" size={16} color={colors.gold} />
-            <Text style={{ color: colors.gold, fontFamily: "Inter_600SemiBold", fontSize: 14 }}>
+            <Text style={{ color: colors.gold, fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>
               عرض الطلب الأصلي
             </Text>
             <Icon name="chevron-left" size={16} color={colors.gold} />
@@ -301,7 +301,7 @@ export default function ReturnDetailScreen() {
             style={({ pressed }) => [styles.actionBtn, { backgroundColor: colors.gold, borderRadius: colors.radius, opacity: pressed ? 0.8 : 1 }]}
           >
             <Icon name={ret.status === "pending" ? "package" : "check-circle"} size={18} color={colors.background} />
-            <Text style={{ color: colors.background, fontFamily: "Inter_700Bold", fontSize: 15 }}>
+            <Text style={{ color: colors.background, fontFamily: "Cairo_700Bold", fontSize: 15 }}>
               {ret.status === "pending" ? "تأكيد الاسترجاع" : "تأكيد المخالصة"}
             </Text>
           </Pressable>
@@ -313,7 +313,7 @@ export default function ReturnDetailScreen() {
             style={[styles.cancelBtn, { borderColor: "#E74C3C44", backgroundColor: "#E74C3C11", borderRadius: colors.radius }]}
           >
             <Icon name="trash-2" size={16} color="#E74C3C" />
-            <Text style={{ color: "#E74C3C", fontFamily: "Inter_600SemiBold", fontSize: 14 }}>
+            <Text style={{ color: "#E74C3C", fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>
               حذف طلب الاسترجاع
             </Text>
           </Pressable>
@@ -327,16 +327,16 @@ export default function ReturnDetailScreen() {
                 style={[styles.cancelBtn, { borderColor: "#E74C3C44", backgroundColor: "#E74C3C11", borderRadius: colors.radius }]}
               >
                 <Icon name="x-circle" size={16} color="#E74C3C" />
-                <Text style={{ color: "#E74C3C", fontFamily: "Inter_600SemiBold", fontSize: 14 }}>
+                <Text style={{ color: "#E74C3C", fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>
                   إلغاء طلب الاسترجاع
                 </Text>
               </Pressable>
             ) : (
               <View style={[styles.cancelFormCard, { backgroundColor: colors.card, borderColor: "#E74C3C44", borderRadius: colors.radius }]}>
-                <Text style={{ color: "#E74C3C", fontFamily: "Inter_700Bold", fontSize: 15, textAlign: "right" }}>
+                <Text style={{ color: "#E74C3C", fontFamily: "Cairo_700Bold", fontSize: 15, textAlign: "right" }}>
                   إلغاء طلب الاسترجاع
                 </Text>
-                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>
+                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>
                   سيتم إبلاغ العميل بالإلغاء مع السبب
                 </Text>
                 <TextInput
@@ -352,7 +352,7 @@ export default function ReturnDetailScreen() {
                     padding: 12,
                     minHeight: 80,
                     color: colors.foreground,
-                    fontFamily: "Inter_400Regular",
+                    fontFamily: "Cairo_400Regular",
                     fontSize: 14,
                     textAlign: "right",
                     textAlignVertical: "top",
@@ -372,7 +372,7 @@ export default function ReturnDetailScreen() {
                       opacity: pressed ? 0.8 : 1,
                     })}
                   >
-                    <Text style={{ color: "#fff", fontFamily: "Inter_600SemiBold", fontSize: 14 }}>
+                    <Text style={{ color: "#fff", fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>
                       تأكيد الإلغاء
                     </Text>
                   </Pressable>
@@ -389,7 +389,7 @@ export default function ReturnDetailScreen() {
                       opacity: pressed ? 0.8 : 1,
                     })}
                   >
-                    <Text style={{ color: colors.foreground, fontFamily: "Inter_500Medium", fontSize: 14 }}>
+                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_500Medium", fontSize: 14 }}>
                       تراجع
                     </Text>
                   </Pressable>
@@ -421,7 +421,7 @@ export default function ReturnDetailScreen() {
             style={[styles.deleteBtn, { borderColor: "#E74C3C44", backgroundColor: "#E74C3C11" }]}
           >
             <Icon name="trash-2" size={14} color="#E74C3C" />
-            <Text style={{ color: "#E74C3C", fontFamily: "Inter_500Medium", fontSize: 14 }}>
+            <Text style={{ color: "#E74C3C", fontFamily: "Cairo_500Medium", fontSize: 14 }}>
               حذف طلب الاسترجاع نهائياً
             </Text>
           </Pressable>

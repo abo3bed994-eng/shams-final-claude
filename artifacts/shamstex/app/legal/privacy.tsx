@@ -124,7 +124,7 @@ export default function PrivacyScreen() {
         contentContainerStyle={[styles.content, { paddingBottom: bottomPad + 40 }]}
       >
         <Text
-          style={[styles.updated, { color: colors.mutedForeground, fontFamily: "Inter_400Regular", textAlign: align }]}
+          style={[styles.updated, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular", textAlign: align }]}
         >
           {isRTL ? "آخر تحديث: يونيو 2026" : "Last updated: June 2026"}
         </Text>
@@ -133,10 +133,10 @@ export default function PrivacyScreen() {
             key={i}
             style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}
           >
-            <Text style={[styles.title, { color: colors.gold, fontFamily: "Inter_700Bold", textAlign: align }]}>
+            <Text style={[styles.title, { color: colors.gold, fontFamily: "Cairo_700Bold", textAlign: align }]}>
               {isRTL ? s.titleAr : s.titleEn}
             </Text>
-            <Text style={[styles.body, { color: colors.foreground, fontFamily: "Inter_400Regular", textAlign: align }]}>
+            <Text style={[styles.body, { color: colors.foreground, fontFamily: "Cairo_400Regular", textAlign: align }]}>
               {isRTL ? s.bodyAr : s.bodyEn}
             </Text>
           </View>

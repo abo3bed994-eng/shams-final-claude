@@ -40,7 +40,7 @@ export default function ContactScreen() {
         ]}
       >
         <Text
-          style={[styles.title, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}
+          style={[styles.title, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}
         >
           {t("contactUs")}
         </Text>
@@ -56,13 +56,13 @@ export default function ContactScreen() {
             style={styles.logoImg}
             resizeMode="contain"
           />
-          <Text style={[styles.brandName, { color: colors.gold, fontFamily: language === "ar" ? "Amiri_700Bold" : "Inter_700Bold" }]}>
+          <Text style={[styles.brandName, { color: colors.gold, fontFamily: language === "ar" ? "Cairo_700Bold" : "Cairo_700Bold" }]}>
             {t("tagline")}
           </Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
             {t("contactUs")}
           </Text>
           {CONTACTS.map((contact) => (
@@ -82,10 +82,10 @@ export default function ContactScreen() {
             >
               <Icon name="phone-call" size={18} color={colors.gold} />
               <View style={styles.contactInfo}>
-                <Text style={[styles.contactLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+                <Text style={[styles.contactLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                   {contact.label}
                 </Text>
-                <Text style={[styles.contactNumber, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
+                <Text style={[styles.contactNumber, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
                   {contact.number}
                 </Text>
               </View>
@@ -97,7 +97,7 @@ export default function ContactScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
             {t("followUs")}
           </Text>
           <View style={styles.socialRow}>
@@ -118,7 +118,7 @@ export default function ContactScreen() {
               >
                 <Icon name={s.icon as any} size={22} color={colors.gold} />
                 <Text
-                  style={[styles.socialLabel, { color: colors.foreground, fontFamily: "Inter_500Medium" }]}
+                  style={[styles.socialLabel, { color: colors.foreground, fontFamily: "Cairo_500Medium" }]}
                 >
                   {s.label}
                 </Text>
@@ -138,36 +138,36 @@ export default function ContactScreen() {
             cardShadow(colors.isDark, "soft"),
           ]}
         >
-          <Text style={[styles.aboutTitle, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.aboutTitle, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
             {settings.aboutTitle}
           </Text>
-          <Text style={[styles.aboutText, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+          <Text style={[styles.aboutText, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
             {settings.aboutText}
           </Text>
           <View style={styles.aboutStats}>
             <View style={styles.stat}>
-              <Text style={[styles.statNum, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+              <Text style={[styles.statNum, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                 {settings.stats?.clients ?? "+500"}
               </Text>
-              <Text style={[styles.statLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+              <Text style={[styles.statLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                 {settings.statLabels?.clients ?? t("clients")}
               </Text>
             </View>
             <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
             <View style={styles.stat}>
-              <Text style={[styles.statNum, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+              <Text style={[styles.statNum, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                 {settings.stats?.products ?? "+50"}
               </Text>
-              <Text style={[styles.statLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+              <Text style={[styles.statLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                 {settings.statLabels?.products ?? t("productsCount")}
               </Text>
             </View>
             <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
             <View style={styles.stat}>
-              <Text style={[styles.statNum, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+              <Text style={[styles.statNum, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                 {settings.stats?.years ?? "15+"}
               </Text>
-              <Text style={[styles.statLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+              <Text style={[styles.statLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                 {settings.statLabels?.years ?? t("yearsExperience")}
               </Text>
             </View>

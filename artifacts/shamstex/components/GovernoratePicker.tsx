@@ -33,7 +33,7 @@ export default function GovernoratePicker({ value, onChange, invalid, placeholde
         <Text
           style={{
             color: value ? colors.foreground : colors.mutedForeground,
-            fontFamily: "Inter_400Regular",
+            fontFamily: "Cairo_400Regular",
             fontSize: 13,
             textAlign: "right",
             flex: 1,
@@ -54,7 +54,7 @@ export default function GovernoratePicker({ value, onChange, invalid, placeholde
             style={{ backgroundColor: colors.card, borderRadius: colors.radius, borderWidth: 1, borderColor: colors.border, maxHeight: "75%", overflow: "hidden" }}
           >
             <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", padding: 14, borderBottomWidth: 1, borderBottomColor: colors.border }}>
-              <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 15 }}>اختر المحافظة</Text>
+              <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 15 }}>اختر المحافظة</Text>
               <Pressable onPress={() => setOpen(false)} hitSlop={8}>
                 <Icon name="x" size={20} color={colors.mutedForeground} />
               </Pressable>
@@ -80,7 +80,7 @@ export default function GovernoratePicker({ value, onChange, invalid, placeholde
                     }}
                   >
                     <Icon name={selected ? "check-circle" : "circle"} size={16} color={selected ? colors.gold : colors.mutedForeground} />
-                    <Text style={{ color: colors.foreground, fontFamily: selected ? "Inter_700Bold" : "Inter_500Medium", fontSize: 14, flex: 1, textAlign: "right" }}>
+                    <Text style={{ color: colors.foreground, fontFamily: selected ? "Cairo_700Bold" : "Cairo_500Medium", fontSize: 14, flex: 1, textAlign: "right" }}>
                       {g}
                     </Text>
                   </Pressable>

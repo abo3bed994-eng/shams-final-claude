@@ -57,7 +57,7 @@ export default function PaymentSettingsPage() {
   return (
     <SettingsScreen title="إعدادات الدفع" bottomPad={bottomPad} save={save} saving={saving}>
       <Card title="وسائل الدفع المتاحة">
-        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>
+        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>
           فعّل أو عطّل أي وسيلة دفع — الوسائل المعطّلة لن تظهر للعميل عند الشراء.
         </Text>
         {PAYMENT_TOGGLES.map((m) => {
@@ -69,7 +69,7 @@ export default function PaymentSettingsPage() {
               style={{ flexDirection: "row-reverse", alignItems: "center", gap: 10, padding: 12, borderWidth: 1, borderColor: on ? colors.gold + "55" : colors.border, borderRadius: 10, backgroundColor: on ? colors.gold + "11" : colors.surface }}
             >
               <Icon name={m.icon} size={18} color={on ? colors.gold : colors.mutedForeground} />
-              <Text style={{ flex: 1, color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 14, textAlign: "right" }}>{m.label}</Text>
+              <Text style={{ flex: 1, color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14, textAlign: "right" }}>{m.label}</Text>
               <Icon name={on ? "check-circle" : "circle"} size={20} color={on ? colors.gold : colors.mutedForeground} />
             </Pressable>
           );
@@ -78,19 +78,19 @@ export default function PaymentSettingsPage() {
       <Card title="إعدادات الدفع">
         <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8, padding: 10, backgroundColor: colors.gold + "11", borderRadius: 8, borderWidth: 1, borderColor: colors.gold + "33" }}>
           <Icon name="wallet" size={18} color={colors.gold} />
-          <Text style={{ color: colors.gold, fontFamily: "Inter_500Medium", fontSize: 13, flex: 1, textAlign: "right" }}>
+          <Text style={{ color: colors.gold, fontFamily: "Cairo_500Medium", fontSize: 13, flex: 1, textAlign: "right" }}>
             أرقام الدفع التي تظهر للعميل عند الشراء. توفّر كل وسيلة لكل فرع يُحدَّد من صفحة "الفروع".
           </Text>
         </View>
 
-        <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 14, textAlign: "right" }}>
+        <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14, textAlign: "right" }}>
           المحافظ الإلكترونية (يمكن إضافة أكثر من رقم)
         </Text>
         <View style={{ gap: 10 }}>
           {wallets.map((w, idx) => (
             <View key={w.id} style={{ padding: 10, borderWidth: 1, borderColor: colors.border, borderRadius: 10, gap: 8, backgroundColor: colors.surface }}>
               <View style={{ flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" }}>
-                <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 13 }}>محفظة #{idx + 1}</Text>
+                <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 13 }}>محفظة #{idx + 1}</Text>
                 <Pressable onPress={() => removeWallet(w.id)} style={{ padding: 6 }}>
                   <Icon name="trash-2" size={16} color="#E74C3C" />
                 </Pressable>
@@ -111,14 +111,14 @@ export default function PaymentSettingsPage() {
 
         <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 4 }} />
 
-        <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 14, textAlign: "right" }}>
+        <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14, textAlign: "right" }}>
           حسابات انستاباي (يمكن إضافة أكثر من حساب)
         </Text>
         <View style={{ gap: 10 }}>
           {ips.map((ip, idx) => (
             <View key={ip.id} style={{ padding: 10, borderWidth: 1, borderColor: colors.border, borderRadius: 10, gap: 8, backgroundColor: colors.surface }}>
               <View style={{ flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" }}>
-                <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 13 }}>انستاباي #{idx + 1}</Text>
+                <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 13 }}>انستاباي #{idx + 1}</Text>
                 <Pressable onPress={() => removeIp(ip.id)} style={{ padding: 6 }}>
                   <Icon name="trash-2" size={16} color="#E74C3C" />
                 </Pressable>
@@ -132,7 +132,7 @@ export default function PaymentSettingsPage() {
 
         <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 4 }} />
 
-        <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 14, textAlign: "right" }}>التحويل البنكي</Text>
+        <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14, textAlign: "right" }}>التحويل البنكي</Text>
         <Field label="اسم البنك" value={draft.payment?.bankName ?? ""} onChange={(v) => setDraft((d) => ({ ...d, payment: { ...(d.payment ?? {} as PaymentSettings), bankName: v } }))} placeholder="البنك الأهلي المصري" />
         <Field label="اسم صاحب الحساب" value={draft.payment?.bankAccountName ?? ""} onChange={(v) => setDraft((d) => ({ ...d, payment: { ...(d.payment ?? {} as PaymentSettings), bankAccountName: v } }))} placeholder="شمس تكس للأقمشة" />
         <Field label="رقم الحساب" value={draft.payment?.bankAccountNumber ?? ""} onChange={(v) => setDraft((d) => ({ ...d, payment: { ...(d.payment ?? {} as PaymentSettings), bankAccountNumber: v } }))} placeholder="1234567890123" keyboardType="decimal-pad" />

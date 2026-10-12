@@ -75,7 +75,7 @@ export default function ProductsScreen() {
         ]}
       >
         <Text
-          style={[styles.title, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}
+          style={[styles.title, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}
         >
           {t("products")}
         </Text>
@@ -151,7 +151,7 @@ export default function ProductsScreen() {
           >
             {canTogglePricing && (
               <View style={{ flexDirection: "row-reverse", gap: 6, paddingHorizontal: 16, paddingTop: 10, alignItems: "center" }}>
-                <Text style={{ color: colors.mutedForeground, fontSize: 11, fontFamily: "Inter_500Medium" }}>
+                <Text style={{ color: colors.mutedForeground, fontSize: 11, fontFamily: "Cairo_500Medium" }}>
                   عرض الأسعار:
                 </Text>
                 {([
@@ -174,7 +174,7 @@ export default function ProductsScreen() {
                     >
                       <Text style={{
                         color: active ? colors.gold : colors.mutedForeground,
-                        fontFamily: active ? "Inter_600SemiBold" : "Inter_400Regular",
+                        fontFamily: active ? "Cairo_600SemiBold" : "Cairo_400Regular",
                         fontSize: 12,
                       }}>
                         {opt.l}
@@ -196,7 +196,7 @@ export default function ProductsScreen() {
             >
               <Icon name="search" size={18} color={colors.mutedForeground} />
               <TextInput
-                style={[styles.searchInput, { color: colors.foreground, fontFamily: "Inter_400Regular" }]}
+                style={[styles.searchInput, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}
                 placeholder={t("searchProducts")}
                 placeholderTextColor={colors.mutedForeground}
                 value={search}
@@ -228,7 +228,7 @@ export default function ProductsScreen() {
                       styles.catText,
                       {
                         color: activeCategory === cat ? colors.background : colors.foreground,
-                        fontFamily: activeCategory === cat ? "Inter_600SemiBold" : "Inter_400Regular",
+                        fontFamily: activeCategory === cat ? "Cairo_600SemiBold" : "Cairo_400Regular",
                       },
                     ]}
                   >
@@ -259,7 +259,7 @@ export default function ProductsScreen() {
                   >
                     <Text style={[styles.subCatText, {
                       color: activeSubcategory === sub ? colors.gold : colors.mutedForeground,
-                      fontFamily: activeSubcategory === sub ? "Inter_600SemiBold" : "Inter_400Regular",
+                      fontFamily: activeSubcategory === sub ? "Cairo_600SemiBold" : "Cairo_400Regular",
                     }]}>
                       {sub}
                     </Text>
@@ -278,7 +278,7 @@ export default function ProductsScreen() {
                 >
                   <Text style={[styles.subCatText, {
                     color: !activeSubcategory ? colors.gold : colors.mutedForeground,
-                    fontFamily: !activeSubcategory ? "Inter_600SemiBold" : "Inter_400Regular",
+                    fontFamily: !activeSubcategory ? "Cairo_600SemiBold" : "Cairo_400Regular",
                   }]}>
                     {t("allCategories")}
                   </Text>
@@ -299,7 +299,7 @@ export default function ProductsScreen() {
         ListEmptyComponent={
           <View style={styles.empty}>
             <Icon name="layers" size={48} color={colors.mutedForeground} />
-            <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+            <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
               {t("noProducts")}
             </Text>
           </View>
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 3,
   },
-  cartBadgeText: { fontSize: 10, fontFamily: "Inter_700Bold" },
+  cartBadgeText: { fontSize: 10, fontFamily: "Cairo_700Bold" },
   searchWrapper: {
     paddingHorizontal: 16,
     paddingVertical: 12,

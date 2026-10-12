@@ -131,14 +131,14 @@ const styles = StyleSheet.create({
   title: {
     color: "#D4AF37",
     fontSize: 20,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Cairo_700Bold",
     marginBottom: 10,
     textAlign: "center",
   },
   body: {
     color: "#DDD",
     fontSize: 14,
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Cairo_400Regular",
     textAlign: "center",
     lineHeight: 22,
     marginBottom: 20,
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   btnPrimaryText: {
     color: "#0A0A0A",
     fontSize: 14,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Cairo_700Bold",
   },
   btnSecondary: {
     paddingVertical: 12,
@@ -174,6 +174,6 @@ const styles = StyleSheet.create({
   btnSecondaryText: {
     color: "#AAA",
     fontSize: 14,
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Cairo_600SemiBold",
   },
 });

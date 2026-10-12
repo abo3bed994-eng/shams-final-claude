@@ -90,7 +90,7 @@ export default function EditCountdownBar() {
           <Text
             style={{
               color: "#0A0A0A",
-              fontFamily: "Inter_700Bold",
+              fontFamily: "Cairo_700Bold",
               fontSize: 13,
               textAlign: "center",
             }}

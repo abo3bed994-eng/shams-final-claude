@@ -169,11 +169,11 @@ export default function PriceMenuSettingsScreen() {
             <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", paddingBottom: 4, borderBottomWidth: 1, borderBottomColor: colors.gold + "44" }}>
               <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 7 }}>
                 <Icon name="layers" size={16} color={colors.gold} />
-                <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 13 }}>
+                <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 13 }}>
                   {productGroupMeta.get(product.id)?.category}
                 </Text>
               </View>
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11 }}>
+              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11 }}>
                 {productGroupMeta.get(product.id)?.count} خامة
               </Text>
             </View>
@@ -201,16 +201,16 @@ export default function PriceMenuSettingsScreen() {
               <Icon name="grip-vertical" size={20} color={isActive ? colors.gold : colors.mutedForeground} />
             </Pressable>
             <View style={{ flex: 1, gap: 3 }}>
-              <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 13, textAlign: "right" }}>
+              <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, textAlign: "right" }}>
                 {product.name}
               </Text>
-              <Text style={{ color: colors.gold, fontFamily: "Inter_600SemiBold", fontSize: 12, textAlign: "right" }}>
+              <Text style={{ color: colors.gold, fontFamily: "Cairo_600SemiBold", fontSize: 12, textAlign: "right" }}>
                 {product.wholesalePrice} ج.م
               </Text>
             </View>
           </View>
           <View style={{ gap: 5 }}>
-            <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right" }}>
+            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>
               قسم القائمة
             </Text>
             <Pressable
@@ -227,7 +227,7 @@ export default function PriceMenuSettingsScreen() {
                 backgroundColor: colors.input,
               }}
             >
-              <Text style={{ color: menu.productCategories[product.id] ? colors.foreground : colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 14 }}>
+              <Text style={{ color: menu.productCategories[product.id] ? colors.foreground : colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 14 }}>
                 {menu.productCategories[product.id] || product.category || "بدون قسم"}
               </Text>
               <Icon name={openCategoryProductId === product.id ? "chevron-up" : "chevron-down"} size={16} color={colors.mutedForeground} />
@@ -243,7 +243,7 @@ export default function PriceMenuSettingsScreen() {
                   }}
                   style={{ paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: colors.border }}
                 >
-                  <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 13, textAlign: "right" }}>
+                  <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 13, textAlign: "right" }}>
                     القسم الأصلي: {product.category || "بدون قسم"}
                   </Text>
                 </Pressable>
@@ -267,7 +267,7 @@ export default function PriceMenuSettingsScreen() {
                         backgroundColor: selected ? colors.gold + "18" : colors.surface,
                       }}
                     >
-                      <Text style={{ color: selected ? colors.gold : colors.foreground, fontFamily: selected ? "Inter_600SemiBold" : "Inter_400Regular", fontSize: 13, textAlign: "right" }}>
+                      <Text style={{ color: selected ? colors.gold : colors.foreground, fontFamily: selected ? "Cairo_600SemiBold" : "Cairo_400Regular", fontSize: 13, textAlign: "right" }}>
                         {category}
                       </Text>
                       {selected && <Icon name="check" size={15} color={colors.gold} />}
@@ -275,7 +275,7 @@ export default function PriceMenuSettingsScreen() {
                   );
                 })}
                 {menu.categories.length === 0 && (
-                  <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right", padding: 12 }}>
+                  <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right", padding: 12 }}>
                     أضف قسمًا أولًا من قسم «أقسام القائمة»
                   </Text>
                 )}
@@ -291,7 +291,7 @@ export default function PriceMenuSettingsScreen() {
   const listHeader = (
     <>
       <Card title="خلفية قائمة الأسعار">
-        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right" }}>
+        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>
           اختر صورة خلفية للقائمة وحدد درجة ظهورها. الخلفية لا تغيّر الأسعار أو بيانات المنتجات.
         </Text>
         {menu.backgroundImageUri && (
@@ -312,7 +312,7 @@ export default function PriceMenuSettingsScreen() {
             style={[styles.bannerBtn, { flex: 1, backgroundColor: colors.surface, borderColor: colors.border, opacity: backgroundLoading ? 0.6 : 1 }]}
           >
             {backgroundLoading ? <ActivityIndicator size="small" color={colors.foreground} /> : <Icon name="image" size={18} color={colors.foreground} />}
-            <Text style={{ color: colors.foreground, fontFamily: "Inter_500Medium", fontSize: 13 }}>
+            <Text style={{ color: colors.foreground, fontFamily: "Cairo_500Medium", fontSize: 13 }}>
               {backgroundLoading ? "جاري الرفع..." : menu.backgroundImageUri ? "تغيير الصورة" : "إضافة صورة"}
             </Text>
           </Pressable>
@@ -331,7 +331,7 @@ export default function PriceMenuSettingsScreen() {
       </Card>
 
       <Card title="أقسام القائمة">
-        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right" }}>
+        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>
           أضف الأقسام ورتبها. يمكنك بعد ذلك كتابة اسم القسم بجانب كل خامة.
         </Text>
         {menu.categories.map((category, index) => (
@@ -344,7 +344,7 @@ export default function PriceMenuSettingsScreen() {
                 <Icon name="chevron-down" size={16} color={index === menu.categories.length - 1 ? colors.border : colors.foreground} />
               </Pressable>
             </View>
-            <Text style={[styles.catListName, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>{category}</Text>
+            <Text style={[styles.catListName, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>{category}</Text>
             <Pressable onPress={() => removeCategory(category)} style={styles.deleteCatBtn}>
               <Icon name="trash-2" size={15} color={colors.destructive} />
             </Pressable>
@@ -360,15 +360,15 @@ export default function PriceMenuSettingsScreen() {
             placeholder="اسم قسم جديد"
             placeholderTextColor={colors.mutedForeground}
             textAlign="right"
-            style={[styles.addInput, { flex: 1, color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Inter_400Regular" }]}
+            style={[styles.addInput, { flex: 1, color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_400Regular" }]}
           />
         </View>
       </Card>
 
-      <Text style={[styles.cardTitle, { color: colors.gold, fontFamily: "Inter_700Bold", textAlign: "right", marginTop: 2 }]}>
+      <Text style={[styles.cardTitle, { color: colors.gold, fontFamily: "Cairo_700Bold", textAlign: "right", marginTop: 2 }]}>
         ترتيب الخامات وتقسيمها
       </Text>
-      <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right", marginBottom: 10 }}>
+      <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right", marginBottom: 10 }}>
         الخامات مجمعة داخل بطاقة حسب قسم قائمة الأسعار. اضغط مطولاً على مقبض السحب لإعادة ترتيب الخامات داخل البطاقة.
       </Text>
     </>

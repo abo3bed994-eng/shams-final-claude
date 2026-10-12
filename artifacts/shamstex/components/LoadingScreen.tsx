@@ -122,7 +122,7 @@ export default function LoadingScreen({
                 styles.tagline,
                 {
                   color: colors.gold,
-                  fontFamily: taglineFontFamily ?? "Inter_700Bold",
+                  fontFamily: taglineFontFamily ?? "Cairo_700Bold",
                 },
               ]}
             >
@@ -180,6 +180,6 @@ const styles = StyleSheet.create({
   message: {
     marginTop: 16,
     fontSize: 13,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Cairo_500Medium",
   },
 });

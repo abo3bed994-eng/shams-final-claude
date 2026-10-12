@@ -576,7 +576,7 @@ export default function LoginScreen() {
             style={styles.logoImg}
             resizeMode="contain"
           />
-          <Text style={[styles.brand, { color: colors.gold, fontFamily: language === "ar" ? "Amiri_700Bold" : "Inter_700Bold" }]}>
+          <Text style={[styles.brand, { color: colors.gold, fontFamily: language === "ar" ? "Cairo_700Bold" : "Cairo_700Bold" }]}>
             {t("tagline")}
           </Text>
         </View>
@@ -593,10 +593,10 @@ export default function LoginScreen() {
               <View style={styles.stepIcon}>
                 <Icon name="smartphone" size={28} color={colors.gold} />
               </View>
-              <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+              <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                 {t("login")}
               </Text>
-              <Text style={[styles.cardSubtitle, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+              <Text style={[styles.cardSubtitle, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                 {t("enterPhone")}
               </Text>
 
@@ -612,13 +612,13 @@ export default function LoginScreen() {
                     style={[styles.countryCodeBox, { borderLeftColor: colors.border }]}
                   >
                     <Text style={{ fontSize: 18 }}>{country.flag}</Text>
-                    <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 14 }}>
+                    <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 14 }}>
                       {country.dial}
                     </Text>
                     <Icon name="chevron-down" size={14} color={colors.mutedForeground} />
                   </Pressable>
                   <TextInput
-                    style={[styles.input, { color: colors.foreground, fontFamily: "Inter_400Regular" }]}
+                    style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}
                     placeholder={t("phone")}
                     placeholderTextColor={colors.mutedForeground}
                     value={phone}
@@ -635,7 +635,7 @@ export default function LoginScreen() {
               {error ? (
                 <View style={[styles.errorBox, { backgroundColor: "#E74C3C11", borderColor: "#E74C3C44" }]}>
                   <Icon name="alert-circle" size={14} color="#E74C3C" />
-                  <Text style={{ color: "#E74C3C", fontFamily: "Inter_500Medium", fontSize: 12, flex: 1, textAlign: "right" }}>
+                  <Text style={{ color: "#E74C3C", fontFamily: "Cairo_500Medium", fontSize: 12, flex: 1, textAlign: "right" }}>
                     {error}
                   </Text>
                 </View>
@@ -651,14 +651,14 @@ export default function LoginScreen() {
 
               {__DEV__ ? (
                 <Pressable onPress={handleDevLogin} style={{ marginTop: 12, alignSelf: "center" }} hitSlop={8}>
-                  <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 12 }}>
+                  <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 12 }}>
                     دخول مطوّر (تجريبي)
                   </Text>
                 </Pressable>
               ) : null}
 
               <View style={[styles.divider, { borderColor: colors.border }]} />
-              <Text style={[styles.newCustomerNote, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+              <Text style={[styles.newCustomerNote, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                 {t("newCustomer")}
               </Text>
             </>
@@ -674,10 +674,10 @@ export default function LoginScreen() {
               <View style={styles.stepIcon}>
                 <Icon name="lock" size={28} color={colors.gold} />
               </View>
-              <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+              <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                 {t("otpTitle")}
               </Text>
-              <Text style={[styles.cardSubtitle, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+              <Text style={[styles.cardSubtitle, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                 {`${t("otpSentTo")} ${e164Phone}`}
               </Text>
 
@@ -689,7 +689,7 @@ export default function LoginScreen() {
               >
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
                 <TextInput
-                  style={[styles.input, { color: colors.foreground, fontFamily: "Inter_700Bold", letterSpacing: 8 }]}
+                  style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_700Bold", letterSpacing: 8 }]}
                   placeholder="_ _ _ _ _ _"
                   placeholderTextColor={colors.mutedForeground}
                   value={otp}
@@ -706,7 +706,7 @@ export default function LoginScreen() {
               {error ? (
                 <View style={[styles.errorBox, { backgroundColor: "#E74C3C11", borderColor: "#E74C3C44" }]}>
                   <Icon name="alert-circle" size={14} color="#E74C3C" />
-                  <Text style={{ color: "#E74C3C", fontFamily: "Inter_500Medium", fontSize: 12, flex: 1, textAlign: "right" }}>
+                  <Text style={{ color: "#E74C3C", fontFamily: "Cairo_500Medium", fontSize: 12, flex: 1, textAlign: "right" }}>
                     {error}
                   </Text>
                 </View>
@@ -725,7 +725,7 @@ export default function LoginScreen() {
                 disabled={loading || resendCountdown > 0}
                 style={{ opacity: (loading || resendCountdown > 0) ? 0.6 : 1 }}
               >
-                <Text style={{ color: colors.gold, fontFamily: "Inter_500Medium", fontSize: 13, textAlign: "center" }}>
+                <Text style={{ color: colors.gold, fontFamily: "Cairo_500Medium", fontSize: 13, textAlign: "center" }}>
                   {resendCountdown > 0
                     ? `إعادة إرسال الكود بعد (${resendCountdown} ثانية)`
                     : "إعادة إرسال الكود"}
@@ -744,16 +744,16 @@ export default function LoginScreen() {
               <View style={styles.stepIcon}>
                 <Icon name="lock" size={28} color={colors.gold} />
               </View>
-              <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+              <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                 الرمز السري
               </Text>
-              <Text style={[styles.cardSubtitle, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+              <Text style={[styles.cardSubtitle, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                 أدخل الرمز السري المكوّن من 4 أرقام
               </Text>
               <View style={[styles.inputWrapper, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
                 <TextInput
-                  style={[styles.input, { color: colors.foreground, fontFamily: "Inter_700Bold", letterSpacing: 12 }]}
+                  style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_700Bold", letterSpacing: 12 }]}
                   placeholder="• • • •"
                   placeholderTextColor={colors.mutedForeground}
                   value={pin}
@@ -769,12 +769,12 @@ export default function LoginScreen() {
               {error ? (
                 <View style={[styles.errorBox, { backgroundColor: "#E74C3C11", borderColor: "#E74C3C44" }]}>
                   <Icon name="alert-circle" size={14} color="#E74C3C" />
-                  <Text style={{ color: "#E74C3C", fontFamily: "Inter_500Medium", fontSize: 12, flex: 1, textAlign: "right" }}>{error}</Text>
+                  <Text style={{ color: "#E74C3C", fontFamily: "Cairo_500Medium", fontSize: 12, flex: 1, textAlign: "right" }}>{error}</Text>
                 </View>
               ) : null}
               <GoldButton label="دخول" onPress={handleVerifyPin} loading={loading} disabled={pin.length !== 4} style={{ width: "100%" }} />
               <Pressable onPress={handleForgotPin} disabled={loading}>
-                <Text style={{ color: colors.gold, fontFamily: "Inter_500Medium", fontSize: 13, textAlign: "center" }}>
+                <Text style={{ color: colors.gold, fontFamily: "Cairo_500Medium", fontSize: 13, textAlign: "center" }}>
                   نسيت الرمز السري؟ إعادة تعيين عبر SMS
                 </Text>
               </Pressable>
@@ -791,16 +791,16 @@ export default function LoginScreen() {
               <View style={styles.stepIcon}>
                 <Icon name="shield" size={28} color={colors.gold} />
               </View>
-              <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+              <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                 {pinPurpose === "reset" ? "إعادة تعيين الرمز السري" : "إنشاء رمز سري"}
               </Text>
-              <Text style={[styles.cardSubtitle, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+              <Text style={[styles.cardSubtitle, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                 اختر رمزاً مكوّناً من 4 أرقام لتسجيل الدخول السريع
               </Text>
               <View style={[styles.inputWrapper, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
                 <TextInput
-                  style={[styles.input, { color: colors.foreground, fontFamily: "Inter_700Bold", letterSpacing: 12 }]}
+                  style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_700Bold", letterSpacing: 12 }]}
                   placeholder="رمز جديد"
                   placeholderTextColor={colors.mutedForeground}
                   value={pin}
@@ -815,7 +815,7 @@ export default function LoginScreen() {
               <View style={[styles.inputWrapper, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
                 <TextInput
-                  style={[styles.input, { color: colors.foreground, fontFamily: "Inter_700Bold", letterSpacing: 12 }]}
+                  style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_700Bold", letterSpacing: 12 }]}
                   placeholder="تأكيد الرمز"
                   placeholderTextColor={colors.mutedForeground}
                   value={confirmPin}
@@ -830,7 +830,7 @@ export default function LoginScreen() {
               {error ? (
                 <View style={[styles.errorBox, { backgroundColor: "#E74C3C11", borderColor: "#E74C3C44" }]}>
                   <Icon name="alert-circle" size={14} color="#E74C3C" />
-                  <Text style={{ color: "#E74C3C", fontFamily: "Inter_500Medium", fontSize: 12, flex: 1, textAlign: "right" }}>{error}</Text>
+                  <Text style={{ color: "#E74C3C", fontFamily: "Cairo_500Medium", fontSize: 12, flex: 1, textAlign: "right" }}>{error}</Text>
                 </View>
               ) : null}
               <GoldButton label="حفظ ودخول" onPress={handleSetPinSubmit} loading={loading} disabled={pin.length !== 4 || confirmPin.length !== 4} style={{ width: "100%" }} />
@@ -847,10 +847,10 @@ export default function LoginScreen() {
               <View style={styles.stepIcon}>
                 <Icon name="user-plus" size={28} color={colors.gold} />
               </View>
-              <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+              <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                 {t("enterName")}
               </Text>
-              <Text style={[styles.cardSubtitle, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+              <Text style={[styles.cardSubtitle, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                 {t("enterNameHint")}
               </Text>
 
@@ -862,7 +862,7 @@ export default function LoginScreen() {
               >
                 <Icon name="user" size={18} color={colors.mutedForeground} />
                 <TextInput
-                  style={[styles.input, { color: colors.foreground, fontFamily: "Inter_400Regular" }]}
+                  style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}
                   placeholder={t("nameLabel")}
                   placeholderTextColor={colors.mutedForeground}
                   value={name}
@@ -884,7 +884,7 @@ export default function LoginScreen() {
 
               <View style={[styles.privacyBox, { backgroundColor: colors.gold + "11", borderColor: colors.gold + "33" }]}>
                 <Icon name="shield-check" size={14} color={colors.gold} />
-                <Text style={[styles.privacyText, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+                <Text style={[styles.privacyText, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                   بياناتك محفوظة وآمنة ولن تُشارك مع أي طرف
                 </Text>
               </View>
@@ -897,7 +897,7 @@ export default function LoginScreen() {
           <Pressable onPress={() => router.push("/legal/privacy" as any)} hitSlop={8}>
             <Text style={[styles.legalLink, { color: colors.gold }]}>سياسة الخصوصية</Text>
           </Pressable>
-          <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11 }}>•</Text>
+          <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11 }}>•</Text>
           <Pressable onPress={() => router.push("/legal/terms" as any)} hitSlop={8}>
             <Text style={[styles.legalLink, { color: colors.gold }]}>الشروط والأحكام</Text>
           </Pressable>
@@ -967,7 +967,7 @@ const styles = StyleSheet.create({
   },
   privacyText: { fontSize: 11, flex: 1, textAlign: "right", lineHeight: 17 },
   legalRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 18 },
-  legalLink: { fontSize: 12, fontFamily: "Inter_600SemiBold", textDecorationLine: "underline" },
+  legalLink: { fontSize: 12, fontFamily: "Cairo_600SemiBold", textDecorationLine: "underline" },
   errorBox: {
     flexDirection: "row-reverse",
     alignItems: "center",

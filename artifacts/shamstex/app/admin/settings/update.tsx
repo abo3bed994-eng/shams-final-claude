@@ -14,10 +14,10 @@ export default function UpdateSettings() {
   return (
     <SettingsScreen title="التحديث الإجباري" bottomPad={bottomPad} save={save} saving={saving}>
       <Card title="🔄 التحديث الإجباري">
-        <Text style={{ color: colors.mutedForeground, fontSize: 12, textAlign: "right", marginBottom: 8 }}>
+        <Text style={{ color: colors.mutedForeground, fontSize: 12, textAlign: "right", marginBottom: 8, fontFamily: "Cairo_400Regular" }}>
           عند تعيين رقم نسخة هنا، أي مستخدم نسخته أقدم سيُمنع من استخدام التطبيق ويظهر له طلب التحديث. المدير لا يتأثر بهذا القيد ويمكنه دائماً تعديل الرقم من هنا.
         </Text>
-        <Text style={{ color: colors.foreground, fontSize: 12, textAlign: "right", marginBottom: 8, fontFamily: "Inter_600SemiBold" }}>
+        <Text style={{ color: colors.foreground, fontSize: 12, textAlign: "right", marginBottom: 8, fontFamily: "Cairo_600SemiBold" }}>
           نسخة التطبيق الحالية: {APP_VERSION}
         </Text>
         <Field
@@ -27,7 +27,7 @@ export default function UpdateSettings() {
           placeholder="اتركه فارغاً للتعطيل"
         />
         {invalidMinVersion && (
-          <Text style={{ color: "#E74C3C", fontSize: 12, textAlign: "right", marginTop: -4 }}>
+          <Text style={{ color: "#E74C3C", fontSize: 12, textAlign: "right", marginTop: -4, fontFamily: "Cairo_400Regular" }}>
             صيغة رقم النسخة غير صحيحة (مثال صحيح: 1.1.0). الرقم غير الصحيح يتم تجاهله ولن يفعّل التحديث الإجباري.
           </Text>
         )}
@@ -36,7 +36,7 @@ export default function UpdateSettings() {
             onPress={() => setDraft((d) => ({ ...d, minVersion: "" }))}
             style={({ pressed }) => ({ alignSelf: "flex-end", paddingVertical: 8, paddingHorizontal: 14, borderRadius: 8, borderWidth: 1, borderColor: colors.border, opacity: pressed ? 0.7 : 1, marginTop: 4 })}
           >
-            <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_600SemiBold", fontSize: 12 }}>تعطيل التحديث الإجباري</Text>
+            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>تعطيل التحديث الإجباري</Text>
           </Pressable>
         )}
         <Field

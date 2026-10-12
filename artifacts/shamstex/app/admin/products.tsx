@@ -119,7 +119,7 @@ export default function AdminProductsScreen() {
                 <View style={styles.nameRow}>
                   {isOutOfStock && (
                     <View style={styles.outOfStockBadge}>
-                      <Text style={[styles.outOfStockBadgeText, { fontFamily: "Inter_700Bold" }]}>
+                      <Text style={[styles.outOfStockBadgeText, { fontFamily: "Cairo_700Bold" }]}>
                         غير متوفر
                       </Text>
                     </View>
@@ -129,7 +129,7 @@ export default function AdminProductsScreen() {
                       styles.productName,
                       {
                         color: isOutOfStock ? "#C0392B" : colors.foreground,
-                        fontFamily: "Inter_700Bold",
+                        fontFamily: "Cairo_700Bold",
                       },
                     ]}
                   >
@@ -138,7 +138,7 @@ export default function AdminProductsScreen() {
                 </View>
                 <View style={styles.productBadges}>
                   <View style={[styles.categoryBadge, { backgroundColor: colors.gold + "22" }]}>
-                    <Text style={[styles.categoryText, { color: colors.gold, fontFamily: "Inter_500Medium" }]}>
+                    <Text style={[styles.categoryText, { color: colors.gold, fontFamily: "Cairo_500Medium" }]}>
                       {product.category}
                       {product.subcategory ? ` / ${product.subcategory}` : ""}
                     </Text>
@@ -149,7 +149,7 @@ export default function AdminProductsScreen() {
                   }]}>
                     <Text style={[styles.unitText, {
                       color: product.unit === "kilo" ? "#2980B9" : "#27AE60",
-                      fontFamily: "Inter_600SemiBold",
+                      fontFamily: "Cairo_600SemiBold",
                     }]}>
                       {UNIT_LABELS[product.unit ?? "meter"]}
                     </Text>
@@ -180,28 +180,28 @@ export default function AdminProductsScreen() {
 
             <View style={[styles.productDetails, { borderTopColor: colors.border }]}>
               <View style={styles.priceItem}>
-                <Text style={[styles.priceValue, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+                <Text style={[styles.priceValue, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                   {product.wholesalePrice} ج.م
                 </Text>
-                <Text style={[styles.priceLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+                <Text style={[styles.priceLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                   سعر التاجر
                 </Text>
               </View>
               <View style={[styles.divider, { backgroundColor: colors.border }]} />
               <View style={styles.priceItem}>
-                <Text style={[styles.priceValue, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+                <Text style={[styles.priceValue, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                   {product.retailPrice} ج.م
                 </Text>
-                <Text style={[styles.priceLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+                <Text style={[styles.priceLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                   سعر الزبون
                 </Text>
               </View>
               <View style={[styles.divider, { backgroundColor: colors.border }]} />
               <View style={styles.priceItem}>
-                <Text style={[styles.priceValue, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+                <Text style={[styles.priceValue, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                   {product.colors.length}
                 </Text>
-                <Text style={[styles.priceLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+                <Text style={[styles.priceLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                   الألوان
                 </Text>
               </View>
@@ -228,7 +228,7 @@ export default function AdminProductsScreen() {
                   styles.stockText,
                   {
                     color: product.inStock ? "#27AE60" : "#C0392B",
-                    fontFamily: "Inter_700Bold",
+                    fontFamily: "Cairo_700Bold",
                   },
                 ]}
               >
@@ -270,7 +270,7 @@ export default function AdminProductsScreen() {
               onChangeText={setSearch}
               placeholder="ابحث عن خامة"
               placeholderTextColor={colors.mutedForeground}
-              style={[styles.searchInput, { color: colors.foreground, fontFamily: "Inter_400Regular" }]}
+              style={[styles.searchInput, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}
               textAlign="right"
               returnKeyType="search"
             />
@@ -286,7 +286,7 @@ export default function AdminProductsScreen() {
       {products.length === 0 ? (
         <View style={styles.empty}>
           <Icon name="layers" size={48} color={colors.mutedForeground} />
-          <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+          <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
             لا توجد منتجات
           </Text>
           <GoldButton

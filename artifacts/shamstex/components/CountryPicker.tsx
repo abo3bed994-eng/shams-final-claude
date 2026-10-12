@@ -31,7 +31,7 @@ export default function CountryPicker({ visible, selected, onClose, onSelect }: 
       <Pressable style={styles.backdrop} onPress={onClose}>
         <Pressable style={[styles.sheet, { backgroundColor: colors.card, borderColor: colors.border }]} onPress={() => {}}>
           <View style={styles.header}>
-            <Text style={[styles.title, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>اختر الدولة</Text>
+            <Text style={[styles.title, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>اختر الدولة</Text>
             <Pressable onPress={onClose} hitSlop={12}>
               <Icon name="x" size={22} color={colors.foreground} />
             </Pressable>
@@ -44,7 +44,7 @@ export default function CountryPicker({ visible, selected, onClose, onSelect }: 
               onChangeText={setSearch}
               placeholder="ابحث..."
               placeholderTextColor={colors.mutedForeground}
-              style={[styles.searchInput, { color: colors.foreground, fontFamily: "Inter_400Regular" }]}
+              style={[styles.searchInput, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}
               textAlign="right"
             />
           </View>
@@ -66,10 +66,10 @@ export default function CountryPicker({ visible, selected, onClose, onSelect }: 
                   }}
                 >
                   <Text style={styles.flag}>{c.flag}</Text>
-                  <Text style={[styles.name, { color: colors.foreground, fontFamily: "Inter_500Medium" }]}>
+                  <Text style={[styles.name, { color: colors.foreground, fontFamily: "Cairo_500Medium" }]}>
                     {c.nameAr}
                   </Text>
-                  <Text style={[styles.dial, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+                  <Text style={[styles.dial, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                     {c.dial}
                   </Text>
                 </Pressable>
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   header: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" },
-  title: { fontSize: 18 },
+  title: { fontSize: 18, fontFamily: "Cairo_700Bold" },
   searchBox: {
     flexDirection: "row-reverse",
     alignItems: "center",
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
   },
-  searchInput: { flex: 1, fontSize: 14, height: "100%" },
+  searchInput: { flex: 1, fontSize: 14, height: "100%", fontFamily: "Cairo_400Regular" },
   row: {
     flexDirection: "row-reverse",
     alignItems: "center",
@@ -117,6 +117,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   flag: { fontSize: 24 },
-  name: { flex: 1, fontSize: 15, textAlign: "right" },
-  dial: { fontSize: 14 },
+  name: { flex: 1, fontSize: 15, textAlign: "right", fontFamily: "Cairo_500Medium" },
+  dial: { fontSize: 14, fontFamily: "Cairo_400Regular" },
 });

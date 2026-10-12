@@ -63,6 +63,7 @@ export interface User {
   banned?: boolean;
   bannedAt?: string;
   bannedReason?: string;
+  lastUpdated?: string;
   addresses?: SavedAddress[];
   favorites?: string[];
   branchId?: string;

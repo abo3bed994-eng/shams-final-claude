@@ -110,25 +110,25 @@ export default function NotificationsScreen() {
           <Text
             style={[
               styles.notifTitle,
-              { color: isReturn ? "#C0392B" : colors.foreground, fontFamily: "Inter_600SemiBold" },
+              { color: isReturn ? "#C0392B" : colors.foreground, fontFamily: "Cairo_600SemiBold" },
             ]}
           >
             {notif.title}
           </Text>
-          <Text style={[styles.notifBody, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+          <Text style={[styles.notifBody, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
             {notif.body}
           </Text>
           {isAction && (
-            <Text style={[styles.tapHint, { color: colors.gold, fontFamily: "Inter_500Medium" }]}>
+            <Text style={[styles.tapHint, { color: colors.gold, fontFamily: "Cairo_500Medium" }]}>
               اضغط للمراجعة والرد ←
             </Text>
           )}
           {notif.linkedOrderId && !isAction && (
-            <Text style={[styles.tapHint, { color: colors.gold, fontFamily: "Inter_500Medium" }]}>
+            <Text style={[styles.tapHint, { color: colors.gold, fontFamily: "Cairo_500Medium" }]}>
               اضغط لعرض الطلب ←
             </Text>
           )}
-          <Text style={[styles.notifTime, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+          <Text style={[styles.notifTime, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
             {new Date(notif.createdAt).toLocaleDateString("ar-EG")}
           </Text>
         </View>
@@ -145,7 +145,7 @@ export default function NotificationsScreen() {
       {visibleNotifications.length === 0 ? (
         <View style={styles.empty}>
           <Icon name="bell-off" size={48} color={colors.mutedForeground} />
-          <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+          <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
             لا توجد إشعارات
           </Text>
         </View>

@@ -125,7 +125,7 @@ export default function ProductDetailScreen() {
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <GoldHeader title="المنتج" onBack={() => router.back()} />
         <View style={styles.notFound}>
-          <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular" }}>
+          <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }}>
             المنتج غير موجود
           </Text>
         </View>
@@ -336,7 +336,7 @@ export default function ProductDetailScreen() {
         ]}
       >
         <Icon name="layers" size={18} color={colors.gold} />
-        <Text style={[styles.dropdownText, { color: colors.foreground, fontFamily: "Inter_500Medium" }]}>
+        <Text style={[styles.dropdownText, { color: colors.foreground, fontFamily: "Cairo_500Medium" }]}>
           {orderType === "weight"
             ? weightColorCount > 0
               ? `${weightColorCount} لون — ${totalWeight} ${unitLabel}`
@@ -374,7 +374,7 @@ export default function ProductDetailScreen() {
                         color: w > 0 ? colors.gold : colors.mutedForeground,
                         backgroundColor: colors.input,
                         borderColor: w > 0 ? colors.gold + "55" : colors.border,
-                        fontFamily: "Inter_700Bold",
+                        fontFamily: "Cairo_700Bold",
                       }]}
                       value={weightTexts[color.name] !== undefined ? weightTexts[color.name] : (w > 0 ? String(w) : "")}
                       placeholder="0"
@@ -401,7 +401,7 @@ export default function ProductDetailScreen() {
                     />
                   </View>
                   <View style={styles.colorRowRight}>
-                    <Text numberOfLines={1} maxFontSizeMultiplier={1.15} style={[styles.colorName, { color: colors.foreground, fontFamily: "Inter_500Medium" }]}>
+                    <Text numberOfLines={1} maxFontSizeMultiplier={1.15} style={[styles.colorName, { color: colors.foreground, fontFamily: "Cairo_500Medium" }]}>
                       {color.name}
                     </Text>
                      {companionMaterials.length > 0 && (
@@ -465,7 +465,7 @@ export default function ProductDetailScreen() {
                   </Pressable>
                   {qty > 0 ? (
                     <>
-                      <Text style={[styles.qtyText, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+                      <Text style={[styles.qtyText, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                         {qty}
                       </Text>
                       <Pressable
@@ -478,7 +478,7 @@ export default function ProductDetailScreen() {
                   ) : null}
                 </View>
                 <View style={styles.colorRowRight}>
-                  <Text numberOfLines={1} maxFontSizeMultiplier={1.15} style={[styles.colorName, { color: colors.foreground, fontFamily: "Inter_500Medium" }]}>
+                  <Text numberOfLines={1} maxFontSizeMultiplier={1.15} style={[styles.colorName, { color: colors.foreground, fontFamily: "Cairo_500Medium" }]}>
                     {color.name}
                   </Text>
                   {companionMaterials.length > 0 && (
@@ -532,13 +532,13 @@ export default function ProductDetailScreen() {
             { backgroundColor: colors.gold + "11", borderColor: colors.gold + "33", borderRadius: colors.radius - 4 },
           ]}
         >
-          <Text style={[styles.weightTotalLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+          <Text style={[styles.weightTotalLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
             إجمالي الوزن
           </Text>
-          <Text style={[styles.weightTotalValue, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.weightTotalValue, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
             {totalWeight} {unitLabel}
           </Text>
-          <Text style={[styles.weightTotalPrice, { color: colors.gold, fontFamily: "Inter_600SemiBold" }]}>
+          <Text style={[styles.weightTotalPrice, { color: colors.gold, fontFamily: "Cairo_600SemiBold" }]}>
             ≈ {(displayPrice * totalWeight).toFixed(0)} ج.م
           </Text>
         </View>
@@ -598,7 +598,7 @@ export default function ProductDetailScreen() {
                       justifyContent: "center",
                     }}
                   >
-                    <Text style={{ color: "#fff", fontSize: 9, fontFamily: "Inter_700Bold" }}>
+                    <Text style={{ color: "#fff", fontSize: 9, fontFamily: "Cairo_700Bold" }}>
                       {cartCount > 9 ? "9+" : cartCount}
                     </Text>
                   </View>
@@ -664,7 +664,7 @@ export default function ProductDetailScreen() {
         ) : (
           <View style={[styles.imagePlaceholder, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <Icon name="layers" size={60} color={colors.goldDark} />
-            <Text style={[styles.category, { color: colors.gold, fontFamily: "Inter_500Medium" }]}>
+            <Text style={[styles.category, { color: colors.gold, fontFamily: "Cairo_500Medium" }]}>
               {product.category}
             </Text>
           </View>
@@ -673,32 +673,32 @@ export default function ProductDetailScreen() {
         <View style={styles.priceSection}>
           <View>
             <Text
-              style={[styles.priceLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}
+              style={[styles.priceLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}
             >
               {user?.role === "merchant" ? "سعر الجملة" : "السعر"}
             </Text>
             {onOffer ? (
               <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                <Text style={[styles.price, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+                <Text style={[styles.price, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                   {displayPrice} ج.م / {product.unit === "kilo" ? "كيلو" : "متر"}
                 </Text>
-                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 16, textDecorationLine: "line-through" }}>
+                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 16, textDecorationLine: "line-through" }}>
                   {product.retailPrice} ج.م
                 </Text>
                 <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 4, backgroundColor: "#27AE60", paddingHorizontal: 9, paddingVertical: 3, borderRadius: 20 }}>
                   <Icon name="tag" size={12} color="#fff" />
-                  <Text style={{ color: "#fff", fontFamily: "Inter_700Bold", fontSize: 11 }}>خصم {discountPercent(product)}%</Text>
+                  <Text style={{ color: "#fff", fontFamily: "Cairo_700Bold", fontSize: 11 }}>خصم {discountPercent(product)}%</Text>
                 </View>
               </View>
             ) : (
-              <Text style={[styles.price, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+              <Text style={[styles.price, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                 {displayPrice} ج.م / {product.unit === "kilo" ? "كيلو" : "متر"}
               </Text>
             )}
           </View>
           {product.description && (
             <Text
-              style={[styles.desc, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}
+              style={[styles.desc, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}
             >
               {product.description}
             </Text>
@@ -707,38 +707,38 @@ export default function ProductDetailScreen() {
 
         {(product.width != null || product.gsm != null || (product.composition?.length ?? 0) > 0) && (
           <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
               مواصفات القماش
             </Text>
             <View style={{ gap: 10 }}>
               {product.width != null && (
                 <View style={styles.specLine}>
-                  <Text style={[styles.specLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>العرض</Text>
-                  <Text style={[styles.specValue, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>{product.width} سم</Text>
+                  <Text style={[styles.specLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>العرض</Text>
+                  <Text style={[styles.specValue, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>{product.width} سم</Text>
                 </View>
               )}
               {product.gsm != null && (
                 <View style={styles.specLine}>
-                  <Text style={[styles.specLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>المقطع (GSM)</Text>
-                  <Text style={[styles.specValue, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>{product.gsm} جم/م²</Text>
+                  <Text style={[styles.specLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>المقطع (GSM)</Text>
+                  <Text style={[styles.specValue, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>{product.gsm} جم/م²</Text>
                 </View>
               )}
               {product.unit === "kilo" && metersPerKg(product.gsm, product.width) != null && (
                 <View style={styles.specLine}>
-                  <Text style={[styles.specLabel, { color: colors.gold, fontFamily: "Inter_500Medium" }]}>المدّ</Text>
-                  <Text style={[styles.specValue, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+                  <Text style={[styles.specLabel, { color: colors.gold, fontFamily: "Cairo_500Medium" }]}>المدّ</Text>
+                  <Text style={[styles.specValue, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                     ≈ {(metersPerKg(product.gsm, product.width) as number).toFixed(1)} متر للكيلو
                   </Text>
                 </View>
               )}
               {(product.composition?.length ?? 0) > 0 && (
                 <View style={[styles.specLine, { alignItems: "flex-start" }]}>
-                  <Text style={[styles.specLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>التركيب</Text>
+                  <Text style={[styles.specLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>التركيب</Text>
                   <View style={{ flex: 1, flexDirection: "row-reverse", flexWrap: "wrap", gap: 6, justifyContent: "flex-start" }}>
                     {product.composition!.map((c, i) => (
                       <View key={i} style={{ flexDirection: "row-reverse", alignItems: "center", gap: 4, backgroundColor: colors.gold + "18", borderColor: colors.gold + "44", borderWidth: 1, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 14 }}>
-                        <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 12 }}>{c.percent}%</Text>
-                        <Text style={{ color: colors.foreground, fontFamily: "Inter_500Medium", fontSize: 12 }}>{c.yarn}</Text>
+                        <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 12 }}>{c.percent}%</Text>
+                        <Text style={{ color: colors.foreground, fontFamily: "Cairo_500Medium", fontSize: 12 }}>{c.yarn}</Text>
                       </View>
                     ))}
                   </View>
@@ -756,7 +756,7 @@ export default function ProductDetailScreen() {
             ]}
           >
             <Icon name="x-circle" size={20} color="#C0392B" />
-            <Text style={[styles.outOfStockBannerText, { fontFamily: "Inter_700Bold" }]}>
+            <Text style={[styles.outOfStockBannerText, { fontFamily: "Cairo_700Bold" }]}>
               هذا المنتج نفذ من المخزون
             </Text>
           </View>
@@ -770,7 +770,7 @@ export default function ProductDetailScreen() {
           ]}
         >
           <Text
-            style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}
+            style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}
           >
             طريقة الطلب
           </Text>
@@ -793,7 +793,7 @@ export default function ProductDetailScreen() {
                   styles.typeBtnText,
                   {
                     color: orderType === "pieces" ? colors.background : colors.foreground,
-                    fontFamily: orderType === "pieces" ? "Inter_600SemiBold" : "Inter_400Regular",
+                    fontFamily: orderType === "pieces" ? "Cairo_600SemiBold" : "Cairo_400Regular",
                   },
                 ]}
               >
@@ -818,7 +818,7 @@ export default function ProductDetailScreen() {
                   styles.typeBtnText,
                   {
                     color: orderType === "weight" ? colors.background : colors.foreground,
-                    fontFamily: orderType === "weight" ? "Inter_600SemiBold" : "Inter_400Regular",
+                    fontFamily: orderType === "weight" ? "Cairo_600SemiBold" : "Cairo_400Regular",
                   },
                 ]}
               >
@@ -842,11 +842,11 @@ export default function ProductDetailScreen() {
               <Icon name="info" size={14} color={colors.gold} />
               <View style={{ flex: 1, gap: 2 }}>
                 <Text
-                  style={[styles.piecesNoteText, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}
+                  style={[styles.piecesNoteText, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}
                 >
                   {product.unit === "meter" ? "الأمتار التقديرية" : "الوزن التقديري"}: {totalPieces * (product.unit === "meter" ? 100 : 20)} {product.unit === "meter" ? "متر" : "كغ"} — السعر التقديري: ≈ {totalPieces * (product.unit === "meter" ? 100 : 20) * displayPrice} ج.م
                 </Text>
-                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11 }}>
+                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11 }}>
                   ({product.unit === "meter" ? "100 متر" : "20 كغ"} لكل ثوب)
                 </Text>
               </View>
@@ -880,7 +880,7 @@ export default function ProductDetailScreen() {
         ) : (
           <View style={[styles.outOfStockFooterBtn, { backgroundColor: "#C0392B22", borderColor: "#C0392B66" }]}>
             <Icon name="x-circle" size={18} color="#C0392B" />
-            <Text style={[styles.outOfStockFooterText, { fontFamily: "Inter_700Bold" }]}>
+            <Text style={[styles.outOfStockFooterText, { fontFamily: "Cairo_700Bold" }]}>
               غير متوفر — نفذ المخزون
             </Text>
           </View>
@@ -902,10 +902,10 @@ export default function ProductDetailScreen() {
           <View style={[styles.companionModalCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <View style={styles.companionModalHeader}>
               <View style={{ flex: 1, gap: 4 }}>
-                <Text style={[styles.companionModalTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+                <Text style={[styles.companionModalTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                   الخامة المرافقة
                 </Text>
-                <Text style={[styles.companionModalSubtitle, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+                <Text style={[styles.companionModalSubtitle, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                   الخامة الأساسية: {product.name}
                 </Text>
               </View>
@@ -921,7 +921,7 @@ export default function ProductDetailScreen() {
             {editorColor && (
               <View style={[styles.companionModalColor, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                 <View style={[styles.colorSwatch, { backgroundColor: editorColor.hex, borderColor: colors.border, borderWidth: editorColor.hex === "#FFFFFF" || editorColor.hex === "#FEFEFE" ? 1 : 0 }]} />
-                <Text style={[styles.companionModalColorText, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
+                <Text style={[styles.companionModalColorText, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
                   اللون {editorColor.name}
                 </Text>
               </View>
@@ -935,7 +935,7 @@ export default function ProductDetailScreen() {
                 const materialUnit = material.unit === "kilo" ? "كغ" : "متر";
                 return (
                   <View key={material.id} style={styles.companionModalMaterial}>
-                    <Text style={[styles.companionModalMaterialName, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
+                    <Text style={[styles.companionModalMaterialName, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
                       {material.name}
                     </Text>
                     <View style={styles.companionModalInputRow}>
@@ -958,14 +958,14 @@ export default function ProductDetailScreen() {
                         placeholder="النسبة"
                         placeholderTextColor={colors.mutedForeground}
                         textAlign="center"
-                        style={[styles.companionModalInput, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Inter_700Bold" }]}
+                        style={[styles.companionModalInput, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_700Bold" }]}
                       />
-                      <Text style={[styles.companionModalPercent, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>%</Text>
+                      <Text style={[styles.companionModalPercent, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>%</Text>
                     </View>
-                    <Text style={[styles.companionModalLimit, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+                    <Text style={[styles.companionModalLimit, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                       الحد الأقصى: {maximum}%
                     </Text>
-                    <Text style={[styles.companionModalAmount, { color: colors.success, fontFamily: "Inter_600SemiBold" }]}>
+                    <Text style={[styles.companionModalAmount, { color: colors.success, fontFamily: "Cairo_600SemiBold" }]}>
                       وزن الخامة المرافقة: {formatCompanionAmount(amount)} {materialUnit}
                     </Text>
                   </View>
@@ -978,7 +978,7 @@ export default function ProductDetailScreen() {
                 onPress={() => setCompanionEditor(null)}
                 style={[styles.companionModalButton, styles.companionModalCancel, { borderColor: colors.border, backgroundColor: colors.surface }]}
               >
-                <Text style={[styles.companionModalButtonText, { color: colors.mutedForeground, fontFamily: "Inter_600SemiBold" }]}>إلغاء</Text>
+                <Text style={[styles.companionModalButtonText, { color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold" }]}>إلغاء</Text>
               </Pressable>
               <Pressable
                 onPress={() => {
@@ -997,7 +997,7 @@ export default function ProductDetailScreen() {
                 }}
                 style={[styles.companionModalButton, { backgroundColor: colors.success }]}
               >
-                <Text style={[styles.companionModalButtonText, { color: "#fff", fontFamily: "Inter_700Bold" }]}>حفظ الخامة المرافقة</Text>
+                <Text style={[styles.companionModalButtonText, { color: "#fff", fontFamily: "Cairo_700Bold" }]}>حفظ الخامة المرافقة</Text>
               </Pressable>
             </View>
           </View>

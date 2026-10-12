@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   text: {
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Cairo_600SemiBold",
     fontSize: 14,
   },
 });

@@ -76,7 +76,7 @@ export default function CompanionMaterialsSettings() {
   return (
     <SettingsScreen title="الخامات المرافقة" bottomPad={bottomPad} save={save} saving={saving}>
       <Card title="إضافة خامة مرافقة">
-        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>
+        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>
           اربطها بالمنتج لاحقاً، وسيتم اختيار لونها تلقائياً حسب لون الخامة الأساسية وإدخال النسبة فقط عند الطلب.
         </Text>
         <Field label="اسم الخامة" value={name} onChange={setName} placeholder="مثال: بطانة أو خيط" />
@@ -109,7 +109,7 @@ export default function CompanionMaterialsSettings() {
                 backgroundColor: unit === option ? colors.gold + "18" : colors.input,
               }}
             >
-              <Text style={{ textAlign: "center", color: unit === option ? colors.gold : colors.foreground, fontFamily: "Inter_500Medium" }}>
+              <Text style={{ textAlign: "center", color: unit === option ? colors.gold : colors.foreground, fontFamily: "Cairo_500Medium" }}>
                 {unitLabel(option)}
               </Text>
             </Pressable>
@@ -120,19 +120,19 @@ export default function CompanionMaterialsSettings() {
 
       <Card title={`الخامات الحالية (${materials.length})`}>
         {materials.length === 0 ? (
-          <Text style={{ color: colors.mutedForeground, textAlign: "right", fontFamily: "Inter_400Regular" }}>لا توجد خامات مرافقة بعد</Text>
+          <Text style={{ color: colors.mutedForeground, textAlign: "right", fontFamily: "Cairo_400Regular" }}>لا توجد خامات مرافقة بعد</Text>
         ) : materials.map((material) => (
           <View key={material.id} style={[styles.entryBox, { borderColor: colors.border }]}>
             <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
               <Pressable onPress={() => deleteMaterial(material.id)} style={styles.deleteBtn}>
                 <Icon name="trash-2" size={16} color={colors.destructive} />
               </Pressable>
-              <Text style={{ flex: 1, color: colors.foreground, fontFamily: "Inter_700Bold", textAlign: "right" }}>{material.name}</Text>
+              <Text style={{ flex: 1, color: colors.foreground, fontFamily: "Cairo_700Bold", textAlign: "right" }}>{material.name}</Text>
               <Pressable
                 onPress={() => updateMaterial(material.id, { inStock: !material.inStock })}
                 style={{ paddingHorizontal: 8, paddingVertical: 5, borderRadius: 8, backgroundColor: material.inStock ? "#27AE6018" : colors.destructive + "18" }}
               >
-                <Text style={{ color: material.inStock ? "#27AE60" : colors.destructive, fontSize: 11, fontFamily: "Inter_500Medium" }}>
+                <Text style={{ color: material.inStock ? "#27AE60" : colors.destructive, fontSize: 11, fontFamily: "Cairo_500Medium" }}>
                   {material.inStock ? "متاحة" : "متوقفة"}
                 </Text>
               </Pressable>
@@ -155,7 +155,7 @@ export default function CompanionMaterialsSettings() {
             <View style={{ flexDirection: "row-reverse", gap: 8 }}>
               {(["meter", "kilo"] as ProductUnit[]).map((option) => (
                 <Pressable key={option} onPress={() => updateMaterial(material.id, { unit: option })} style={{ flex: 1, paddingVertical: 8, borderRadius: 8, borderWidth: 1, borderColor: material.unit === option ? colors.gold : colors.border }}>
-                  <Text style={{ textAlign: "center", color: material.unit === option ? colors.gold : colors.mutedForeground, fontSize: 12, fontFamily: "Inter_500Medium" }}>{unitLabel(option)}</Text>
+                  <Text style={{ textAlign: "center", color: material.unit === option ? colors.gold : colors.mutedForeground, fontSize: 12, fontFamily: "Cairo_500Medium" }}>{unitLabel(option)}</Text>
                 </Pressable>
               ))}
             </View>

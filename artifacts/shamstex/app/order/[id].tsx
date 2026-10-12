@@ -288,7 +288,7 @@ export default function OrderDetailScreen() {
         <GoldHeader title="تفاصيل الطلب" onBack={() => router.back()} />
         <View style={[styles.notFound, { paddingHorizontal: 24 }]}>
           <Icon name="lock" size={48} color={colors.gold} />
-          <Text style={{ color: colors.foreground, fontSize: 16, fontFamily: "Inter_600SemiBold", marginTop: 14, textAlign: "center" }}>
+          <Text style={{ color: colors.foreground, fontSize: 16, fontFamily: "Cairo_600SemiBold", marginTop: 14, textAlign: "center" }}>
             غير مصرح بعرض هذا الطلب
           </Text>
           <Text style={{ color: colors.mutedForeground, fontSize: 13, marginTop: 6, textAlign: "center", lineHeight: 20 }}>
@@ -298,7 +298,7 @@ export default function OrderDetailScreen() {
             onPress={() => router.back()}
             style={{ marginTop: 22, backgroundColor: colors.gold, paddingVertical: 10, paddingHorizontal: 28, borderRadius: 8 }}
           >
-            <Text style={{ color: "#000", fontFamily: "Inter_600SemiBold", fontSize: 14 }}>العودة</Text>
+            <Text style={{ color: "#000", fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>العودة</Text>
           </Pressable>
         </View>
       </View>
@@ -397,14 +397,14 @@ export default function OrderDetailScreen() {
       >
         <View style={[styles.statusCard, { backgroundColor: activeColor + "11", borderColor: activeColor + "44", borderRadius: colors.radius }, cardShadow(colors.isDark, "soft")]}>
           <Icon name={isCancelled ? "x-circle" : isScheduled ? "moon" : STATUS_STEPS[currentStep].icon as any} size={28} color={activeColor} />
-          <Text style={[styles.statusLabel, { color: activeColor, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.statusLabel, { color: activeColor, fontFamily: "Cairo_700Bold" }]}>
             {isCancelled ? "تم إلغاء الطلب" : isScheduled ? "معلّق — خارج أوقات العمل" : STATUS_STEPS[currentStep].label}
           </Text>
-          <Text style={[styles.orderDate, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+          <Text style={[styles.orderDate, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
             {date}
           </Text>
           {isScheduled && order.scheduledFor && (
-            <Text style={{ color: activeColor, fontFamily: "Inter_600SemiBold", fontSize: 13, marginTop: 8, textAlign: "center" }}>
+            <Text style={{ color: activeColor, fontFamily: "Cairo_600SemiBold", fontSize: 13, marginTop: 8, textAlign: "center" }}>
               سيصل الطلب {new Date(order.scheduledFor).toLocaleString("ar-EG", { weekday: "long", hour: "2-digit", minute: "2-digit" })}
             </Text>
           )}
@@ -431,10 +431,10 @@ export default function OrderDetailScreen() {
             >
               <Icon name="rotate-ccw" size={20} color="#C0392B" />
               <View style={{ flex: 1 }}>
-                <Text style={{ color: "#C0392B", fontFamily: "Inter_700Bold", fontSize: 14, textAlign: "right" }}>
+                <Text style={{ color: "#C0392B", fontFamily: "Cairo_700Bold", fontSize: 14, textAlign: "right" }}>
                   هذا الطلب عليه طلب استرجاع
                 </Text>
-                <Text style={{ color: "#C0392B99", fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right" }}>
+                <Text style={{ color: "#C0392B99", fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>
                   اضغط لعرض تفاصيل الاسترجاع{orderReturns.length > 1 ? ` (${orderReturns.length} طلبات)` : ""}
                 </Text>
               </View>
@@ -447,11 +447,11 @@ export default function OrderDetailScreen() {
           <View style={[{ backgroundColor: "#F39C1215", borderColor: "#F39C1244", borderWidth: 1, borderRadius: colors.radius, padding: 12, flexDirection: "row-reverse", alignItems: "center", gap: 10 }]}>
             <Icon name="edit-3" size={18} color="#F39C12" />
             <View style={{ flex: 1 }}>
-              <Text style={{ color: "#F39C12", fontFamily: "Inter_700Bold", fontSize: 14, textAlign: "right" }}>
+              <Text style={{ color: "#F39C12", fontFamily: "Cairo_700Bold", fontSize: 14, textAlign: "right" }}>
                 تم تعديل الطلب من قبل العميل
               </Text>
               {order.editedAt && (
-                <Text style={{ color: "#F39C1299", fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right" }}>
+                <Text style={{ color: "#F39C1299", fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>
                   {new Date(order.editedAt).toLocaleDateString("ar-EG", { day: "numeric", month: "short", year: "numeric" })} — {new Date(order.editedAt).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" })}
                 </Text>
               )}
@@ -483,7 +483,7 @@ export default function OrderDetailScreen() {
                       styles.stepLabel,
                       {
                         color: isCompleted ? colors.foreground : colors.mutedForeground,
-                        fontFamily: isCompleted ? "Inter_600SemiBold" : "Inter_400Regular",
+                        fontFamily: isCompleted ? "Cairo_600SemiBold" : "Cairo_400Regular",
                       },
                     ]}
                     numberOfLines={2}
@@ -506,7 +506,7 @@ export default function OrderDetailScreen() {
           {isStaff && !!order.assignedToName && (
             <View style={[styles.assignedInline, { borderTopColor: colors.border }]}>
               <Icon name="user-check" size={15} color={colors.gold} />
-              <Text style={[styles.assignedText, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
+              <Text style={[styles.assignedText, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
                 استلمه: {order.assignedToName}
               </Text>
             </View>
@@ -532,18 +532,18 @@ export default function OrderDetailScreen() {
             <View style={[{ backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: colors.radius, padding: 14, gap: 10 }]}>
               {isStaff && (
                 <>
-                  <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 15, textAlign: "right" }}>
+                  <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 15, textAlign: "right" }}>
                     معلومات العميل
                   </Text>
                   <View style={styles.infoRow}>
                     <Icon name="user" size={15} color={colors.mutedForeground} />
-                    <Text style={[styles.infoText, { color: colors.foreground, fontFamily: "Inter_500Medium" }]}>
+                    <Text style={[styles.infoText, { color: colors.foreground, fontFamily: "Cairo_500Medium" }]}>
                       {order.userName}
                     </Text>
                   </View>
                   <View style={styles.infoRow}>
                     <Icon name="phone" size={15} color={colors.mutedForeground} />
-                    <Text style={[styles.infoText, { color: colors.foreground, fontFamily: "Inter_500Medium" }]}>
+                    <Text style={[styles.infoText, { color: colors.foreground, fontFamily: "Cairo_500Medium" }]}>
                       {order.userPhone}
                     </Text>
                   </View>
@@ -577,7 +577,7 @@ export default function OrderDetailScreen() {
                         }]}
                       >
                         <Icon name="phone" size={16} color={colors.gold} />
-                        <Text style={{ color: colors.gold, fontFamily: "Inter_600SemiBold", fontSize: 13 }}>
+                        <Text style={{ color: colors.gold, fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>
                           اتصال بالعميل
                         </Text>
                       </Pressable>
@@ -599,7 +599,7 @@ export default function OrderDetailScreen() {
                           }]}
                         >
                           <Icon name="message-circle" size={16} color={showMsgInput ? colors.background : colors.gold} />
-                          <Text style={{ color: showMsgInput ? colors.background : colors.gold, fontFamily: "Inter_600SemiBold", fontSize: 13 }}>
+                          <Text style={{ color: showMsgInput ? colors.background : colors.gold, fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>
                             رسالة للعميل
                           </Text>
                         </Pressable>
@@ -609,7 +609,7 @@ export default function OrderDetailScreen() {
                   {showMsgInput && order.status !== "cancelled" && !isLockedByOther && (
                     <View style={{ gap: 8, marginTop: 2 }}>
                       <TextInput
-                        style={[styles.msgInput, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.foreground, fontFamily: "Inter_400Regular", borderRadius: colors.radius - 4 }]}
+                        style={[styles.msgInput, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.foreground, fontFamily: "Cairo_400Regular", borderRadius: colors.radius - 4 }]}
                         placeholder="مثال: الصنف غير متوفر حالياً..."
                         placeholderTextColor={colors.mutedForeground}
                         value={msgText}
@@ -622,7 +622,7 @@ export default function OrderDetailScreen() {
                           onPress={() => { setShowMsgInput(false); setMsgText(""); }}
                           style={[styles.msgCancelBtn, { borderColor: colors.border, borderRadius: colors.radius - 4 }]}
                         >
-                          <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 13 }}>إلغاء</Text>
+                          <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 13 }}>إلغاء</Text>
                         </Pressable>
                         <Pressable
                           onPress={async () => {
@@ -640,7 +640,7 @@ export default function OrderDetailScreen() {
                           style={[styles.msgSendBtn, { backgroundColor: colors.gold, borderRadius: colors.radius - 4, opacity: sendingMsg || !msgText.trim() ? 0.5 : 1 }]}
                         >
                           <Icon name="send" size={14} color={colors.background} />
-                          <Text style={{ color: colors.background, fontFamily: "Inter_600SemiBold", fontSize: 13 }}>
+                          <Text style={{ color: colors.background, fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>
                             {sendingMsg ? "جاري الإرسال..." : "إرسال"}
                           </Text>
                         </Pressable>
@@ -652,7 +652,7 @@ export default function OrderDetailScreen() {
               )}
               <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
                 <Icon name={fulfillmentIcon as any} size={18} color={fulfillmentColor} />
-                <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 15, flex: 1, textAlign: "right" }}>
+                <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 15, flex: 1, textAlign: "right" }}>
                   طريقة الاستلام: {fulfillmentTitle}
                 </Text>
               </View>
@@ -660,7 +660,7 @@ export default function OrderDetailScreen() {
               {ft === "shipping" && !isStaff && (
                 <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8, padding: 10, backgroundColor: "#F5A62315", borderColor: "#F5A62344", borderWidth: 1, borderRadius: colors.radius - 6 }}>
                   <Icon name="alert-triangle" size={16} color="#F5A623" />
-                  <Text style={{ color: "#B5790E", fontFamily: "Inter_700Bold", fontSize: 12, flex: 1, textAlign: "right" }}>
+                  <Text style={{ color: "#B5790E", fontFamily: "Cairo_700Bold", fontSize: 12, flex: 1, textAlign: "right" }}>
                     السعر غير شامل ثمن الشحن
                   </Text>
                 </View>
@@ -668,9 +668,9 @@ export default function OrderDetailScreen() {
 
               {ft === "branch" && branch && (
                 <View style={{ gap: 6 }}>
-                  <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 14, textAlign: "right" }}>{branch.name}</Text>
+                  <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 14, textAlign: "right" }}>{branch.name}</Text>
                   {branch.address ? (
-                    <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>{branch.address}</Text>
+                    <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>{branch.address}</Text>
                   ) : null}
                   {isStaff && branch.phone ? (
                     <Pressable
@@ -678,7 +678,7 @@ export default function OrderDetailScreen() {
                       style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}
                     >
                       <Icon name="phone" size={13} color={colors.gold} />
-                      <Text style={{ color: colors.gold, fontFamily: "Inter_600SemiBold", fontSize: 12 }}>{branch.phone}</Text>
+                      <Text style={{ color: colors.gold, fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>{branch.phone}</Text>
                     </Pressable>
                   ) : null}
                   {branch.mapsUrl && !isStaff ? (
@@ -687,14 +687,14 @@ export default function OrderDetailScreen() {
                       style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 8, padding: 10, backgroundColor: "#3498DB15", borderColor: "#3498DB44", borderWidth: 1, borderRadius: colors.radius - 6, marginTop: 4 }}
                     >
                       <Icon name="map" size={15} color="#3498DB" />
-                      <Text style={{ color: "#3498DB", fontFamily: "Inter_700Bold", fontSize: 13 }}>فتح اللوكيشن في الخرائط</Text>
+                      <Text style={{ color: "#3498DB", fontFamily: "Cairo_700Bold", fontSize: 13 }}>فتح اللوكيشن في الخرائط</Text>
                     </Pressable>
                   ) : null}
                 </View>
               )}
 
               {ft === "branch" && !branch && order.branchName && (
-                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 13, textAlign: "right" }}>{order.branchName}</Text>
+                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 13, textAlign: "right" }}>{order.branchName}</Text>
               )}
 
               {ft === "shipping" && (
@@ -702,7 +702,7 @@ export default function OrderDetailScreen() {
                   {providerName ? (
                     <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
                       <Icon name="package" size={14} color={colors.mutedForeground} />
-                      <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 13 }}>
+                      <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>
                         شركة الشحن: {providerName}
                       </Text>
                     </View>
@@ -711,8 +711,8 @@ export default function OrderDetailScreen() {
                     <View style={{ flexDirection: "row-reverse", alignItems: "flex-start", gap: 6, padding: 10, backgroundColor: colors.gold + "11", borderColor: colors.gold + "33", borderWidth: 1, borderRadius: colors.radius - 6 }}>
                       <Icon name="map-pin" size={14} color={colors.gold} style={{ marginTop: 2 }} />
                       <View style={{ flex: 1, gap: 2 }}>
-                        <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 12, textAlign: "right" }}>عنوان الشحن</Text>
-                        <Text style={{ color: colors.foreground, fontFamily: "Inter_500Medium", fontSize: 13, textAlign: "right", lineHeight: 20 }}>
+                        <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 12, textAlign: "right" }}>عنوان الشحن</Text>
+                        <Text style={{ color: colors.foreground, fontFamily: "Cairo_500Medium", fontSize: 13, textAlign: "right", lineHeight: 20 }}>
                           {order.shippingAddress}
                         </Text>
                       </View>
@@ -721,7 +721,7 @@ export default function OrderDetailScreen() {
                   {order.shippingWaybillNumber ? (
                     <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
                       <Icon name="hash" size={14} color={colors.mutedForeground} />
-                      <Text style={{ color: colors.foreground, fontFamily: "Inter_500Medium", fontSize: 13, letterSpacing: 0.5 }}>
+                      <Text style={{ color: colors.foreground, fontFamily: "Cairo_500Medium", fontSize: 13, letterSpacing: 0.5 }}>
                         رقم البوليصة: {order.shippingWaybillNumber}
                       </Text>
                     </View>
@@ -729,7 +729,7 @@ export default function OrderDetailScreen() {
                   {order.shippingWaybillImage ? (
                     <Pressable onPress={() => setShowWaybillPreview(true)}>
                       <Image source={{ uri: order.shippingWaybillImage }} style={{ width: "100%", height: 180, borderRadius: colors.radius - 6, backgroundColor: colors.surface }} resizeMode="cover" />
-                      <Text style={{ color: colors.mutedForeground, fontSize: 11, textAlign: "center", marginTop: 4, fontFamily: "Inter_400Regular" }}>
+                      <Text style={{ color: colors.mutedForeground, fontSize: 11, textAlign: "center", marginTop: 4, fontFamily: "Cairo_400Regular" }}>
                         صورة بوليصة الشحن — اضغط للعرض
                       </Text>
                     </Pressable>
@@ -745,7 +745,7 @@ export default function OrderDetailScreen() {
                       style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 8, padding: 12, borderRadius: colors.radius - 6, backgroundColor: colors.gold + "15", borderWidth: 1, borderColor: colors.gold + "44" }}
                     >
                       <Icon name={order.shippingWaybillImage ? "edit-3" : "upload"} size={16} color={colors.gold} />
-                      <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 13 }}>
+                      <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 13 }}>
                         {order.shippingWaybillImage ? "تعديل بيانات الشحن" : "رفع بوليصة الشحن"}
                       </Text>
                     </Pressable>
@@ -794,8 +794,8 @@ export default function OrderDetailScreen() {
               padding: 10, borderRadius: colors.radius - 6, backgroundColor: colors.surface, opacity: pressed ? 0.7 : 1, gap: 8,
             }]}>
               <View style={{ flex: 1, alignItems: "flex-end" }}>
-                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11 }}>{label}</Text>
-                <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 14, textAlign: "right" }} numberOfLines={1}>{value}</Text>
+                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11 }}>{label}</Text>
+                <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 14, textAlign: "right" }} numberOfLines={1}>{value}</Text>
               </View>
               <Icon name="copy" size={16} color={colors.gold} />
             </Pressable>
@@ -807,8 +807,8 @@ export default function OrderDetailScreen() {
                   <Icon name={PAYMENT_METHOD_ICONS[pm] ?? "credit-card"} size={18} color={pmColor} />
                 </View>
                 <View style={{ flex: 1, gap: 2 }}>
-                  <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right" }}>طريقة الدفع</Text>
-                  <Text style={{ color: pmColor, fontFamily: "Inter_700Bold", fontSize: 14, textAlign: "right" }}>
+                  <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>طريقة الدفع</Text>
+                  <Text style={{ color: pmColor, fontFamily: "Cairo_700Bold", fontSize: 14, textAlign: "right" }}>
                     {pmShort[pm] ?? pm}
                   </Text>
                 </View>
@@ -818,11 +818,11 @@ export default function OrderDetailScreen() {
                   <View style={{ height: 1, backgroundColor: pmColor + "33", marginVertical: 4 }} />
                   <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
                     <Icon name="credit-card" size={18} color={colors.gold} />
-                    <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 14, flex: 1, textAlign: "right" }}>
+                    <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 14, flex: 1, textAlign: "right" }}>
                       بيانات السداد
                     </Text>
                   </View>
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>
+              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>
                 يرجى سداد قيمة الفاتورة على الحساب التالي ثم رفع صورة الإيصال:
               </Text>
               {overrideHandleVal ? (
@@ -862,7 +862,7 @@ export default function OrderDetailScreen() {
                       style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 6, padding: 10, borderRadius: colors.radius - 6, borderWidth: 1, borderColor: colors.border }}
                     >
                       <Icon name="edit-2" size={14} color={colors.gold} />
-                      <Text style={{ color: colors.gold, fontFamily: "Inter_600SemiBold", fontSize: 13 }}>
+                      <Text style={{ color: colors.gold, fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>
                         {order.paymentOverrideHandle ? "تعديل رقم السداد المخصص" : "إضافة رقم سداد مخصص لهذا الطلب"}
                       </Text>
                     </Pressable>
@@ -873,14 +873,14 @@ export default function OrderDetailScreen() {
                         onChangeText={setOverrideHandle}
                         placeholder="رقم/حساب السداد"
                         placeholderTextColor={colors.mutedForeground}
-                        style={{ backgroundColor: colors.input, borderColor: colors.border, borderWidth: 1, borderRadius: 8, padding: 10, color: colors.foreground, textAlign: "right", fontFamily: "Inter_400Regular" }}
+                        style={{ backgroundColor: colors.input, borderColor: colors.border, borderWidth: 1, borderRadius: 8, padding: 10, color: colors.foreground, textAlign: "right", fontFamily: "Cairo_400Regular" }}
                       />
                       <TextInput
                         value={overrideName}
                         onChangeText={setOverrideName}
                         placeholder="اسم صاحب الحساب (اختياري)"
                         placeholderTextColor={colors.mutedForeground}
-                        style={{ backgroundColor: colors.input, borderColor: colors.border, borderWidth: 1, borderRadius: 8, padding: 10, color: colors.foreground, textAlign: "right", fontFamily: "Inter_400Regular" }}
+                        style={{ backgroundColor: colors.input, borderColor: colors.border, borderWidth: 1, borderRadius: 8, padding: 10, color: colors.foreground, textAlign: "right", fontFamily: "Cairo_400Regular" }}
                       />
                       <View style={{ flexDirection: "row-reverse", gap: 8 }}>
                         <Pressable
@@ -896,13 +896,13 @@ export default function OrderDetailScreen() {
                           }}
                           style={{ flex: 1, padding: 10, backgroundColor: colors.gold, borderRadius: 8, alignItems: "center" }}
                         >
-                          <Text style={{ color: colors.background, fontFamily: "Inter_700Bold" }}>حفظ</Text>
+                          <Text style={{ color: colors.background, fontFamily: "Cairo_700Bold" }}>حفظ</Text>
                         </Pressable>
                         <Pressable
                           onPress={() => setShowOverrideInput(false)}
                           style={{ flex: 1, padding: 10, borderRadius: 8, alignItems: "center", borderWidth: 1, borderColor: colors.border }}
                         >
-                          <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium" }}>إلغاء</Text>
+                          <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }}>إلغاء</Text>
                         </Pressable>
                       </View>
                     </View>
@@ -916,7 +916,7 @@ export default function OrderDetailScreen() {
               {order.transferProofImage ? (
                 <Pressable onPress={() => setShowTransferProof(true)} style={{ marginTop: 4 }}>
                   <Image source={{ uri: order.transferProofImage }} style={{ width: "100%", height: 180, borderRadius: colors.radius - 6, backgroundColor: colors.surface }} resizeMode="cover" />
-                  <Text style={{ color: colors.mutedForeground, fontSize: 11, textAlign: "center", marginTop: 4, fontFamily: "Inter_400Regular" }}>
+                  <Text style={{ color: colors.mutedForeground, fontSize: 11, textAlign: "center", marginTop: 4, fontFamily: "Cairo_400Regular" }}>
                     {isStaff ? "إيصال التحويل من العميل — اضغط للعرض" : "صورة إيصال التحويل — اضغط للعرض"}
                   </Text>
                 </Pressable>
@@ -946,7 +946,7 @@ export default function OrderDetailScreen() {
                     style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 8, padding: 12, borderRadius: colors.radius - 6, backgroundColor: colors.gold + "15", borderWidth: 1, borderColor: colors.gold + "44" }}
                   >
                     <Icon name={order.transferProofImage ? "refresh-cw" : "upload"} size={16} color={colors.gold} />
-                    <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 13 }}>
+                    <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 13 }}>
                       {uploadingTransferProof ? "جاري الرفع..." : order.transferProofImage ? "تغيير صورة الإيصال" : "رفع صورة إيصال التحويل"}
                     </Text>
                   </Pressable>
@@ -957,7 +957,7 @@ export default function OrderDetailScreen() {
                       style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 6, padding: 10, borderRadius: colors.radius - 6, borderWidth: 1, borderColor: colors.border }}
                     >
                       <Icon name="repeat" size={14} color={colors.mutedForeground} />
-                      <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 12 }}>
+                      <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 12 }}>
                         تغيير طريقة الدفع
                       </Text>
                     </Pressable>
@@ -970,7 +970,7 @@ export default function OrderDetailScreen() {
           );
         })()}
         <View style={[styles.itemsSection, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }, cardShadow(colors.isDark, "soft")]}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
             المنتجات المطلوبة
           </Text>
           {order.items.map((item, index) => (
@@ -981,13 +981,13 @@ export default function OrderDetailScreen() {
               <View style={styles.orderItemRight}>
                 <View style={[styles.colorSwatch, { backgroundColor: item.colorHex, borderColor: colors.border }]} />
                 <View style={styles.orderItemInfo}>
-                  <Text style={[styles.orderItemName, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
+                  <Text style={[styles.orderItemName, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
                     {item.productName}
                   </Text>
-                  <Text style={[styles.orderItemColor, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+                  <Text style={[styles.orderItemColor, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                     {item.colorName}
                   </Text>
-                  <Text style={{ color: colors.gold + "99", fontFamily: "Inter_500Medium", fontSize: 11 }}>
+                  <Text style={{ color: colors.gold + "99", fontFamily: "Cairo_500Medium", fontSize: 11 }}>
                     {item.unitPrice} ج.م/{ulbl(unitOf(item))}
                   </Text>
                   {isStaff && order.status === "preparing" && !isLockedByOther && (
@@ -1025,7 +1025,7 @@ export default function OrderDetailScreen() {
                       />
                       <Text style={{
                         fontSize: 11,
-                        fontFamily: "Inter_600SemiBold",
+                        fontFamily: "Cairo_600SemiBold",
                         color: item.stockStatus === "unavailable" ? "#E74C3C" : item.stockStatus === "partial" ? "#F39C12" : colors.mutedForeground,
                       }}>
                         {item.stockStatus === "unavailable"
@@ -1041,28 +1041,28 @@ export default function OrderDetailScreen() {
               <View style={[styles.orderItemLeft, { gap: 10 }]}>
                 {item.orderType === "weight" ? (
                   <View style={{ alignItems: "flex-start", gap: 4 }}>
-                    <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 11 }}>
+                    <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 11 }}>
                       {item.weight ?? 1} {ulbl(unitOf(item))}
                     </Text>
-                    <Text style={[styles.orderItemPrice, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+                    <Text style={[styles.orderItemPrice, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                       {item.unitPrice * (item.weight ?? 1)} ج.م
                     </Text>
                     {companionTotal(item) > 0 && (
                       <View style={{ alignItems: "flex-start", gap: 2, marginTop: 2 }}>
-                        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 10 }}>
+                        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 10 }}>
                           الخامات المرافقة: {Math.round(companionTotal(item) * 100) / 100} ج.م
                         </Text>
-                        <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 12 }}>
+                        <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 12 }}>
                           إجمالي الصنف: {Math.round(((item.unitPrice * (item.weight ?? 1)) + companionTotal(item)) * 100) / 100} ج.م
                         </Text>
                       </View>
                     )}
-                    <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 10 }}>
+                    <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 10 }}>
                       ≈ {boltsOf(item.weight, item)} ثوب (الثوب {blt(unitOf(item))} {ulbl(unitOf(item))})
                     </Text>
                     {isStaff && order.status === "preparing" && !isLockedByOther && (
                       <View style={{ gap: 4, marginTop: 2 }}>
-                        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 10 }}>
+                        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 10 }}>
                           عدد الأثواب:
                         </Text>
                         <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
@@ -1081,7 +1081,7 @@ export default function OrderDetailScreen() {
                             <Icon name="minus" size={12} color={colors.gold} />
                           </Pressable>
                           <TextInput
-                            style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 13, minWidth: 40, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 2 }}
+                            style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 13, minWidth: 40, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 2 }}
                             value={weightTexts[`b_${index}`] !== undefined ? weightTexts[`b_${index}`] : String(boltsOf(item.weight, item))}
                             keyboardType="number-pad"
                             onChangeText={(txt) => {
@@ -1113,7 +1113,7 @@ export default function OrderDetailScreen() {
                             <Icon name="plus" size={12} color={colors.background} />
                           </Pressable>
                         </View>
-                        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 10 }}>
+                        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 10 }}>
                           {unitOf(item) === "meter" ? "الأمتار الفعلية (متر):" : "الوزن الفعلي (كغ):"}
                         </Text>
                         <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
@@ -1131,7 +1131,7 @@ export default function OrderDetailScreen() {
                             <Icon name="minus" size={12} color={colors.gold} />
                           </Pressable>
                           <TextInput
-                            style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 13, minWidth: 40, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 2 }}
+                            style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, minWidth: 40, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 2 }}
                             value={weightTexts[`w_${index}`] !== undefined ? weightTexts[`w_${index}`] : String(item.weight ?? 1)}
                             keyboardType="decimal-pad"
                             onChangeText={(txt) => {
@@ -1166,41 +1166,41 @@ export default function OrderDetailScreen() {
                   </View>
                 ) : (
                   <View style={{ alignItems: "flex-start", gap: 4 }}>
-                    <Text style={[styles.orderItemQty, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+                    <Text style={[styles.orderItemQty, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                       x{item.quantity} ثوب
                     </Text>
                     {item.actualWeight ? (
                       <View style={{ gap: 2 }}>
-                        <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 13 }}>
+                        <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 13 }}>
                           {item.actualWeight} {ulbl(unitOf(item))}
                         </Text>
-                        <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 12 }}>
+                        <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 12 }}>
                           {item.actualWeight * item.unitPrice} ج.م
                         </Text>
                       </View>
                     ) : (
                       <View style={{ gap: 2 }}>
-                        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11 }}>
+                        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11 }}>
                           ≈ {item.quantity * blt(unitOf(item))} {ulbl(unitOf(item))} (تقديري)
                         </Text>
-                        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 10 }}>
+                        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 10 }}>
                           ≈ {item.quantity * blt(unitOf(item)) * item.unitPrice} ج.م (تقديري)
                         </Text>
                       </View>
                     )}
                     {companionTotal(item) > 0 && (
                       <View style={{ alignItems: "flex-start", gap: 2, marginTop: 2 }}>
-                        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 10 }}>
+                        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 10 }}>
                           الخامات المرافقة: {Math.round(companionTotal(item) * 100) / 100} ج.م
                         </Text>
-                        <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 12 }}>
+                        <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 12 }}>
                           إجمالي الصنف: {Math.round(((item.actualWeight ?? (item.quantity * blt(unitOf(item)))) * item.unitPrice + companionTotal(item)) * 100) / 100} ج.م
                         </Text>
                       </View>
                     )}
                     {isStaff && order.status === "preparing" && !isLockedByOther && (
                       <View style={{ gap: 4, marginTop: 2 }}>
-                        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 10 }}>
+                        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 10 }}>
                           عدد الأثواب:
                         </Text>
                         <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
@@ -1218,7 +1218,7 @@ export default function OrderDetailScreen() {
                             <Icon name="minus" size={12} color={colors.gold} />
                           </Pressable>
                           <TextInput
-                            style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 13, minWidth: 40, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 2 }}
+                            style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, minWidth: 40, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 2 }}
                             value={weightTexts[`q_${index}`] !== undefined ? weightTexts[`q_${index}`] : String(item.quantity)}
                             keyboardType="number-pad"
                             onChangeText={(txt) => {
@@ -1248,7 +1248,7 @@ export default function OrderDetailScreen() {
                             <Icon name="plus" size={12} color={colors.background} />
                           </Pressable>
                         </View>
-                        <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 10 }}>
+                        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 10 }}>
                           {unitOf(item) === "meter" ? "الأمتار الفعلية (متر):" : "الوزن الفعلي (كغ):"}
                         </Text>
                         <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
@@ -1267,7 +1267,7 @@ export default function OrderDetailScreen() {
                             <Icon name="minus" size={12} color={colors.gold} />
                           </Pressable>
                           <TextInput
-                            style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 13, minWidth: 40, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 2 }}
+                            style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, minWidth: 40, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 2 }}
                             value={weightTexts[`a_${index}`] !== undefined ? weightTexts[`a_${index}`] : String(item.actualWeight ?? (item.quantity * blt(unitOf(item))))}
                             keyboardType="decimal-pad"
                             onChangeText={(txt) => {
@@ -1327,18 +1327,18 @@ export default function OrderDetailScreen() {
               </View>
               {item.companions?.length ? (
                 <View style={[styles.companionList, { backgroundColor: colors.gold + "0D", borderColor: colors.gold + "33" }]}>
-                  <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 11, textAlign: "right" }}>الخامات المرافقة</Text>
+                  <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 11, textAlign: "right" }}>الخامات المرافقة</Text>
                   {item.companions.map((companion, companionIndex) => (
                     <View key={`${companion.materialId}-${companionIndex}`} style={{ gap: 5 }}>
                       <View style={styles.companionLine}>
-                        <Text style={[styles.companionPrice, { color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 11 }]}>{Math.round(companionLineTotal(companion) * 100) / 100} ج.م</Text>
-                        <Text style={[styles.companionText, { color: colors.foreground, fontFamily: "Inter_400Regular", fontSize: 11 }]}>
+                        <Text style={[styles.companionPrice, { color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 11 }]}>{Math.round(companionLineTotal(companion) * 100) / 100} ج.م</Text>
+                        <Text style={[styles.companionText, { color: colors.foreground, fontFamily: "Cairo_400Regular", fontSize: 11 }]}>
                           {companion.materialName} — {companion.colorName} · {companion.percentage}% · {Math.round(companionAmount(companion) * 100) / 100} {companion.unit === "meter" ? "متر" : "كغ"}
                         </Text>
                       </View>
                       {isStaff && order.status === "preparing" && !isLockedByOther && (
                         <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
-                          <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 10 }}>
+                          <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 10 }}>
                             الوزن الفعلي:
                           </Text>
                           <TextInput
@@ -1358,9 +1358,9 @@ export default function OrderDetailScreen() {
                             }}
                             keyboardType="decimal-pad"
                             textAlign="center"
-                            style={{ width: 82, paddingVertical: 5, paddingHorizontal: 6, borderWidth: 1, borderColor: colors.border, borderRadius: 7, backgroundColor: colors.input, color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 11 }}
+                            style={{ width: 82, paddingVertical: 5, paddingHorizontal: 6, borderWidth: 1, borderColor: colors.border, borderRadius: 7, backgroundColor: colors.input, color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 11 }}
                           />
-                          <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 10 }}>
+                          <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 10 }}>
                             {companion.unit === "meter" ? "متر" : "كغ"}
                           </Text>
                         </View>
@@ -1408,7 +1408,7 @@ export default function OrderDetailScreen() {
              const showFinal = unitGroups.length > 1 || hasFee || companionsGrand > 0;
             const Badge = ({ estimated }: { estimated: boolean }) => (
               <View style={{ paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6, backgroundColor: estimated ? "#F39C1222" : "#27AE6022" }}>
-                <Text style={{ color: estimated ? "#F39C12" : "#27AE60", fontFamily: "Inter_700Bold", fontSize: 10 }}>
+                <Text style={{ color: estimated ? "#F39C12" : "#27AE60", fontFamily: "Cairo_700Bold", fontSize: 10 }}>
                   {estimated ? "تقديري" : "فعلي"}
                 </Text>
               </View>
@@ -1423,48 +1423,48 @@ export default function OrderDetailScreen() {
                         adjustsFontSizeToFit
                         numberOfLines={1}
                         minimumFontScale={0.5}
-                        style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 16, flexShrink: 1, textAlign: "left" }}
+                        style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 16, flexShrink: 1, textAlign: "left" }}
                       >
                         {g.estimated ? "≈ " : ""}{fmt(g.qty)} {ulbl(g.unit)} — {fmt(g.price)} ج.م
                       </Text>
                     </View>
-                    <Text style={[styles.totalLabel, { color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 14 }]}>
+                    <Text style={[styles.totalLabel, { color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14 }]}>
                       {g.unit === "meter" ? "مجموع الأمتار" : "إجمالي الوزن"}
                     </Text>
                   </View>
                 ))}
                  {companionsGrand > 0 && (
                    <View style={styles.totalRow}>
-                     <Text style={[styles.totalPrice, { color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 14 }]}>
+                     <Text style={[styles.totalPrice, { color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 14 }]}>
                        +{fmt(companionsGrand)} ج.م
                      </Text>
-                     <Text style={[styles.totalLabel, { color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 14 }]}>
+                     <Text style={[styles.totalLabel, { color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14 }]}>
                        إجمالي الخامات المرافقة
                      </Text>
                    </View>
                  )}
                 {hasFee && (
                   <View style={styles.totalRow}>
-                    <Text style={[styles.totalPrice, { color: "#E74C3C", fontFamily: "Inter_600SemiBold", fontSize: 14 }]}>
+                    <Text style={[styles.totalPrice, { color: "#E74C3C", fontFamily: "Cairo_600SemiBold", fontSize: 14 }]}>
                       +{fee} ج.م
                     </Text>
-                    <Text style={[styles.totalLabel, { color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12 }]}>
+                    <Text style={[styles.totalLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12 }]}>
                       رسوم المحفظة الإلكترونية
                     </Text>
                   </View>
                 )}
                 {showFinal && (
                   <View style={[styles.totalRow, { borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 8 }]}>
-                    <Text style={[styles.totalPrice, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+                    <Text style={[styles.totalPrice, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
                       {anyEstimated ? "≈ " : ""}{fmt(finalTotal)} ج.م
                     </Text>
-                    <Text style={[styles.totalLabel, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
+                    <Text style={[styles.totalLabel, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
                       {anyEstimated ? "الإجمالي التقديري" : "الإجمالي النهائي"}
                     </Text>
                   </View>
                 )}
                 {anyEstimated && (
-                  <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "center" }}>
+                  <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "center" }}>
                     تقدير تقريبي لكل ثوب (يُحدَّد الوزن/الأمتار عند التجهيز)
                   </Text>
                 )}
@@ -1476,10 +1476,10 @@ export default function OrderDetailScreen() {
 
         {order.notes && (
           <View style={[styles.notesCard, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }, cardShadow(colors.isDark, "soft")]}>
-            <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
               ملاحظات
             </Text>
-            <Text style={[styles.notesText, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+            <Text style={[styles.notesText, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
               {order.notes}
             </Text>
           </View>
@@ -1519,7 +1519,7 @@ export default function OrderDetailScreen() {
             }]}
           >
             <Icon name="file-text" size={18} color={colors.gold} />
-            <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 14 }}>
+            <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 14 }}>
               عرض الفاتورة
             </Text>
           </Pressable>
@@ -1546,7 +1546,7 @@ export default function OrderDetailScreen() {
             }]}
           >
             <Icon name="printer" size={18} color="#D88700" />
-            <Text style={{ color: "#D88700", fontFamily: "Inter_700Bold", fontSize: 14 }}>
+            <Text style={{ color: "#D88700", fontFamily: "Cairo_700Bold", fontSize: 14 }}>
               طباعة ورقة التجهيز
             </Text>
           </Pressable>
@@ -1580,7 +1580,7 @@ export default function OrderDetailScreen() {
                   style={[styles.prevBtn, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: colors.radius - 4 }]}
                 >
                   <Icon name="chevron-right" size={14} color={colors.mutedForeground} />
-                  <Text style={[styles.prevBtnText, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+                  <Text style={[styles.prevBtnText, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
                     {prevAction.label}
                   </Text>
                 </Pressable>
@@ -1643,7 +1643,7 @@ export default function OrderDetailScreen() {
               {nextAction && isLockedByOther && (
                 <View style={[styles.lockedMsg, { backgroundColor: colors.surface, borderRadius: colors.radius - 4 }]}>
                   <Icon name="lock" size={14} color={colors.mutedForeground} />
-                  <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 13, textAlign: "right" }}>
+                  <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 13, textAlign: "right" }}>
                     هذا الطلب مستلم من {order.assignedToName ?? "موظف آخر"}
                   </Text>
                 </View>
@@ -1678,7 +1678,7 @@ export default function OrderDetailScreen() {
             }]}
           >
             <Icon name="x-circle" size={14} color="#F39C12" />
-            <Text style={{ color: "#F39C12", fontFamily: "Inter_600SemiBold", fontSize: 13 }}>
+            <Text style={{ color: "#F39C12", fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>
               إغلاق تعديل العميل
             </Text>
           </Pressable>
@@ -1709,7 +1709,7 @@ export default function OrderDetailScreen() {
             }]}
           >
             <Icon name="edit-3" size={14} color="#27AE60" />
-            <Text style={{ color: "#27AE60", fontFamily: "Inter_600SemiBold", fontSize: 13 }}>
+            <Text style={{ color: "#27AE60", fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>
               فتح التعديل للعميل
             </Text>
           </Pressable>
@@ -1760,7 +1760,7 @@ export default function OrderDetailScreen() {
               }}
             >
               <Icon name="x-circle" size={18} color="#E74C3C" />
-              <Text style={{ color: "#E74C3C", fontFamily: "Inter_700Bold", fontSize: 14 }}>
+              <Text style={{ color: "#E74C3C", fontFamily: "Cairo_700Bold", fontSize: 14 }}>
                 {remainingMin < 0
                   ? "إلغاء الطلب المعلّق"
                   : `إلغاء الطلب (متبقي ~${remainingMin} ${remainingMin === 1 ? "دقيقة" : "دقائق"})`}
@@ -1776,11 +1776,11 @@ export default function OrderDetailScreen() {
           >
             <View style={styles.editableCustomerHeader}>
               <Icon name="alert-triangle" size={16} color="#F39C12" />
-              <Text style={{ color: "#F39C12", fontFamily: "Inter_700Bold", fontSize: 14, textAlign: "right", flex: 1 }}>
+              <Text style={{ color: "#F39C12", fontFamily: "Cairo_700Bold", fontSize: 14, textAlign: "right", flex: 1 }}>
                 خامة غير متوفرة — يمكنك تعديل طلبك
               </Text>
             </View>
-            <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 13, textAlign: "right", lineHeight: 20 }}>
+            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 13, textAlign: "right", lineHeight: 20 }}>
               {hasAffectedItems
                 ? "حدّد فريق العمل الكميات المتوفرة من الأصناف التالية. أكّد التعديل لقبولها، أو عدّل طلبك لاختيار بديل."
                 : "تم إعلامك بأن أحد الأصناف غير متوفر. يمكنك الآن تعديل الطلب واختيار بديل أو تعديل الكميات."}
@@ -1804,10 +1804,10 @@ export default function OrderDetailScreen() {
                   <View style={{ flexDirection: "row-reverse", alignItems: "flex-start", gap: 10 }}>
                     <View style={[styles.colorSwatch, { backgroundColor: item.colorHex, borderColor: colors.border }]} />
                     <View style={{ flex: 1 }}>
-                      <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 13, textAlign: "right" }}>
+                      <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 13, textAlign: "right" }}>
                         {item.productName} — {item.colorName}
                       </Text>
-                      <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right", marginTop: 2 }}>
+                      <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right", marginTop: 2 }}>
                         الكمية المطلوبة: {item.orderType === "weight" ? `${item.weight ?? 1} ${ulbl(unitOf(item))}` : `${item.quantity} ثوب`}
                       </Text>
                     </View>
@@ -1816,14 +1816,14 @@ export default function OrderDetailScreen() {
                   {isUnavailable ? (
                     <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6, backgroundColor: "#E74C3C18", borderRadius: colors.radius - 6, padding: 8 }}>
                       <Icon name="x-circle" size={14} color="#E74C3C" />
-                      <Text style={{ color: "#E74C3C", fontFamily: "Inter_600SemiBold", fontSize: 12, flex: 1, textAlign: "right" }}>
+                      <Text style={{ color: "#E74C3C", fontFamily: "Cairo_600SemiBold", fontSize: 12, flex: 1, textAlign: "right" }}>
                         غير متوفر — سيُحذف عند تأكيد التعديل
                       </Text>
                     </View>
                   ) : (
                     <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6, backgroundColor: "#F39C1218", borderRadius: colors.radius - 6, padding: 8 }}>
                       <Icon name="alert-triangle" size={14} color="#F39C12" />
-                      <Text style={{ color: "#F39C12", fontFamily: "Inter_600SemiBold", fontSize: 12, flex: 1, textAlign: "right" }}>
+                      <Text style={{ color: "#F39C12", fontFamily: "Cairo_600SemiBold", fontSize: 12, flex: 1, textAlign: "right" }}>
                         متوفر فقط: {item.availableQuantity} {ulbl(unitOf(item))} — سيتم تعديل الكمية للمتوفر عند التأكيد
                       </Text>
                     </View>
@@ -1852,7 +1852,7 @@ export default function OrderDetailScreen() {
                   }}
                 >
                   <Icon name="check-circle" size={18} color={colors.background} />
-                  <Text style={{ color: colors.background, fontFamily: "Inter_700Bold", fontSize: 14 }}>
+                  <Text style={{ color: colors.background, fontFamily: "Cairo_700Bold", fontSize: 14 }}>
                     {confirmingEdit ? "جاري الحفظ..." : "تأكيد التعديل"}
                   </Text>
                 </Pressable>
@@ -1875,7 +1875,7 @@ export default function OrderDetailScreen() {
                 }}
               >
                 <Icon name="edit-3" size={18} color="#FFFFFF" />
-                <Text style={{ color: "#FFFFFF", fontFamily: "Inter_700Bold", fontSize: 14 }}>
+                <Text style={{ color: "#FFFFFF", fontFamily: "Cairo_700Bold", fontSize: 14 }}>
                   تعديل الطلب
                 </Text>
               </Pressable>
@@ -1896,7 +1896,7 @@ export default function OrderDetailScreen() {
               }}
             >
               <Icon name="x-circle" size={18} color="#E74C3C" />
-              <Text style={{ color: "#E74C3C", fontFamily: "Inter_700Bold", fontSize: 14 }}>
+              <Text style={{ color: "#E74C3C", fontFamily: "Cairo_700Bold", fontSize: 14 }}>
                 إلغاء الطلب
               </Text>
             </Pressable>
@@ -1928,10 +1928,10 @@ export default function OrderDetailScreen() {
                   <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 10 }}>
                     <Icon name="rotate-ccw" size={18} color="#C0392B" />
                     <View style={{ flex: 1 }}>
-                      <Text style={{ color: "#C0392B", fontFamily: "Inter_700Bold", fontSize: 14, textAlign: "right" }}>
+                      <Text style={{ color: "#C0392B", fontFamily: "Cairo_700Bold", fontSize: 14, textAlign: "right" }}>
                         يوجد طلب استرجاع لهذا الطلب
                       </Text>
-                      <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>
+                      <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>
                         {orderReturn.status === "settled" ? "تمت المخالصة" : orderReturn.status === "returned" ? "تم الاسترجاع — بانتظار المخالصة" : "قيد المراجعة"}
                       </Text>
                     </View>
@@ -1946,10 +1946,10 @@ export default function OrderDetailScreen() {
                   style={[styles.returnBtn, { backgroundColor: "#C0392B18", borderColor: "#C0392B", borderRadius: colors.radius }]}
                 >
                   <Icon name="rotate-ccw" size={16} color="#C0392B" />
-                  <Text style={{ color: "#C0392B", fontFamily: "Inter_600SemiBold", fontSize: 14 }}>
+                  <Text style={{ color: "#C0392B", fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>
                     طلب استرجاع
                   </Text>
-                  <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11 }}>
+                  <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11 }}>
                     متاح خلال {15 - daysSinceDelivery} يوم
                   </Text>
                 </Pressable>
@@ -1958,7 +1958,7 @@ export default function OrderDetailScreen() {
               {canReturn && !withinReturnWindow && (
                 <View style={[styles.returnExpired, { backgroundColor: colors.surface, borderRadius: colors.radius }]}>
                   <Icon name="clock" size={14} color={colors.mutedForeground} />
-                  <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12 }}>
+                  <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12 }}>
                     انتهت مهلة الاسترجاع (15 يوم من التسليم)
                   </Text>
                 </View>
@@ -1966,10 +1966,10 @@ export default function OrderDetailScreen() {
 
               {showReturnForm && (
                 <View style={[styles.returnFormCard, { backgroundColor: colors.card, borderColor: "#C0392B", borderRadius: colors.radius }]}>
-                  <Text style={{ color: "#C0392B", fontFamily: "Inter_700Bold", fontSize: 15, textAlign: "right" }}>
+                  <Text style={{ color: "#C0392B", fontFamily: "Cairo_700Bold", fontSize: 15, textAlign: "right" }}>
                     طلب استرجاع
                   </Text>
-                  <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right", marginTop: 4 }}>
+                  <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right", marginTop: 4 }}>
                     اختر الأصناف التي تريد استرجاعها واكتب السبب
                   </Text>
 
@@ -1991,7 +1991,7 @@ export default function OrderDetailScreen() {
                       }}>
                         {order.items.every((_, i) => returnSelectedItems[i]) && <Icon name="check" size={12} color="#fff" />}
                       </View>
-                      <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 13 }}>تحديد الكل</Text>
+                      <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>تحديد الكل</Text>
                     </Pressable>
 
                     {order.items.map((item, index) => {
@@ -2037,10 +2037,10 @@ export default function OrderDetailScreen() {
                             </View>
                             <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: item.colorHex, borderWidth: 1, borderColor: colors.border }} />
                             <View style={{ flex: 1 }}>
-                              <Text style={{ color: colors.foreground, fontFamily: "Inter_500Medium", fontSize: 13, textAlign: "right" }}>
+                              <Text style={{ color: colors.foreground, fontFamily: "Cairo_500Medium", fontSize: 13, textAlign: "right" }}>
                                 {item.productName}
                               </Text>
-                              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right" }}>
+                              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>
                                 {item.colorName} — {item.quantity} ثوب · {maxWeight} {measureLabel}
                               </Text>
                             </View>
@@ -2048,7 +2048,7 @@ export default function OrderDetailScreen() {
                           {returnSelectedItems[index] && (
                             <View style={{ gap: 8, paddingHorizontal: 8, paddingVertical: 6 }}>
                               <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
-                                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 11, width: 90, textAlign: "right" }}>
+                                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 11, width: 90, textAlign: "right" }}>
                                   عدد الأثواب:
                                 </Text>
                                 <Pressable
@@ -2058,7 +2058,7 @@ export default function OrderDetailScreen() {
                                   <Icon name="minus" size={10} color="#C0392B" />
                                 </Pressable>
                                 <TextInput
-                                  style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 12, minWidth: 36, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 1 }}
+                                  style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 12, minWidth: 36, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 1 }}
                                   value={returnBoltTexts[index] !== undefined ? returnBoltTexts[index] : String(curBolts)}
                                   keyboardType="number-pad"
                                   onChangeText={(txt) => {
@@ -2076,12 +2076,12 @@ export default function OrderDetailScreen() {
                                 >
                                   <Icon name="plus" size={10} color="#fff" />
                                 </Pressable>
-                                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 10 }}>
+                                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 10 }}>
                                   (من {maxBolts})
                                 </Text>
                               </View>
                               <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
-                                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 11, width: 90, textAlign: "right" }}>
+                                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 11, width: 90, textAlign: "right" }}>
                                   {unitIsMeter ? "الطول (متر):" : "الوزن (كغ):"}
                                 </Text>
                                 <Pressable
@@ -2091,7 +2091,7 @@ export default function OrderDetailScreen() {
                                   <Icon name="minus" size={10} color="#C0392B" />
                                 </Pressable>
                                 <TextInput
-                                  style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 12, minWidth: 36, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 1 }}
+                                  style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 12, minWidth: 36, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 1 }}
                                   value={returnWeightTexts[index] !== undefined ? returnWeightTexts[index] : String(curWeight)}
                                   keyboardType="decimal-pad"
                                   onChangeText={(txt) => {
@@ -2109,7 +2109,7 @@ export default function OrderDetailScreen() {
                                 >
                                   <Icon name="plus" size={10} color="#fff" />
                                 </Pressable>
-                                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 10 }}>
+                                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 10 }}>
                                   {measureLabel} (من {maxWeight})
                                 </Text>
                               </View>
@@ -2121,7 +2121,7 @@ export default function OrderDetailScreen() {
                   </View>
 
                   <TextInput
-                    style={[styles.returnInput, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.foreground, fontFamily: "Inter_400Regular", borderRadius: colors.radius - 4 }]}
+                    style={[styles.returnInput, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.foreground, fontFamily: "Cairo_400Regular", borderRadius: colors.radius - 4 }]}
                     placeholder="سبب الاسترجاع..."
                     placeholderTextColor={colors.mutedForeground}
                     value={returnReason}
@@ -2131,7 +2131,7 @@ export default function OrderDetailScreen() {
                   />
 
                   <View style={{ marginTop: 10, gap: 8 }}>
-                    <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 13, textAlign: "right" }}>
+                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 13, textAlign: "right" }}>
                       صورة المشكلة (اختياري)
                     </Text>
                     <Pressable
@@ -2165,7 +2165,7 @@ export default function OrderDetailScreen() {
                       }]}
                     >
                       <Icon name={returnProblemImage ? "check-circle" : "camera"} size={16} color={returnProblemImage ? "#C0392B" : colors.mutedForeground} />
-                      <Text style={{ color: returnProblemImage ? "#C0392B" : colors.mutedForeground, fontFamily: "Inter_600SemiBold", fontSize: 13 }}>
+                      <Text style={{ color: returnProblemImage ? "#C0392B" : colors.mutedForeground, fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>
                         {uploadingReturnProblem ? "جاري الرفع..." : returnProblemImage ? "تم رفع صورة المشكلة — تغيير" : "رفع صورة المشكلة"}
                       </Text>
                     </Pressable>
@@ -2237,7 +2237,7 @@ export default function OrderDetailScreen() {
                       onPress={() => { setShowReturnForm(false); setReturnReason(""); setReturnSelectedItems({}); setReturnItemWeights({}); setReturnItemBolts({}); setReturnProblemImage(null); }}
                       style={[styles.msgCancelBtn, { borderColor: colors.border, borderRadius: colors.radius - 4 }]}
                     >
-                      <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 13 }}>إلغاء</Text>
+                      <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 13 }}>إلغاء</Text>
                     </Pressable>
                   </View>
                 </View>
@@ -2268,7 +2268,7 @@ export default function OrderDetailScreen() {
             style={[styles.deleteBtn, { borderColor: "#C0392B44", backgroundColor: "#C0392B11" }]}
           >
             <Icon name="trash-2" size={14} color="#C0392B" />
-            <Text style={[styles.deleteBtnText, { color: "#C0392B", fontFamily: "Inter_500Medium" }]}>
+            <Text style={[styles.deleteBtnText, { color: "#C0392B", fontFamily: "Cairo_500Medium" }]}>
               حذف الطلب نهائياً
             </Text>
           </Pressable>
@@ -2291,14 +2291,14 @@ export default function OrderDetailScreen() {
                 style={({ pressed }) => ({ flex: 1, flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 12, borderRadius: 10, backgroundColor: "rgba(255,255,255,0.15)", opacity: pressed ? 0.7 : 1 })}
               >
                 <Icon name="download" size={18} color="#fff" />
-                <Text style={{ color: "#fff", fontFamily: "Inter_600SemiBold", fontSize: 13 }}>حفظ في الجهاز</Text>
+                <Text style={{ color: "#fff", fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>حفظ في الجهاز</Text>
               </Pressable>
               <Pressable
                 onPress={() => order.transferProofImage && shareImage(order.transferProofImage, `transfer_${order.id.slice(0, 12)}`)}
                 style={({ pressed }) => ({ flex: 1, flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 12, borderRadius: 10, backgroundColor: colors.gold, opacity: pressed ? 0.7 : 1 })}
               >
                 <Icon name="share-2" size={18} color="#000" />
-                <Text style={{ color: "#000", fontFamily: "Inter_700Bold", fontSize: 13 }}>مشاركة</Text>
+                <Text style={{ color: "#000", fontFamily: "Cairo_700Bold", fontSize: 13 }}>مشاركة</Text>
               </Pressable>
             </View>
           </View>
@@ -2310,7 +2310,7 @@ export default function OrderDetailScreen() {
           <View style={{ flex: 1, marginTop: insets.top + 40, backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20, overflow: "hidden" }}>
             <View style={{ flexDirection: "row-reverse", alignItems: "center", padding: 16, borderBottomWidth: 1, borderBottomColor: colors.border, gap: 12, backgroundColor: colors.background }}>
               <Icon name="printer" size={20} color="#D88700" />
-              <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 16, flex: 1, textAlign: "right" }}>
+              <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 16, flex: 1, textAlign: "right" }}>
                 معاينة ورقة التجهيز #{order.id.slice(0, 12)}
               </Text>
               <Pressable onPress={() => setShowPackingSlipModal(false)} style={{ width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center", backgroundColor: colors.surface }}>
@@ -2346,7 +2346,7 @@ export default function OrderDetailScreen() {
                 style={({ pressed }) => ({ flex: 1, flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 14, borderRadius: colors.radius - 4, backgroundColor: "#D8B45A", opacity: (pressed || printingPackingSlip) ? 0.7 : 1 })}
               >
                 <Icon name="printer" size={18} color="#000" />
-                <Text style={{ color: "#000", fontFamily: "Inter_800ExtraBold", fontSize: 14 }}>
+                <Text style={{ color: "#000", fontFamily: "Cairo_800ExtraBold", fontSize: 14 }}>
                   {printingPackingSlip ? "جاري التحضير..." : "طباعة"}
                 </Text>
               </Pressable>
@@ -2375,7 +2375,7 @@ export default function OrderDetailScreen() {
                 style={({ pressed }) => ({ flex: 1, flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 14, borderRadius: colors.radius - 4, backgroundColor: colors.surface, borderWidth: 1.5, borderColor: "#D8B45A88", opacity: (pressed || printingPackingSlip) ? 0.7 : 1 })}
               >
                 <Icon name="file-down" size={18} color="#D88700" />
-                <Text style={{ color: "#D88700", fontFamily: "Inter_700Bold", fontSize: 14 }}>PDF</Text>
+                <Text style={{ color: "#D88700", fontFamily: "Cairo_700Bold", fontSize: 14 }}>PDF</Text>
               </Pressable>
             </View>
           </View>
@@ -2387,7 +2387,7 @@ export default function OrderDetailScreen() {
           <View style={{ flex: 1, marginTop: insets.top + 40, backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20, overflow: "hidden" }}>
             <View style={{ flexDirection: "row-reverse", alignItems: "center", padding: 16, borderBottomWidth: 1, borderBottomColor: colors.border, gap: 12, backgroundColor: colors.background }}>
               <Icon name="file-text" size={20} color={colors.gold} />
-              <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 16, flex: 1, textAlign: "right" }}>
+              <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 16, flex: 1, textAlign: "right" }}>
                 معاينة الفاتورة #{order.id.slice(0, 12)}
               </Text>
               <Pressable onPress={() => setShowInvoiceModal(false)} style={{ width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center", backgroundColor: colors.surface }}>
@@ -2425,7 +2425,7 @@ export default function OrderDetailScreen() {
                 style={({ pressed }) => ({ flex: 1, flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 14, borderRadius: colors.radius - 4, backgroundColor: colors.gold, opacity: (pressed || printingInvoice) ? 0.7 : 1 })}
               >
                 <Icon name="printer" size={18} color="#000" />
-                <Text style={{ color: "#000", fontFamily: "Inter_800ExtraBold", fontSize: 14 }}>
+                <Text style={{ color: "#000", fontFamily: "Cairo_800ExtraBold", fontSize: 14 }}>
                   {printingInvoice ? "جاري التحضير..." : "طباعة"}
                 </Text>
               </Pressable>
@@ -2454,7 +2454,7 @@ export default function OrderDetailScreen() {
                 style={({ pressed }) => ({ flex: 1, flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 14, borderRadius: colors.radius - 4, backgroundColor: colors.surface, borderWidth: 1.5, borderColor: colors.gold + "55", opacity: (pressed || printingInvoice) ? 0.7 : 1 })}
               >
                 <Icon name="file-down" size={18} color={colors.gold} />
-                <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 14 }}>PDF</Text>
+                <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 14 }}>PDF</Text>
               </Pressable>
             </View>
           </View>
@@ -2477,14 +2477,14 @@ export default function OrderDetailScreen() {
                 style={({ pressed }) => ({ flex: 1, flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 12, borderRadius: 10, backgroundColor: "rgba(255,255,255,0.15)", opacity: pressed ? 0.7 : 1 })}
               >
                 <Icon name="download" size={18} color="#fff" />
-                <Text style={{ color: "#fff", fontFamily: "Inter_600SemiBold", fontSize: 13 }}>حفظ في الجهاز</Text>
+                <Text style={{ color: "#fff", fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>حفظ في الجهاز</Text>
               </Pressable>
               <Pressable
                 onPress={() => order.shippingWaybillImage && shareImage(order.shippingWaybillImage, `waybill_${order.id.slice(0, 12)}`)}
                 style={({ pressed }) => ({ flex: 1, flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 12, borderRadius: 10, backgroundColor: colors.gold, opacity: pressed ? 0.7 : 1 })}
               >
                 <Icon name="share-2" size={18} color="#000" />
-                <Text style={{ color: "#000", fontFamily: "Inter_700Bold", fontSize: 13 }}>مشاركة</Text>
+                <Text style={{ color: "#000", fontFamily: "Cairo_700Bold", fontSize: 13 }}>مشاركة</Text>
               </Pressable>
             </View>
           </View>
@@ -2494,8 +2494,8 @@ export default function OrderDetailScreen() {
       <Modal visible={showWaybillModal} transparent animationType="fade" onRequestClose={() => setShowWaybillModal(false)}>
         <Pressable onPress={() => setShowWaybillModal(false)} style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.55)", justifyContent: "center", padding: 20 }}>
           <Pressable onPress={(e) => e.stopPropagation()} style={{ backgroundColor: colors.card, borderRadius: colors.radius, padding: 16, gap: 12, borderWidth: 1, borderColor: colors.border }}>
-            <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 16, textAlign: "right" }}>بيانات الشحن</Text>
-            <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 12, textAlign: "right" }}>اختر شركة الشحن</Text>
+            <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 16, textAlign: "right" }}>بيانات الشحن</Text>
+            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 12, textAlign: "right" }}>اختر شركة الشحن</Text>
             <View style={{ gap: 6 }}>
               {((settings.shippingProviders && settings.shippingProviders.length > 0) ? settings.shippingProviders : SHIPPING_PROVIDER_DEFAULTS)
                 .filter((p) => p.enabled !== false)
@@ -2506,7 +2506,7 @@ export default function OrderDetailScreen() {
                     style={{ flexDirection: "row-reverse", alignItems: "center", padding: 10, borderRadius: 8, borderWidth: 1, borderColor: waybillProviderInput === p.id ? colors.gold : colors.border, backgroundColor: waybillProviderInput === p.id ? colors.gold + "15" : colors.surface }}
                   >
                     <Icon name={waybillProviderInput === p.id ? "check-circle" : "circle"} size={16} color={waybillProviderInput === p.id ? colors.gold : colors.mutedForeground} />
-                    <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 14, flex: 1, textAlign: "right", marginRight: 8 }}>{p.name}</Text>
+                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14, flex: 1, textAlign: "right", marginRight: 8 }}>{p.name}</Text>
                   </Pressable>
                 ))}
             </View>
@@ -2515,7 +2515,7 @@ export default function OrderDetailScreen() {
               onChangeText={setWaybillNumberInput}
               placeholder="رقم البوليصة"
               placeholderTextColor={colors.mutedForeground}
-              style={{ backgroundColor: colors.input, borderColor: colors.border, borderWidth: 1, borderRadius: 8, padding: 10, color: colors.foreground, textAlign: "right", fontFamily: "Inter_500Medium" }}
+              style={{ backgroundColor: colors.input, borderColor: colors.border, borderWidth: 1, borderRadius: 8, padding: 10, color: colors.foreground, textAlign: "right", fontFamily: "Cairo_500Medium" }}
             />
             <Pressable
               onPress={async () => {
@@ -2582,7 +2582,7 @@ export default function OrderDetailScreen() {
               style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 8, padding: 11, borderRadius: 8, borderWidth: 1, borderColor: (waybillImageInput ? colors.destructive : colors.gold) + "55", backgroundColor: (waybillImageInput ? colors.destructive : colors.gold) + "12" }}
             >
               <Icon name={waybillImageInput ? "trash-2" : "upload"} size={15} color={waybillImageInput ? colors.destructive : colors.gold} />
-              <Text style={{ color: waybillImageInput ? colors.destructive : colors.gold, fontFamily: "Inter_700Bold", fontSize: 13 }}>
+              <Text style={{ color: waybillImageInput ? colors.destructive : colors.gold, fontFamily: "Cairo_700Bold", fontSize: 13 }}>
                 {uploadingWaybill ? "جاري المعالجة..." : waybillImageInput ? "حذف الصورة" : "رفع الصورة"}
               </Text>
             </Pressable>
@@ -2617,12 +2617,12 @@ export default function OrderDetailScreen() {
               style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 8, padding: 12, borderRadius: 8, backgroundColor: colors.gold }}
             >
               <Icon name="check" size={16} color={colors.background} />
-              <Text style={{ color: colors.background, fontFamily: "Inter_700Bold", fontSize: 13 }}>
+              <Text style={{ color: colors.background, fontFamily: "Cairo_700Bold", fontSize: 13 }}>
                 {uploadingWaybill ? "جاري الحفظ..." : "حفظ"}
               </Text>
             </Pressable>
             <Pressable onPress={() => setShowWaybillModal(false)} style={{ padding: 10, alignItems: "center" }}>
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium" }}>إلغاء</Text>
+              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }}>إلغاء</Text>
             </Pressable>
           </Pressable>
         </Pressable>
@@ -2631,7 +2631,7 @@ export default function OrderDetailScreen() {
       <Modal visible={showChangeMethodModal} transparent animationType="fade" onRequestClose={() => setShowChangeMethodModal(false)}>
         <Pressable onPress={() => setShowChangeMethodModal(false)} style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.55)", justifyContent: "center", padding: 20 }}>
           <Pressable onPress={(e) => e.stopPropagation()} style={{ backgroundColor: colors.card, borderRadius: colors.radius, padding: 16, gap: 10, borderWidth: 1, borderColor: colors.border }}>
-            <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 16, textAlign: "right" }}>تغيير طريقة الدفع</Text>
+            <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 16, textAlign: "right" }}>تغيير طريقة الدفع</Text>
             {(() => {
               const ps = settings.payment;
               const opts: { key: PaymentMethod; label: string }[] = ([
@@ -2661,12 +2661,12 @@ export default function OrderDetailScreen() {
                   style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", padding: 12, borderRadius: 8, borderWidth: 1, borderColor: order.paymentMethod === m.key ? colors.gold : colors.border, backgroundColor: order.paymentMethod === m.key ? colors.gold + "15" : colors.surface }}
                 >
                   <Icon name={PAYMENT_METHOD_ICONS[m.key] ?? "credit-card"} size={18} color={order.paymentMethod === m.key ? colors.gold : colors.mutedForeground} />
-                  <Text style={{ color: order.paymentMethod === m.key ? colors.gold : colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 14, flex: 1, textAlign: "right", marginRight: 10 }}>{m.label}</Text>
+                  <Text style={{ color: order.paymentMethod === m.key ? colors.gold : colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14, flex: 1, textAlign: "right", marginRight: 10 }}>{m.label}</Text>
                 </Pressable>
               ));
             })()}
             <Pressable onPress={() => setShowChangeMethodModal(false)} style={{ padding: 10, alignItems: "center" }}>
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium" }}>إلغاء</Text>
+              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }}>إلغاء</Text>
             </Pressable>
           </Pressable>
         </Pressable>
@@ -2693,26 +2693,26 @@ export default function OrderDetailScreen() {
                 <>
                   <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
                     <Icon name="package" size={18} color={colors.gold} />
-                    <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 16, flex: 1, textAlign: "right" }}>
+                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 16, flex: 1, textAlign: "right" }}>
                       تحديد المتوفر
                     </Text>
                   </View>
-                  <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 13, textAlign: "right", lineHeight: 20 }}>
+                  <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 13, textAlign: "right", lineHeight: 20 }}>
                     {item.productName} — {item.colorName}{"\n"}
                     الكمية المطلوبة: {orderedQty} {ulbl(u)}
                   </Text>
-                  <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 13, textAlign: "right" }}>
+                  <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 13, textAlign: "right" }}>
                     متوفر فقط ({u === "meter" ? "بالمتر" : "بالكيلو"}):
                   </Text>
                   <TextInput
-                    style={{ backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, borderRadius: colors.radius - 4, color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 16, paddingHorizontal: 14, paddingVertical: 12, textAlign: "right" }}
+                    style={{ backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, borderRadius: colors.radius - 4, color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 16, paddingHorizontal: 14, paddingVertical: 12, textAlign: "right" }}
                     placeholder="اتركه فارغًا إذا كان غير متوفر نهائيًا"
                     placeholderTextColor={colors.mutedForeground}
                     value={availInput}
                     keyboardType="decimal-pad"
                     onChangeText={(txt) => { if (/^\d*\.?\d*$/.test(txt)) setAvailInput(txt); }}
                   />
-                  <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right" }}>
+                  <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>
                     إذا تركت الخانة فارغة سيظهر الصنف للعميل كـ «غير متوفر» وسيُحذف عند تأكيد التعديل.
                   </Text>
 
@@ -2764,7 +2764,7 @@ export default function OrderDetailScreen() {
                       }}
                       style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 13, borderRadius: colors.radius - 4, backgroundColor: colors.gold }}
                     >
-                      <Text style={{ color: colors.background, fontFamily: "Inter_700Bold", fontSize: 14 }}>حفظ</Text>
+                      <Text style={{ color: colors.background, fontFamily: "Cairo_700Bold", fontSize: 14 }}>حفظ</Text>
                     </Pressable>
                     {item.stockStatus && (
                       <Pressable
@@ -2794,14 +2794,14 @@ export default function OrderDetailScreen() {
                         }}
                         style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 13, borderRadius: colors.radius - 4, borderWidth: 1, borderColor: "#27AE60", backgroundColor: "#27AE6018" }}
                       >
-                        <Text style={{ color: "#27AE60", fontFamily: "Inter_600SemiBold", fontSize: 14 }}>متاح بالكامل</Text>
+                        <Text style={{ color: "#27AE60", fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>متاح بالكامل</Text>
                       </Pressable>
                     )}
                     <Pressable
                       onPress={() => setAvailModalIndex(null)}
                       style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 13, borderRadius: colors.radius - 4, borderWidth: 1, borderColor: colors.border }}
                     >
-                      <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 14 }}>إلغاء</Text>
+                      <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 14 }}>إلغاء</Text>
                     </Pressable>
                   </View>
                 </>

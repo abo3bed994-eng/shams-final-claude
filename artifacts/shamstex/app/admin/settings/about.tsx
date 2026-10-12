@@ -16,9 +16,9 @@ export default function AboutSettings() {
           placeholder="مثال: شمس تكس"
         />
         <View style={{ gap: 5 }}>
-          <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right" }}>نص النبذة</Text>
+          <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>نص النبذة</Text>
           <TextInput
-            style={[styles.multiline, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Inter_400Regular" }]}
+            style={[styles.multiline, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_400Regular" }]}
             value={draft.aboutText}
             onChangeText={(v) => setDraft((d) => ({ ...d, aboutText: v }))}
             multiline

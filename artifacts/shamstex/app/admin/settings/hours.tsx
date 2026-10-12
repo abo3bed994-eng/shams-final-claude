@@ -25,7 +25,7 @@ function TimeField({
 
   return (
     <View style={{ flex: 1, gap: 4 }}>
-      <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right" }}>
+      <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>
         {label}
       </Text>
       <Pressable
@@ -40,7 +40,7 @@ function TimeField({
           },
         ]}
       >
-        <Text style={{ color: value ? colors.foreground : colors.mutedForeground, fontFamily: "Inter_600SemiBold", fontSize: 15 }}>
+        <Text style={{ color: value ? colors.foreground : colors.mutedForeground, fontFamily: "Cairo_600SemiBold", fontSize: 15 }}>
           {value || "--:--"}
         </Text>
       </Pressable>
@@ -62,12 +62,12 @@ function TimeField({
               gap: 12,
             }}
           >
-            <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 15, textAlign: "center" }}>
+            <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 15, textAlign: "center" }}>
               {label}
             </Text>
             <View style={{ flexDirection: "row", gap: 10, height: 200 }}>
               <View style={{ flex: 1 }}>
-                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "center", marginBottom: 6 }}>
+                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "center", marginBottom: 6 }}>
                   الساعة
                 </Text>
                 <ScrollView showsVerticalScrollIndicator={false}>
@@ -82,7 +82,7 @@ function TimeField({
                         alignItems: "center",
                       }}
                     >
-                      <Text style={{ color: h === curH ? colors.gold : colors.foreground, fontFamily: h === curH ? "Inter_700Bold" : "Inter_400Regular", fontSize: 15 }}>
+                      <Text style={{ color: h === curH ? colors.gold : colors.foreground, fontFamily: h === curH ? "Cairo_700Bold" : "Cairo_400Regular", fontSize: 15 }}>
                         {pad2(h)}
                       </Text>
                     </Pressable>
@@ -90,7 +90,7 @@ function TimeField({
                 </ScrollView>
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "center", marginBottom: 6 }}>
+                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "center", marginBottom: 6 }}>
                   الدقيقة
                 </Text>
                 <ScrollView showsVerticalScrollIndicator={false}>
@@ -105,7 +105,7 @@ function TimeField({
                         alignItems: "center",
                       }}
                     >
-                      <Text style={{ color: m === curM ? colors.gold : colors.foreground, fontFamily: m === curM ? "Inter_700Bold" : "Inter_400Regular", fontSize: 15 }}>
+                      <Text style={{ color: m === curM ? colors.gold : colors.foreground, fontFamily: m === curM ? "Cairo_700Bold" : "Cairo_400Regular", fontSize: 15 }}>
                         {pad2(m)}
                       </Text>
                     </Pressable>
@@ -117,7 +117,7 @@ function TimeField({
               onPress={() => setOpen(false)}
               style={{ backgroundColor: colors.gold, borderRadius: 10, paddingVertical: 12, alignItems: "center" }}
             >
-              <Text style={{ color: colors.background, fontFamily: "Inter_700Bold", fontSize: 14 }}>تم</Text>
+              <Text style={{ color: colors.background, fontFamily: "Cairo_700Bold", fontSize: 14 }}>تم</Text>
             </Pressable>
           </Pressable>
         </Pressable>
@@ -135,7 +135,7 @@ export default function HoursSettings() {
         {(draft.workingHours ?? []).map((day, idx) => (
           <View key={day.day} style={[styles.workDayRow, { backgroundColor: colors.surface, borderColor: day.enabled ? colors.gold + "44" : colors.border }]}>
             <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
-              <Text style={{ color: day.enabled ? colors.foreground : colors.mutedForeground, fontFamily: "Inter_600SemiBold", fontSize: 14 }}>{day.day}</Text>
+              <Text style={{ color: day.enabled ? colors.foreground : colors.mutedForeground, fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>{day.day}</Text>
               <Switch
                 value={day.enabled}
                 onValueChange={(v) => setDraft((d) => ({ ...d, workingHours: (d.workingHours ?? []).map((wd, i) => (i === idx ? { ...wd, enabled: v } : wd)) }))}
@@ -163,8 +163,8 @@ export default function HoursSettings() {
         ))}
         <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", paddingVertical: 8, marginTop: 4, borderTopWidth: 1, borderColor: colors.border }}>
           <View style={{ flex: 1, marginEnd: 12 }}>
-            <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold", fontSize: 13, textAlign: "right" }}>تعليق الطلبات خارج أوقات العمل</Text>
-            <Text style={{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Inter_400Regular", marginTop: 2 }}>
+            <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 13, textAlign: "right" }}>تعليق الطلبات خارج أوقات العمل</Text>
+            <Text style={{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Cairo_400Regular", marginTop: 2 }}>
               {draft.suspendOrdersOutsideHours !== false ? "العميل يستطيع الطلب لكن يصل الطاقم تلقائياً عند بدء الدوام" : "كل الطلبات تصل الطاقم فوراً (24/7)"}
             </Text>
           </View>

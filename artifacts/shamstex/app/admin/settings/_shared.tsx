@@ -101,11 +101,11 @@ export function Field({
   const colors = useColors();
   return (
     <View style={{ gap: 5 }}>
-      <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right" }}>{label}</Text>
+      <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>{label}</Text>
       <TextInput
         style={[
           styles.input,
-          { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Inter_400Regular" },
+          { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_400Regular" },
         ]}
         value={value}
         onChangeText={onChange}
@@ -122,7 +122,7 @@ export const Card = React.memo(function Card({ children, title }: { children: Re
   const colors = useColors();
   return (
     <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-      <Text style={[styles.cardTitle, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>{title}</Text>
+      <Text style={[styles.cardTitle, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>{title}</Text>
       {children}
     </View>
   );
@@ -136,23 +136,23 @@ export const styles = StyleSheet.create({
   container: { flex: 1 },
   content: { padding: 16, gap: 14 },
   card: { borderWidth: 1, borderRadius: 12, padding: 14, gap: 10 },
-  cardTitle: { fontSize: 14, textAlign: "right", marginBottom: 4 },
-  input: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14 },
-  multiline: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, minHeight: 100, textAlignVertical: "top" },
+  cardTitle: { fontSize: 14, textAlign: "right", marginBottom: 4, fontFamily: "Cairo_700Bold" },
+  input: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, fontFamily: "Cairo_400Regular" },
+  multiline: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, minHeight: 100, textAlignVertical: "top", fontFamily: "Cairo_400Regular" },
   statsRow: { flexDirection: "row-reverse", gap: 10 },
   catFixedRow: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 14, paddingVertical: 10, borderRadius: 8, borderWidth: 1 },
   catListRow: { flexDirection: "row-reverse", alignItems: "center", borderRadius: 8, borderWidth: 1, paddingHorizontal: 10, paddingVertical: 8, gap: 8 },
   catRowArrows: { flexDirection: "column", alignItems: "center", gap: 2 },
   arrowBtn: { width: 28, height: 28, alignItems: "center", justifyContent: "center" },
-  catListName: { flex: 1, fontSize: 14, textAlign: "right" },
+  catListName: { flex: 1, fontSize: 14, textAlign: "right", fontFamily: "Cairo_500Medium" },
   deleteCatBtn: { width: 28, height: 28, alignItems: "center", justifyContent: "center" },
   addRow: { flexDirection: "row-reverse", gap: 10, alignItems: "center" },
-  addInput: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, fontSize: 14 },
+  addInput: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, fontSize: 14, fontFamily: "Cairo_400Regular" },
   subCatGroup: { borderWidth: 1, borderRadius: 8, padding: 12, gap: 10 },
-  subCatGroupTitle: { fontSize: 14, textAlign: "right" },
+  subCatGroupTitle: { fontSize: 14, textAlign: "right", fontFamily: "Cairo_600SemiBold" },
   subTagsWrap: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 8 },
   subTag: { flexDirection: "row-reverse", alignItems: "center", gap: 4, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 14, borderWidth: 1 },
-  subTagText: { fontSize: 12 },
+  subTagText: { fontSize: 12, fontFamily: "Cairo_500Medium" },
   entryBox: { borderWidth: 1, borderRadius: 10, padding: 12, gap: 10 },
   deleteBtn: { alignSelf: "flex-start", width: 32, height: 32, alignItems: "center", justifyContent: "center" },
   entryFields: { gap: 10 },
@@ -166,5 +166,5 @@ export const styles = StyleSheet.create({
   bannerBtns: { flexDirection: "row-reverse", gap: 10 },
   bannerBtn: { flex: 1, flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 12, borderRadius: 10, borderWidth: 1.5 },
   workDayRow: { borderWidth: 1, borderRadius: 10, padding: 12, gap: 10 },
-  timeInput: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, fontSize: 14, textAlign: "center" },
+  timeInput: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, fontSize: 14, textAlign: "center", fontFamily: "Cairo_600SemiBold" },
 });

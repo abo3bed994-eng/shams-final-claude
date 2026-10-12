@@ -63,7 +63,7 @@ export default function EditProductScreen() {
   if (!product) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background, alignItems: "center", justifyContent: "center" }]}>
-        <Text style={{ color: colors.foreground, fontFamily: "Inter_500Medium" }}>المنتج غير موجود</Text>
+        <Text style={{ color: colors.foreground, fontFamily: "Cairo_500Medium" }}>المنتج غير موجود</Text>
       </View>
     );
   }
@@ -170,7 +170,7 @@ export default function EditProductScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
             الصور
           </Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.imagesRow}>
@@ -184,7 +184,7 @@ export default function EditProductScreen() {
               style={[styles.addImageBtn, { borderColor: colors.gold + "66", backgroundColor: colors.surface }]}
             >
               <Icon name="camera" size={22} color={colors.gold} />
-              <Text style={[{ color: colors.gold, fontFamily: "Inter_500Medium", fontSize: 10, textAlign: "center" }]}>
+              <Text style={[{ color: colors.gold, fontFamily: "Cairo_500Medium", fontSize: 10, textAlign: "center" }]}>
                 إضافة صورة
               </Text>
             </Pressable>
@@ -198,14 +198,14 @@ export default function EditProductScreen() {
             ))}
           </ScrollView>
           {images.length === 0 && (
-            <Text style={[{ color: colors.mutedForeground, fontSize: 12, textAlign: "right", fontFamily: "Inter_400Regular" }]}>
+            <Text style={[{ color: colors.mutedForeground, fontSize: 12, textAlign: "right", fontFamily: "Cairo_400Regular" }]}>
               لا توجد صور حالياً
             </Text>
           )}
         </View>
 
         <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
             معلومات المنتج
           </Text>
           {[
@@ -213,11 +213,11 @@ export default function EditProductScreen() {
             { label: "الوصف", value: description, onChange: setDescription },
           ].map((f) => (
             <View key={f.label} style={styles.fieldGroup}>
-              <Text style={[{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Inter_400Regular" }]}>
+              <Text style={[{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Cairo_400Regular" }]}>
                 {f.label}
               </Text>
               <TextInput
-                style={[styles.textInput, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Inter_400Regular" }]}
+                style={[styles.textInput, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_400Regular" }]}
                 value={f.value}
                 onChangeText={f.onChange}
                 textAlign="right"
@@ -225,7 +225,7 @@ export default function EditProductScreen() {
             </View>
           ))}
           <View style={styles.fieldGroup}>
-            <Text style={[{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Inter_400Regular" }]}>
+            <Text style={[{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Cairo_400Regular" }]}>
               الفئة
             </Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, flexDirection: "row-reverse" }}>
@@ -235,7 +235,7 @@ export default function EditProductScreen() {
                   onPress={() => { setCategory(cat); setSubcategory(""); }}
                   style={[styles.catChip, { backgroundColor: category === cat ? colors.gold : colors.surface, borderColor: category === cat ? colors.gold : colors.border }]}
                 >
-                  <Text style={[{ color: category === cat ? colors.background : colors.foreground, fontFamily: category === cat ? "Inter_600SemiBold" : "Inter_400Regular", fontSize: 13 }]}>
+                  <Text style={[{ color: category === cat ? colors.background : colors.foreground, fontFamily: category === cat ? "Cairo_600SemiBold" : "Cairo_400Regular", fontSize: 13 }]}>
                     {cat}
                   </Text>
                 </Pressable>
@@ -245,7 +245,7 @@ export default function EditProductScreen() {
 
           {(settings.subcategories?.[category] ?? []).length > 0 && (
             <View style={styles.fieldGroup}>
-              <Text style={[{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Inter_400Regular" }]}>
+              <Text style={[{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Cairo_400Regular" }]}>
                 الفئة الفرعية
               </Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, flexDirection: "row-reverse" }}>
@@ -257,7 +257,7 @@ export default function EditProductScreen() {
                     borderStyle: "dashed",
                   }]}
                 >
-                  <Text style={[{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 13 }]}>
+                  <Text style={[{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 13 }]}>
                     بدون فئة فرعية
                   </Text>
                 </Pressable>
@@ -270,7 +270,7 @@ export default function EditProductScreen() {
                       borderColor: subcategory === sub ? colors.gold : colors.border,
                     }]}
                   >
-                    <Text style={[{ color: subcategory === sub ? colors.gold : colors.foreground, fontFamily: subcategory === sub ? "Inter_600SemiBold" : "Inter_400Regular", fontSize: 13 }]}>
+                    <Text style={[{ color: subcategory === sub ? colors.gold : colors.foreground, fontFamily: subcategory === sub ? "Cairo_600SemiBold" : "Cairo_400Regular", fontSize: 13 }]}>
                       {sub}
                     </Text>
                   </Pressable>
@@ -281,7 +281,7 @@ export default function EditProductScreen() {
         </View>
 
         <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
             وحدة البيع
           </Text>
           <View style={{ flexDirection: "row-reverse", gap: 12 }}>
@@ -313,7 +313,7 @@ export default function EditProductScreen() {
                 }]}
               >
                 <Icon name={opt.icon as any} size={16} color={unit === opt.value ? colors.background : colors.foreground} />
-                <Text style={{ color: unit === opt.value ? colors.background : colors.foreground, fontFamily: unit === opt.value ? "Inter_600SemiBold" : "Inter_400Regular", fontSize: 14 }}>
+                <Text style={{ color: unit === opt.value ? colors.background : colors.foreground, fontFamily: unit === opt.value ? "Cairo_600SemiBold" : "Cairo_400Regular", fontSize: 14 }}>
                   {opt.label}
                 </Text>
               </Pressable>
@@ -322,15 +322,15 @@ export default function EditProductScreen() {
         </View>
 
         <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
             الحد الأدنى للطلب
           </Text>
           <View style={styles.fieldGroup}>
-            <Text style={[{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Inter_400Regular" }]}>
+            <Text style={[{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Cairo_400Regular" }]}>
               الحد الأدنى لكل لون ({unit === "kilo" ? "كغ" : "متر"})
             </Text>
             <TextInput
-              style={[styles.textInput, { color: colors.gold, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Inter_700Bold" }]}
+              style={[styles.textInput, { color: colors.gold, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_700Bold" }]}
               value={minimumOrderQuantity}
               onChangeText={(value) => { if (/^\d*\.?\d*$/.test(value)) setMinimumOrderQuantity(value); }}
               keyboardType="decimal-pad"
@@ -338,14 +338,14 @@ export default function EditProductScreen() {
               placeholderTextColor={colors.mutedForeground}
               textAlign="right"
             />
-            <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "right" }}>
+            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>
               القيمة الافتراضية للمنتجات القديمة: {unit === "kilo" ? "20 كغ" : "100 متر"}.
             </Text>
           </View>
         </View>
 
         <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
             الأسعار
           </Text>
           <View style={{ flexDirection: "row-reverse", gap: 12 }}>
@@ -354,11 +354,11 @@ export default function EditProductScreen() {
               { label: "سعر التاجر *", value: wholesalePrice, onChange: setWholesalePrice },
             ].map((f) => (
               <View key={f.label} style={[styles.fieldGroup, { flex: 1 }]}>
-                <Text style={[{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Inter_400Regular" }]}>
+                <Text style={[{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Cairo_400Regular" }]}>
                   {f.label}
                 </Text>
                 <TextInput
-                  style={[styles.textInput, { color: colors.gold, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Inter_700Bold" }]}
+                  style={[styles.textInput, { color: colors.gold, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_700Bold" }]}
                   value={f.value}
                   onChangeText={f.onChange}
                   keyboardType="decimal-pad"
@@ -369,11 +369,11 @@ export default function EditProductScreen() {
           </View>
 
           <View style={styles.fieldGroup}>
-            <Text style={[{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Inter_400Regular" }]}>
+            <Text style={[{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Cairo_400Regular" }]}>
               سعر العرض للزبون (اختياري) — اتركه فارغاً لإلغاء العرض
             </Text>
             <TextInput
-              style={[styles.textInput, { color: "#C0392B", backgroundColor: colors.input, borderColor: offerPrice.trim() ? "#C0392B" : colors.border, fontFamily: "Inter_700Bold" }]}
+              style={[styles.textInput, { color: "#C0392B", backgroundColor: colors.input, borderColor: offerPrice.trim() ? "#C0392B" : colors.border, fontFamily: "Cairo_700Bold" }]}
               value={offerPrice}
               onChangeText={setOfferPrice}
               keyboardType="decimal-pad"
@@ -382,7 +382,7 @@ export default function EditProductScreen() {
               placeholderTextColor={colors.mutedForeground}
             />
             {offerPrice.trim() !== "" && Number(offerPrice) > 0 && Number(offerPrice) < Number(retailPrice || 0) && (
-              <Text style={{ color: "#C0392B", fontSize: 11, textAlign: "right", fontFamily: "Inter_500Medium" }}>
+              <Text style={{ color: "#C0392B", fontSize: 11, textAlign: "right", fontFamily: "Cairo_500Medium" }}>
                 سيظهر السعر القديم {retailPrice} ج.م مشطوباً والسعر الجديد {offerPrice} ج.م
               </Text>
             )}
@@ -400,7 +400,7 @@ export default function EditProductScreen() {
         />
 
         <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
             الألوان ({selectedColors.length} مختار)
           </Text>
           <View style={styles.colorGrid}>
@@ -413,7 +413,7 @@ export default function EditProductScreen() {
                   style={[styles.colorOption, { backgroundColor: selected ? colors.gold + "22" : colors.surface, borderColor: selected ? colors.gold : colors.border }]}
                 >
                   <View style={[styles.colorSwatch, { backgroundColor: color.hex, borderColor: colors.border }]} />
-                  <Text style={[{ color: colors.foreground, fontFamily: "Inter_400Regular", fontSize: 12 }]}>
+                  <Text style={[{ color: colors.foreground, fontFamily: "Cairo_400Regular", fontSize: 12 }]}>
                     {color.name}
                   </Text>
                   {selected && <Icon name="check" size={12} color={colors.gold} />}
@@ -425,8 +425,8 @@ export default function EditProductScreen() {
 
         {settings.companionMaterials?.length ? (
           <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>الخامات المرافقة</Text>
-            <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "right" }}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>الخامات المرافقة</Text>
+            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>
               اختر الخامات التي تظهر عند طلب هذا المنتج.
             </Text>
             <View style={{ flexDirection: "row-reverse", flexWrap: "wrap", gap: 8 }}>
@@ -434,7 +434,7 @@ export default function EditProductScreen() {
                 const selected = companionMaterialIds.includes(material.id);
                 return (
                   <Pressable key={material.id} onPress={() => setCompanionMaterialIds((current) => selected ? current.filter((id) => id !== material.id) : [...current, material.id])} style={[styles.catChip, { backgroundColor: selected ? colors.gold + "22" : colors.surface, borderColor: selected ? colors.gold : colors.border }]}>
-                    <Text style={{ color: selected ? colors.gold : colors.foreground, fontFamily: selected ? "Inter_600SemiBold" : "Inter_400Regular", fontSize: 13 }}>{material.name}</Text>
+                    <Text style={{ color: selected ? colors.gold : colors.foreground, fontFamily: selected ? "Cairo_600SemiBold" : "Cairo_400Regular", fontSize: 13 }}>{material.name}</Text>
                   </Pressable>
                 );
               })}

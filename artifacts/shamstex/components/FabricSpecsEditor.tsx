@@ -45,17 +45,17 @@ export default function FabricSpecsEditor({
 
   return (
     <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
-      <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+      <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
         مواصفات القماش
       </Text>
 
       <View style={styles.specRow}>
         <View style={styles.specField}>
-          <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+          <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
             العرض (سم)
           </Text>
           <TextInput
-            style={[styles.textInput, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4, fontFamily: "Inter_600SemiBold" }]}
+            style={[styles.textInput, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4, fontFamily: "Cairo_600SemiBold" }]}
             value={width}
             onChangeText={setWidth}
             keyboardType="decimal-pad"
@@ -65,11 +65,11 @@ export default function FabricSpecsEditor({
           />
         </View>
         <View style={styles.specField}>
-          <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+          <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
             المقطع / GSM (جم/م²)
           </Text>
           <TextInput
-            style={[styles.textInput, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4, fontFamily: "Inter_600SemiBold" }]}
+            style={[styles.textInput, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4, fontFamily: "Cairo_600SemiBold" }]}
             value={gsm}
             onChangeText={setGsm}
             keyboardType="decimal-pad"
@@ -82,18 +82,18 @@ export default function FabricSpecsEditor({
 
       <View style={{ gap: 8 }}>
         <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
-          <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Inter_500Medium" }]}>
+          <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
             التركيب
           </Text>
           {composition.length > 1 && (
-            <Text style={{ fontSize: 11, fontFamily: "Inter_600SemiBold", color: total === 100 ? colors.gold : "#C0392B" }}>
+            <Text style={{ fontSize: 11, fontFamily: "Cairo_600SemiBold", color: total === 100 ? colors.gold : "#C0392B" }}>
               المجموع {total}%
             </Text>
           )}
         </View>
 
         {yarnTypes.length === 0 && (
-          <Text style={{ color: "#C0392B", fontSize: 12, textAlign: "right", fontFamily: "Inter_400Regular" }}>
+          <Text style={{ color: "#C0392B", fontSize: 12, textAlign: "right", fontFamily: "Cairo_400Regular" }}>
             أضف أنواع الفتلة من إعدادات التطبيق أولاً
           </Text>
         )}
@@ -103,13 +103,13 @@ export default function FabricSpecsEditor({
             <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 10 }}>
               <View style={{ flex: 1 }}>
                 {single ? (
-                  <Text style={{ color: colors.gold, fontFamily: "Inter_700Bold", fontSize: 14, textAlign: "right" }}>
+                  <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 14, textAlign: "right" }}>
                     100%
                   </Text>
                 ) : (
                   <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
                     <TextInput
-                      style={[styles.percentInput, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4, fontFamily: "Inter_700Bold" }]}
+                      style={[styles.percentInput, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4, fontFamily: "Cairo_700Bold" }]}
                       value={entry.percent ? String(entry.percent) : ""}
                       onChangeText={(v) => setPercent(idx, Number(v.replace(/[^0-9]/g, "")) || 0)}
                       keyboardType="number-pad"
@@ -118,7 +118,7 @@ export default function FabricSpecsEditor({
                       textAlign="center"
                       maxLength={3}
                     />
-                    <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 13 }}>%</Text>
+                    <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 13 }}>%</Text>
                   </View>
                 )}
               </View>
@@ -135,7 +135,7 @@ export default function FabricSpecsEditor({
                     onPress={() => setYarn(idx, yarn)}
                     style={[styles.yarnChip, { backgroundColor: selected ? colors.gold + "22" : colors.card, borderColor: selected ? colors.gold : colors.border }]}
                   >
-                    <Text style={{ color: selected ? colors.gold : colors.foreground, fontFamily: selected ? "Inter_600SemiBold" : "Inter_400Regular", fontSize: 13 }}>
+                    <Text style={{ color: selected ? colors.gold : colors.foreground, fontFamily: selected ? "Cairo_600SemiBold" : "Cairo_400Regular", fontSize: 13 }}>
                       {yarn}
                     </Text>
                   </Pressable>
@@ -151,10 +151,10 @@ export default function FabricSpecsEditor({
           style={[styles.addEntryBtn, { borderColor: colors.gold + "66", opacity: yarnTypes.length === 0 ? 0.4 : 1 }]}
         >
           <Icon name="plus" size={16} color={colors.gold} />
-          <Text style={{ color: colors.gold, fontFamily: "Inter_600SemiBold", fontSize: 13 }}>إضافة فتلة</Text>
+          <Text style={{ color: colors.gold, fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>إضافة فتلة</Text>
         </Pressable>
         {single && (
-          <Text style={{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Inter_400Regular" }}>
+          <Text style={{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Cairo_400Regular" }}>
             عند وجود فتلة واحدة فقط تُحتسب 100% تلقائياً
           </Text>
         )}

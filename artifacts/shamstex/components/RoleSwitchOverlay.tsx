@@ -38,14 +38,14 @@ const styles = StyleSheet.create({
   title: {
     color: "#D4AF37",
     fontSize: 16,
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Cairo_600SemiBold",
     marginTop: 18,
     textAlign: "center",
   },
   sub: {
     color: "#999",
     fontSize: 13,
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Cairo_400Regular",
     marginTop: 8,
     textAlign: "center",
   },

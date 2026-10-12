@@ -208,7 +208,7 @@ export default function HomeScreen() {
             <Icon name="bell" size={22} color={colors.foreground} />
             {unreadCount > 0 && (
               <View style={[styles.badge, { backgroundColor: colors.gold }]}>
-                <Text style={[styles.badgeText, { color: colors.background, fontFamily: "Inter_700Bold" }]}>
+                <Text style={[styles.badgeText, { color: colors.background, fontFamily: "Cairo_700Bold" }]}>
                   {unreadCount}
                 </Text>
               </View>
@@ -221,7 +221,7 @@ export default function HomeScreen() {
             <Icon name="heart" size={22} color={colors.foreground} />
             {favorites.length > 0 && (
               <View style={[styles.badge, { backgroundColor: colors.gold }]}>
-                <Text style={[styles.badgeText, { color: colors.background, fontFamily: "Inter_700Bold" }]}>
+                <Text style={[styles.badgeText, { color: colors.background, fontFamily: "Cairo_700Bold" }]}>
                   {favorites.length > 9 ? "9+" : favorites.length}
                 </Text>
               </View>
@@ -236,7 +236,7 @@ export default function HomeScreen() {
             </Animated.View>
             {cartCount > 0 && (
               <View style={[styles.badge, { backgroundColor: "#E74C3C" }]}>
-                <Text style={[styles.badgeText, { color: "#fff", fontFamily: "Inter_700Bold" }]}>
+                <Text style={[styles.badgeText, { color: "#fff", fontFamily: "Cairo_700Bold" }]}>
                   {cartCount > 9 ? "9+" : cartCount}
                 </Text>
               </View>
@@ -269,7 +269,7 @@ export default function HomeScreen() {
             { backgroundColor: colors.gold + "22", borderColor: colors.gold + "44", opacity: pressed ? 0.7 : 1 },
           ]}
         >
-          <Text style={[styles.avatarText, { color: colors.gold, fontFamily: "Inter_700Bold" }]}>
+          <Text style={[styles.avatarText, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
             {user?.name?.charAt(0) ?? "؟"}
           </Text>
         </Pressable>
@@ -390,12 +390,12 @@ export default function HomeScreen() {
             <View style={styles.activeOrdersHeader}>
               <View style={styles.activeOrdersRight}>
                 <Icon name="package" size={18} color={colors.gold} />
-                <Text style={[styles.activeOrdersTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+                <Text style={[styles.activeOrdersTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                   {t("currentOrders")}
                 </Text>
               </View>
               <View style={[styles.activeOrdersBadge, { backgroundColor: colors.gold }]}>
-                <Text style={{ color: colors.background, fontFamily: "Inter_700Bold", fontSize: 12 }}>
+                <Text style={{ color: colors.background, fontFamily: "Cairo_700Bold", fontSize: 12 }}>
                   {activeOrders.length}
                 </Text>
               </View>
@@ -406,12 +406,12 @@ export default function HomeScreen() {
                 <View key={order.id} style={[styles.activeOrderRow, { borderTopColor: colors.border }]}>
                   <Icon name="chevron-left" size={14} color={colors.mutedForeground} />
                   <View style={{ flex: 1, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
-                    <Text style={{ color: colors.foreground, fontFamily: "Inter_500Medium", fontSize: 13 }}>
+                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_500Medium", fontSize: 13 }}>
                       {t("orderNum")} #{order.id.slice(0, 12)}
                     </Text>
                     <View style={[styles.activeOrderStatusPill, { backgroundColor: statusInfo.color + "22" }]}>
                       <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: statusInfo.color }} />
-                      <Text style={{ color: statusInfo.color, fontFamily: "Inter_600SemiBold", fontSize: 11 }}>
+                      <Text style={{ color: statusInfo.color, fontFamily: "Cairo_600SemiBold", fontSize: 11 }}>
                         {statusInfo.text}
                       </Text>
                     </View>
@@ -420,7 +420,7 @@ export default function HomeScreen() {
               );
             })}
             {activeOrders.length > 3 && (
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 12, textAlign: "center", paddingTop: 6 }}>
+              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "center", paddingTop: 6 }}>
                 +{activeOrders.length - 3} {t("moreOrders")}
               </Text>
             )}
@@ -430,17 +430,17 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Pressable onPress={() => router.push("/(tabs)/products")}>
-              <Text style={[styles.seeAll, { color: colors.gold, fontFamily: "Inter_600SemiBold" }]}>
+              <Text style={[styles.seeAll, { color: colors.gold, fontFamily: "Cairo_600SemiBold" }]}>
                 {t("viewAll")}
               </Text>
             </Pressable>
-            <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
               {t("featuredProducts")}
             </Text>
           </View>
 
           {featuredProducts.length === 0 ? (
-            <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
+            <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
               {t("noFeatured")}
             </Text>
           ) : (
@@ -464,7 +464,7 @@ export default function HomeScreen() {
               },
             ]}
           >
-            <Text style={[styles.viewAllBottomText, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
+            <Text style={[styles.viewAllBottomText, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
               {isRTL ? "عرض جميع المنتجات" : "View All Products"}
             </Text>
             <Icon
@@ -566,18 +566,18 @@ const styles = StyleSheet.create({
   bannerGreeting: {
     color: "rgba(255,255,255,0.75)",
     fontSize: 12,
-    fontFamily: "Inter_400Regular",
+    fontFamily: "Cairo_400Regular",
   },
   bannerUserName: {
     color: "#FFFFFF",
     fontSize: 20,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "Cairo_700Bold",
     flexShrink: 1,
   },
   bannerCaption: {
     fontSize: 12.5,
     lineHeight: 18,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Cairo_500Medium",
     textAlign: "right",
     flexShrink: 1,
   },
@@ -592,7 +592,7 @@ const styles = StyleSheet.create({
   },
   bannerRoleText: {
     fontSize: 11,
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "Cairo_600SemiBold",
   },
   dotsRow: {
     position: "absolute",

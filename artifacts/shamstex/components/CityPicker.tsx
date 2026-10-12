@@ -45,7 +45,7 @@ export default function CityPicker({ governorate, value, onChange, invalid, plac
         <Text
           style={{
             color: value ? colors.foreground : colors.mutedForeground,
-            fontFamily: "Inter_400Regular",
+            fontFamily: "Cairo_400Regular",
             fontSize: 13,
             textAlign: "right",
             flex: 1,
@@ -66,7 +66,7 @@ export default function CityPicker({ governorate, value, onChange, invalid, plac
             style={{ backgroundColor: colors.card, borderRadius: colors.radius, borderWidth: 1, borderColor: colors.border, maxHeight: "75%", overflow: "hidden" }}
           >
             <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", padding: 14, borderBottomWidth: 1, borderBottomColor: colors.border }}>
-              <Text style={{ color: colors.foreground, fontFamily: "Inter_700Bold", fontSize: 15 }}>اختر المدينة / المركز</Text>
+              <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 15 }}>اختر المدينة / المركز</Text>
               <Pressable onPress={() => setOpen(false)} hitSlop={8}>
                 <Icon name="x" size={20} color={colors.mutedForeground} />
               </Pressable>
@@ -86,14 +86,14 @@ export default function CityPicker({ governorate, value, onChange, invalid, plac
                   paddingVertical: 9,
                   color: colors.foreground,
                   textAlign: "right",
-                  fontFamily: "Inter_400Regular",
+                  fontFamily: "Cairo_400Regular",
                   fontSize: 13,
                 }}
               />
             </View>
             <ScrollView contentContainerStyle={{ padding: 8 }} keyboardShouldPersistTaps="handled">
               {filtered.length === 0 ? (
-                <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_400Regular", fontSize: 13, textAlign: "center", paddingVertical: 20 }}>
+                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 13, textAlign: "center", paddingVertical: 20 }}>
                   لا توجد نتائج
                 </Text>
               ) : (
@@ -117,7 +117,7 @@ export default function CityPicker({ governorate, value, onChange, invalid, plac
                       }}
                     >
                       <Icon name={selected ? "check-circle" : "circle"} size={16} color={selected ? colors.gold : colors.mutedForeground} />
-                      <Text style={{ color: colors.foreground, fontFamily: selected ? "Inter_700Bold" : "Inter_500Medium", fontSize: 14, flex: 1, textAlign: "right" }}>
+                      <Text style={{ color: colors.foreground, fontFamily: selected ? "Cairo_700Bold" : "Cairo_500Medium", fontSize: 14, flex: 1, textAlign: "right" }}>
                         {c}
                       </Text>
                     </Pressable>

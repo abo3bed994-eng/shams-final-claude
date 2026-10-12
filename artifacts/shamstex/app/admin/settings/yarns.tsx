@@ -25,11 +25,11 @@ export default function YarnsSettings() {
   return (
     <SettingsScreen title="أنواع الفتلة" bottomPad={bottomPad} save={save} saving={saving}>
       <Card title="أنواع الفتلة (للتركيب)">
-        <Text style={{ color: colors.mutedForeground, fontSize: 12, textAlign: "right", fontFamily: "Inter_400Regular" }}>
+        <Text style={{ color: colors.mutedForeground, fontSize: 12, textAlign: "right", fontFamily: "Cairo_400Regular" }}>
           تُستخدم هذه الأسماء في قائمة تركيب القماش عند إضافة أو تعديل منتج.
         </Text>
         {yarns.length === 0 ? (
-          <Text style={{ color: colors.mutedForeground, textAlign: "right", fontSize: 13, fontFamily: "Inter_400Regular" }}>
+          <Text style={{ color: colors.mutedForeground, textAlign: "right", fontSize: 13, fontFamily: "Cairo_400Regular" }}>
             لا توجد أنواع فتلة بعد
           </Text>
         ) : (
@@ -39,7 +39,7 @@ export default function YarnsSettings() {
                 <Pressable onPress={() => deleteYarn(yarn)} style={{ padding: 2 }}>
                   <Icon name="x" size={12} color={colors.mutedForeground} />
                 </Pressable>
-                <Text style={[styles.subTagText, { color: colors.foreground, fontFamily: "Inter_400Regular" }]}>{yarn}</Text>
+                <Text style={[styles.subTagText, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}>{yarn}</Text>
               </View>
             ))}
           </View>
@@ -47,7 +47,7 @@ export default function YarnsSettings() {
         <View style={styles.addRow}>
           <GoldButton label="إضافة" onPress={addYarn} size="sm" style={{ minWidth: 80 }} disabled={!newYarn.trim()} />
           <TextInput
-            style={[styles.addInput, { flex: 1, color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Inter_400Regular" }]}
+            style={[styles.addInput, { flex: 1, color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_400Regular" }]}
             value={newYarn}
             onChangeText={setNewYarn}
             placeholder="اسم الفتلة (مثال: قطن)"
