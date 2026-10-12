@@ -849,9 +849,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         // Force-logout immediately so they get kicked to the login screen.
         const me = userRef.current;
         if (me?.phone) {
-          const stillExists = freshCustomers.some((c: any) => samePhone(c.phone, me.phone));
-          if (!stillExists) {
+          const myDoc = freshCustomers.find((c: any) => samePhone(c.phone, me.phone));
+          if (!myDoc) {
             forceLogoutAccountRemoved();
+            return;
+          }
+          if (me.role !== "customer" && myDoc.role === "customer") {
+            forceLogoutRoleChanged();
             return;
           }
         }
@@ -865,6 +869,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       unsubCustomers = FS.subscribeCustomerByPhone(user.phone, (own) => {
         if (own) {
           isFirstOwnLoad = false;
+          const me = userRef.current;
+          if (me && me.role !== own.role) {
+            forceLogoutRoleChanged();
+            return;
+          }
           applyFreshCustomers([own]);
         } else if (!isFirstOwnLoad) {
           forceLogoutAccountRemoved();
@@ -963,6 +972,47 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const bannedAlertShownRef = React.useRef<boolean>(false);
   const roleChangeAlertShownRef = React.useRef<boolean>(false);
 
+  // Helper to force-logout when an account is demoted/role-changed by an admin
+  const forceLogoutRoleChanged = useCallback(async () => {
+    if (roleChangeAlertShownRef.current) return;
+    roleChangeAlertShownRef.current = true;
+    const previousUser = userRef.current;
+    try {
+      const Notifications = await import("expo-notifications");
+      const tokenData = await Notifications.getExpoPushTokenAsync().catch(() => null);
+      await Notifications.dismissAllNotificationsAsync().catch(() => {});
+      if (previousUser?.phone) {
+        await FS.deletePushToken(migrateLocalToE164(previousUser.phone), tokenData?.data);
+      }
+    } catch {}
+    try {
+      const { signOut } = await import("@/lib/phoneAuth");
+      await signOut();
+    } catch {}
+    try {
+      await AsyncStorage.multiRemove([
+        "user", "notifications", "orders", "returnRequests", "registered_customers",
+      ]).catch(() => {});
+      await deleteSecureItem("sessionToken");
+    } catch {}
+    setRegisteredCustomersState([]);
+    setUserState(null);
+    setNotifications([]);
+    setOrdersState([]);
+    setReturnRequests([]);
+    setCart([]);
+    setEditingOrderId(null);
+    Alert.alert(
+      "تم تغيير دورك",
+      "تم إعادتك كعميل من قِبل الإدارة. يرجى تسجيل الدخول مجدداً بحساب العميل.",
+      [{ text: "حسناً" }]
+    );
+    try {
+      const { router } = await import("expo-router");
+      router.replace("/auth/login" as any);
+    } catch {}
+  }, []);
+
   // Role-aware orders subscription: customers see only their own orders,
   // staff see all. Re-subscribes when user identity/role changes.
   useEffect(() => {
@@ -1006,17 +1056,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       unsub = FS.subscribeSession(migrateLocalToE164(user.phone), async (remoteToken) => {
         if (cancelled || !remoteToken) return;
         if (remoteToken !== localToken) {
-          // Another device took over this account → log out FULLY immediately:
-          // clear all per-user state, secure token, then force-navigate to the
-          // login screen so the old session can no longer interact with the app.
+          if (remoteToken.startsWith("revoked_")) {
+            forceLogoutRoleChanged();
+            return;
+          }
+          // Another device took over this account → log out FULLY immediately
           try {
             await AsyncStorage.multiRemove([
               "user",
               "notifications",
               "orders",
               "returnRequests",
+              "registered_customers",
             ]).catch(() => {});
             await deleteSecureItem("sessionToken");
+          } catch {}
+          try {
+            const { signOut } = await import("@/lib/phoneAuth");
+            await signOut();
           } catch {}
           setUserState(null);
           setNotifications([]);
@@ -1024,6 +1081,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           setReturnRequests([]);
           setCart([]);
           setEditingOrderId(null);
+          setRegisteredCustomersState([]);
           try {
             const { router } = await import("expo-router");
             router.replace("/auth/login" as any);
@@ -1186,39 +1244,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (roleChanged) {
-        // Same race-safe order as bannedNow: clear in-memory user FIRST so any
-        // concurrent persistUserSafe / Firestore writer sees null and bails.
-        // Do NOT call persistUserSafe(synced) — it would re-write the synced
-        // record (with the new role) into AsyncStorage after multiRemove, and
-        // the next app launch would silently log the user back in.
-        if (roleChangeAlertShownRef.current) return;
-        roleChangeAlertShownRef.current = true;
-        setUserState(null);
-        setNotifications([]);
-        setOrdersState([]);
-        setReturnRequests([]);
-        setCart([]);
-        setEditingOrderId(null);
-        (async () => {
-          try {
-            await AsyncStorage.multiRemove([
-              "user",
-              "notifications",
-              "orders",
-              "returnRequests",
-            ]).catch(() => {});
-            await deleteSecureItem("sessionToken");
-          } catch {}
-          Alert.alert(
-            "تم تغيير دورك",
-            "تم تحديث دورك من قِبل الإدارة. الرجاء تسجيل الدخول مجدداً.",
-            [{ text: "حسناً" }]
-          );
-          try {
-            const { router } = await import("expo-router");
-            router.replace("/auth/login" as any);
-          } catch {}
-        })();
+        forceLogoutRoleChanged();
         return;
       }
 
@@ -1517,6 +1543,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
     const currentUser = userRef.current;
     if (currentUser && samePhone(currentUser.phone, updatedUser.phone)) {
+      if (currentUser.role !== updatedUser.role && updatedUser.role === "customer") {
+        forceLogoutRoleChanged();
+        return;
+      }
       const synced: User = {
         ...currentUser,
         ...updatedUser,
