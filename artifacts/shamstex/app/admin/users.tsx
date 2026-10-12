@@ -108,22 +108,7 @@ const SUPERVISOR_GRANTABLE: EmployeePermission[] = [
 ];
 
 const DEMO_STAFF: User[] = [
-  { id: "u1", phone: "0000000001", name: "مدير النظام", role: "admin" },
   { id: "u0", phone: "01221131138", name: "المدير", role: "admin" },
-  {
-    id: "u3",
-    phone: "0000000003",
-    name: "موظف",
-    role: "employee",
-    permissions: ["view_orders", "view_products"],
-  },
-  {
-    id: "u4",
-    phone: "0000000004",
-    name: "مشرف",
-    role: "supervisor",
-    permissions: ["view_orders", "edit_orders", "view_products", "view_users", "send_notifications", "approve_upgrades"],
-  },
 ];
 
 type TabKey = "customers" | "staff";
@@ -299,11 +284,9 @@ export default function AdminUsersScreen() {
 
       saveCustomerChange({ ...updated, role: newRole, permissions: perms, upgradeStatus: undefined, lastUpdated: new Date().toISOString() } as any);
 
-      // Wipe any pending orders for this user so they don't carry over across
-      // roles (e.g. a customer becoming merchant shouldn't see old retail orders
-      // sitting in the queue). Best-effort, never blocks the UI.
-      if (updated.phone) {
-        FS.deleteOrdersForUserPhone(updated.phone).catch(() => {});
+      // If promoted to staff, remove them from deletedStaffPhones so they show in the staff list
+      if (newRole === "employee" || newRole === "supervisor" || newRole === "admin") {
+        setDeletedStaffPhones((prev) => prev.filter((p) => !samePhone(p, updated.phone)));
       }
 
       if (user) {
@@ -368,10 +351,9 @@ export default function AdminUsersScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const target = staffList.find((u) => u.id === userId);
     if (!target) return;
-    // Wipe pending orders for this staff member too — they may have placed
-    // orders as a customer/merchant before being promoted.
-    if (target.phone) {
-      FS.deleteOrdersForUserPhone(target.phone).catch(() => {});
+    if (newRole === "customer") {
+      handleDeleteStaff(target);
+      return;
     }
     if (user) {
       FS.appendAuditLog({
@@ -476,12 +458,10 @@ export default function AdminUsersScreen() {
   };
 
   const PRIMARY_ADMIN_PHONE = "+201221131138";
-  // Both legacy local format and new E.164 format to protect existing accounts during migration.
+  // Only the primary admin is protected from deletion, banning, or demotion.
   const PROTECTED_PHONES = [
     "+201221131138",
     "01221131138",
-    "0000000001",
-    "+200000000001",
   ];
 
   const handleBanCustomer = (u: User) => {
@@ -566,17 +546,59 @@ export default function AdminUsersScreen() {
   const handleDeleteStaff = (u: User) => {
     if (PROTECTED_PHONES.some((p) => samePhone(p, u.phone))) return;
     Alert.alert(
-      "حذف عضو الفريق",
-      `هل أنت متأكد من حذف "${u.name}" من الفريق؟\n\nسيتم حذف بياناته نهائياً.`,
+      "إزالة من الفريق",
+      `هل أنت متأكد من إزالة "${u.name}" من فريق العمل وإعادته كعميل عادي؟\n\nسيحتفظ بحسابه وكافة بياناته وطلباته السابقة دون أي مساس، وتتحول رتبته إلى عميل عادي.`,
       [
         { text: "إلغاء", style: "cancel" },
         {
-          text: "حذف",
+          text: "إزالة وإعادة كعميل",
           style: "destructive",
           onPress: () => {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+            const customerUser: User = {
+              ...u,
+              role: "customer",
+              permissions: [],
+              branchId: undefined,
+              canHandleShipping: undefined,
+              supervisorScope: undefined,
+              lastUpdated: new Date().toISOString(),
+            };
+            saveCustomerChange(customerUser);
             setDeletedStaffPhones((prev) => [...prev, u.phone]);
-            deleteRegisteredCustomer(u.phone);
+            if (u.phone) {
+              FS.savePushToken(u.phone, "customer", "", {
+                permissions: [],
+                branchId: undefined,
+                supervisorScope: undefined,
+              }).catch(() => {});
+            }
+            if (user) {
+              FS.appendAuditLog({
+                actorId: user.id,
+                actorName: user.name ?? "—",
+                actorRole: user.role,
+                action: "staff.remove_to_customer",
+                targetId: u.id,
+                targetType: "user",
+                details: { phone: u.phone, fromRole: u.role, toRole: "customer" },
+              }).catch(() => {});
+            }
+            addNotification({
+              id: `role_customer_${u.id}_${Date.now()}`,
+              title: "تغيير الدور",
+              body: "تم إزالتك من فريق العمل وإعادتك كعميل عادي.",
+              createdAt: new Date().toISOString(),
+              read: false,
+              targetUserId: u.id,
+              targetUserPhone: u.phone,
+            });
+            notifyUserByPhone(
+              u.phone,
+              "تغيير الدور",
+              "تم إزالتك من فريق العمل وإعادتك كعميل عادي.",
+              { type: "role_change", newRole: "customer" }
+            ).catch(() => {});
             setExpandedUser(null);
           },
         },
@@ -1032,13 +1054,15 @@ export default function AdminUsersScreen() {
                   الدور الوظيفي
                 </Text>
                 <View style={{ flexDirection: "row-reverse", gap: 8, flexWrap: "wrap" }}>
-                  {(["admin", "supervisor", "employee"] as UserRole[]).map((role) => (
+                  {(["admin", "supervisor", "employee", "customer"] as UserRole[]).map((role) => (
                     <Pressable
                       key={role}
                       onPress={() => {
                         if (u.role === role) return;
                         if (role === "admin") {
                           handlePromoteToAdmin(u);
+                        } else if (role === "customer") {
+                          handleDeleteStaff(u);
                         } else {
                           Alert.alert(
                             "تغيير الدور",
@@ -1206,11 +1230,11 @@ export default function AdminUsersScreen() {
             {!PROTECTED_PHONES.includes(u.phone) && user?.role === "admin" && (
               <Pressable
                 onPress={() => handleDeleteStaff(u)}
-                style={[styles.deleteUserBtn, { borderColor: "#E74C3C44", backgroundColor: "#E74C3C11", borderRadius: colors.radius - 4 }]}
+                style={[styles.deleteUserBtn, { borderColor: "#E67E2244", backgroundColor: "#E67E2211", borderRadius: colors.radius - 4 }]}
               >
-                <Icon name="trash-2" size={14} color="#E74C3C" />
-                <Text style={{ color: "#E74C3C", fontFamily: "Inter_500Medium", fontSize: 13 }}>
-                  حذف من الفريق نهائياً
+                <Icon name="user-minus" size={14} color="#E67E22" />
+                <Text style={{ color: "#E67E22", fontFamily: "Inter_500Medium", fontSize: 13 }}>
+                  إزالة من الفريق وإعادته كعميل
                 </Text>
               </Pressable>
             )}
