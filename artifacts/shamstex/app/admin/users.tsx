@@ -17,7 +17,7 @@ import { useColors } from "@/hooks/useColors";
 import { useApp, User, UserRole, EmployeePermission } from "@/context/AppContext";
 import { notifyUserByPhone } from "@/lib/pushService";
 import { FS } from "@/lib/firebase";
-import { canonicalPhone, samePhone } from "@/lib/phoneUtils";
+import { canonicalPhone, samePhone, migrateLocalToE164 } from "@/lib/phoneUtils";
 import GoldHeader from "@/components/GoldHeader";
 import { useAdminGuard } from "@/hooks/useAdminGuard";
 
@@ -283,6 +283,9 @@ export default function AdminUsersScreen() {
       if (newRole === "supervisor") perms = [...SUPERVISOR_PERMISSIONS];
 
       saveCustomerChange({ ...updated, role: newRole, permissions: perms, upgradeStatus: undefined, lastUpdated: new Date().toISOString() } as any);
+      if (updated.role !== "customer" && newRole === "customer" && updated.phone) {
+        FS.saveSession(migrateLocalToE164(updated.phone), `revoked_${Date.now()}`).catch(() => {});
+      }
 
       // If promoted to staff, remove them from deletedStaffPhones so they show in the staff list
       if (newRole === "employee" || newRole === "supervisor" || newRole === "admin") {
@@ -572,6 +575,7 @@ export default function AdminUsersScreen() {
                 branchId: undefined,
                 supervisorScope: undefined,
               }).catch(() => {});
+              FS.saveSession(migrateLocalToE164(u.phone), `revoked_${Date.now()}`).catch(() => {});
             }
             if (user) {
               FS.appendAuditLog({
