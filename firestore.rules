@@ -104,7 +104,7 @@ service cloud.firestore {
     // SESSIONS — phone-keyed; only owner reads/writes
     // -----------------------------------------------------------------
     match /sessions/{phone} {
-      allow read, write: if isAuthed() && phone == userPhone();
+      allow read, write: if isAuthed() && (phone == userPhone() || isAdmin());
     }
 
     // -----------------------------------------------------------------
@@ -120,7 +120,8 @@ service cloud.firestore {
     // -----------------------------------------------------------------
     match /pushTokens/{phone} {
       allow read: if isAuthed() && (phone == userPhone() || isStaff() || resource.data.role in ["admin", "supervisor", "employee"]);
-      allow write: if isAuthed() && phone == userPhone();
+      allow write: if isAuthed() && (phone == userPhone() || isAdmin());
+      allow delete: if isAuthed() && (phone == userPhone() || isAdmin());
     }
 
     // -----------------------------------------------------------------

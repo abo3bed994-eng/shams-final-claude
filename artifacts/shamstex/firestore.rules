@@ -238,8 +238,9 @@ service cloud.firestore {
 
     // ============ Sessions (single-device login) ============
     match /sessions/{phone} {
-      // Only the owning phone can read/write its session token
-      allow read, write: if isSignedIn() && phone == userPhone();
+      // Only the owning phone can read/write its session token; admin can write to revoke
+      allow read: if isSignedIn() && (phone == userPhone() || isAdmin());
+      allow write: if isSignedIn() && (phone == userPhone() || isAdmin());
     }
 
     // ============ OTP rate limiting ============
@@ -271,7 +272,7 @@ service cloud.firestore {
         isStaff() ||
         resource.data.role in ["admin", "supervisor", "employee"]
       );
-      allow write: if isSignedIn() && phone == userPhone();
+      allow write: if isSignedIn() && (phone == userPhone() || isAdmin());
       allow delete: if isSignedIn() && (phone == userPhone() || isAdmin());
     }
 

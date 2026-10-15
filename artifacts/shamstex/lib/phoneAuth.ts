@@ -83,10 +83,6 @@ export async function startPhoneSignIn(
 
 // Returns the E.164 phone number of the Firebase auth session persisted on
 // THIS device, or null if the device has never completed a phone OTP sign-in.
-// Used to decide whether PIN quick-unlock is allowed: PIN alone must never
-// grant access on a device that has no matching Firebase identity, because
-// Firestore security rules would silently reject every protected write
-// (session registration, orders, uploads) on that device.
 export function getCurrentAuthPhone(): string | null {
   try {
     if (Platform.OS === "web") {
@@ -107,6 +103,58 @@ export function getCurrentAuthPhone(): string | null {
   } catch {
     return null;
   }
+}
+
+// Subscribes to Firebase auth state changes. Crucial on Android where Google Play Services
+// can auto-verify the SMS code in the background without manual code entry.
+export function subscribeAuthChange(
+  callback: (user: { uid: string; phoneNumber: string | null } | null) => void
+): () => void {
+  try {
+    if (Platform.OS === "web") {
+      const { onAuthStateChanged } = require("@firebase/auth");
+      return onAuthStateChanged(webAuth, (user: any) => {
+        if (user) {
+          callback({ uid: user.uid, phoneNumber: user.phoneNumber ?? null });
+        } else {
+          callback(null);
+        }
+      });
+    }
+
+    const rnAuthModule = getNativeAuth();
+    if (!rnAuthModule) return () => {};
+
+    if (typeof rnAuthModule.onAuthStateChanged === "function" && typeof rnAuthModule.getAuth === "function") {
+      const auth = rnAuthModule.getAuth();
+      return rnAuthModule.onAuthStateChanged(auth, (user: any) => {
+        if (user) {
+          callback({ uid: user.uid, phoneNumber: user.phoneNumber ?? null });
+        } else {
+          callback(null);
+        }
+      });
+    } else if (typeof rnAuthModule.default === "function") {
+      return rnAuthModule.default().onAuthStateChanged((user: any) => {
+        if (user) {
+          callback({ uid: user.uid, phoneNumber: user.phoneNumber ?? null });
+        } else {
+          callback(null);
+        }
+      });
+    } else if (typeof rnAuthModule === "function") {
+      return rnAuthModule().onAuthStateChanged((user: any) => {
+        if (user) {
+          callback({ uid: user.uid, phoneNumber: user.phoneNumber ?? null });
+        } else {
+          callback(null);
+        }
+      });
+    }
+  } catch (e) {
+    if (__DEV__) console.warn("[subscribeAuthChange] failed:", e);
+  }
+  return () => {};
 }
 
 export async function signOut(): Promise<void> {

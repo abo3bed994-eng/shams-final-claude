@@ -21,7 +21,7 @@ const ITEMS: { key: string; title: string; icon: string; route: string }[] = [
   { key: "branches", title: "الفروع ووسائل الدفع لكل فرع", icon: "map-pin", route: "/admin/settings/branches" },
   { key: "shipping", title: "شركات الشحن", icon: "truck", route: "/admin/settings/shipping" },
   { key: "payment", title: "إعدادات الدفع", icon: "wallet", route: "/admin/settings/payment" },
-  { key: "update", title: "التحديث الإجباري", icon: "download", route: "/admin/settings/update" },
+  { key: "update", title: "تحديثات التطبيق (إجباري واختياري)", icon: "download", route: "/admin/settings/update" },
 ];
 
 export default function SettingsHub() {

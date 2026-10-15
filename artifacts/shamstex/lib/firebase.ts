@@ -526,17 +526,21 @@ export const FS = {
       permissions?: string[];
     }
   ) {
+    if (!phone || !expoPushToken) return;
+    const canonical = migrateLocalToE164(phone);
     try {
       const snap = await getDocs(query(collection(db, "pushTokens"), where("expoPushToken", "==", expoPushToken)));
       for (const d of snap.docs) {
-        if (d.id !== phone) {
-          await deleteDoc(d.ref).catch(() => {});
+        if (d.id !== canonical && d.id !== phone) {
+          await deleteDoc(d.ref).catch(() => {
+            updateDoc(d.ref, { expoPushToken: "" }).catch(() => {});
+          });
         }
       }
     } catch (_) {}
 
     const payload: Record<string, any> = {
-      phone,
+      phone: canonical,
       role,
       expoPushToken,
       updatedAt: new Date().toISOString(),
@@ -546,14 +550,22 @@ export const FS = {
     if (extra?.supervisorScope) payload.supervisorScope = extra.supervisorScope;
     if (extra?.permissions) payload.permissions = extra.permissions;
 
-    await setDoc(doc(db, "pushTokens", phone), payload, { merge: true });
+    await setDoc(doc(db, "pushTokens", canonical), payload, { merge: true });
   },
 
   async deletePushToken(phone: string, expoPushToken?: string) {
     if (phone) {
-      await deleteDoc(doc(db, "pushTokens", phone)).catch(() => {});
       const canonical = migrateLocalToE164(phone);
+      await updateDoc(doc(db, "pushTokens", phone), {
+        expoPushToken: "",
+        updatedAt: new Date().toISOString(),
+      }).catch(() => {});
+      await deleteDoc(doc(db, "pushTokens", phone)).catch(() => {});
       if (canonical !== phone) {
+        await updateDoc(doc(db, "pushTokens", canonical), {
+          expoPushToken: "",
+          updatedAt: new Date().toISOString(),
+        }).catch(() => {});
         await deleteDoc(doc(db, "pushTokens", canonical)).catch(() => {});
       }
     }
@@ -561,7 +573,9 @@ export const FS = {
       try {
         const snap = await getDocs(query(collection(db, "pushTokens"), where("expoPushToken", "==", expoPushToken)));
         for (const d of snap.docs) {
-          await deleteDoc(d.ref).catch(() => {});
+          await deleteDoc(d.ref).catch(() => {
+            updateDoc(d.ref, { expoPushToken: "" }).catch(() => {});
+          });
         }
       } catch (_) {}
     }

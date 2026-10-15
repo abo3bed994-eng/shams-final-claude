@@ -45,6 +45,7 @@ const queryClient = new QueryClient();
 
 function RootLayoutNav() {
   const { user, isLoading, settings } = useApp();
+
   const [splashDone, setSplashDone] = useState(Platform.OS === "web");
   const navigated = useRef(false);
   const pushRegistered = useRef<string | null>(null);
@@ -143,7 +144,11 @@ function RootLayoutNav() {
   // Force-update gate runs only after settings have loaded, and admins bypass it
   // so they can correct a mistaken minVersion from the admin panel.
   const isAdmin = user?.role === "admin";
-  if (!isAdmin && isUpdateRequired((settings as any)?.minVersion)) {
+  const isForceRequired = isUpdateRequired(
+    (settings as any)?.minVersion,
+    (settings as any)?.forceUpdateEnabled
+  );
+  if (!isAdmin && isForceRequired) {
     return <ForceUpdateScreen />;
   }
 

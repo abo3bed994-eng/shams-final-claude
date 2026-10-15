@@ -23,7 +23,7 @@ import Icon from "@/components/Icon";
 import CountryPicker from "@/components/CountryPicker";
 import { COUNTRIES, DEFAULT_COUNTRY, Country } from "@/lib/countries";
 import { isValidLocal, toE164, migrateLocalToE164, samePhone } from "@/lib/phoneUtils";
-import { startPhoneSignIn, getCurrentAuthPhone, PhoneAuthConfirmation } from "@/lib/phoneAuth";
+import { startPhoneSignIn, getCurrentAuthPhone, subscribeAuthChange, PhoneAuthConfirmation } from "@/lib/phoneAuth";
 import { cardShadow } from "@/constants/shadows";
 
 type Step = "phone" | "otp" | "name" | "enterPin" | "setPin";
@@ -62,6 +62,8 @@ export default function LoginScreen() {
   const [resendCountdown, setResendCountdown] = useState(0);
   const confirmRef = useRef<PhoneAuthConfirmation | null>(null);
   const forgotPinModeRef = useRef(false);
+  const otpCompletedRef = useRef(false);
+  const submittingRef = useRef(false);
 
   useEffect(() => {
     if (resendCountdown <= 0) return;
@@ -107,18 +109,87 @@ export default function LoginScreen() {
     }
   };
 
+  // ---------- Proceed after verified (shared between manual OTP & background auto-verify) ----------
+  const proceedAfterOtpVerified = async (verifiedPhone: string) => {
+    try {
+      const existing = await lookupCustomer(verifiedPhone);
+      if (existing && (existing as any).banned && !isOwnerPhone(verifiedPhone)) {
+        setError(
+          (existing as any).bannedReason
+            ? `تم حظر هذا الحساب: ${(existing as any).bannedReason}`
+            : "تم حظر هذا الحساب من قِبل الإدارة."
+        );
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        return;
+      }
+      // Owner phones bypass PIN entirely
+      if (isOwnerPhone(verifiedPhone) && existing) {
+        await finishLogin(existing.name, existing.role as any, { ...existing, phone: verifiedPhone });
+      } else if (forgotPinModeRef.current && existing) {
+        // Forgot-PIN flow: OTP verified → set new PIN
+        forgotPinModeRef.current = false;
+        setPin("");
+        setConfirmPin("");
+        setPinPurpose("reset");
+        setStep("setPin");
+      } else if (existing) {
+        if (existing.pin) {
+          setStep("enterPin");
+        } else {
+          setPinPurpose("existingNoPin");
+          setStep("setPin");
+        }
+      } else {
+        setStep("name");
+      }
+    } catch (procErr: any) {
+      console.warn("[proceedAfterOtpVerified] error:", procErr);
+      setError("حدث خطأ أثناء إتمام الدخول، حاول مرة أخرى");
+    }
+  };
+
+  // Background auto-verification listener for Android Google Play Services SMS Retriever
+  useEffect(() => {
+    if (step !== "otp") return;
+    otpCompletedRef.current = false;
+    const unsub = subscribeAuthChange(async (authUser) => {
+      if (!authUser || !authUser.phoneNumber) return;
+      if (otpCompletedRef.current) return;
+      if (samePhone(authUser.phoneNumber, e164Phone)) {
+        if (__DEV__) console.log("[PhoneAuth] Background auto-verification detected for:", authUser.phoneNumber);
+        otpCompletedRef.current = true;
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        setLoading(true);
+        try {
+          await proceedAfterOtpVerified(authUser.phoneNumber);
+        } finally {
+          setLoading(false);
+        }
+      }
+    });
+    return () => {
+      unsub();
+    };
+  }, [step, e164Phone]);
+
   // ---------- Phone submit: PIN-first routing ----------
   const handlePhoneSubmit = async () => {
     if (!phoneValid) {
       setError("رقم الهاتف غير صحيح");
       return;
     }
+    if (submittingRef.current || loading) return;
+    submittingRef.current = true;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setError("");
     // Owner phones bypass PIN — go straight to OTP
     if (isOwnerPhone(e164Phone)) {
       forgotPinModeRef.current = false;
-      await sendOtp();
+      try {
+        await sendOtp();
+      } finally {
+        submittingRef.current = false;
+      }
       return;
     }
     const existing = await lookupCustomer(e164Phone);
@@ -143,27 +214,38 @@ export default function LoginScreen() {
         // protected write (orders, uploads).
         const authPhone = getCurrentAuthPhone();
         if (authPhone && samePhone(authPhone, e164Phone)) {
+          submittingRef.current = false;
           setStep("enterPin");
         } else {
           forgotPinModeRef.current = false;
-          await sendOtp();
+          try {
+            await sendOtp();
+          } finally {
+            submittingRef.current = false;
+          }
         }
       } else {
-        // SECURITY: existing account without PIN must verify ownership via SMS
-        // before being allowed to set one — otherwise anyone who knows the
-        // phone number could claim the account.
         forgotPinModeRef.current = true;
-        await sendOtp();
+        try {
+          await sendOtp();
+        } finally {
+          submittingRef.current = false;
+        }
       }
       return;
     }
     // New customer → OTP first, then name, then setPin
     forgotPinModeRef.current = false;
-    await sendOtp();
+    try {
+      await sendOtp();
+    } finally {
+      submittingRef.current = false;
+    }
   };
 
   // ---------- Real OTP send ----------
   const sendOtp = async () => {
+    otpCompletedRef.current = false;
     setLoading(true);
     // Rate-limit successful OTP sends: 10 per phone per 24 hours. Owner phones
     // are exempt. The read-only check does not consume an attempt.
@@ -223,60 +305,71 @@ export default function LoginScreen() {
   // ---------- Real OTP verify ----------
   const handleVerifyOtp = async () => {
     if (otp.length < 6) return;
+    if (otpCompletedRef.current) return;
+    if (submittingRef.current || loading) return;
+    submittingRef.current = true;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setLoading(true);
     setError("");
 
+    // Check if the device is already authenticated with this phone (e.g. background auto-verify)
+    const currentAuthPhone = getCurrentAuthPhone();
+    if (currentAuthPhone && samePhone(currentAuthPhone, e164Phone)) {
+      if (__DEV__) console.log("[PhoneAuth] Already authenticated with phone:", currentAuthPhone);
+      otpCompletedRef.current = true;
+      try {
+        await proceedAfterOtpVerified(currentAuthPhone);
+      } finally {
+        submittingRef.current = false;
+        setLoading(false);
+      }
+      return;
+    }
+
     if (!confirmRef.current) {
+      // If confirmRef was lost, check if background auth succeeded before erroring
+      const fallbackPhone = getCurrentAuthPhone();
+      if (fallbackPhone && samePhone(fallbackPhone, e164Phone)) {
+        otpCompletedRef.current = true;
+        try {
+          await proceedAfterOtpVerified(fallbackPhone);
+        } finally {
+          submittingRef.current = false;
+          setLoading(false);
+        }
+        return;
+      }
       setError("انتهت صلاحية الجلسة، أعد المحاولة");
+      submittingRef.current = false;
       setLoading(false);
       return;
     }
+
     try {
       const result = await confirmRef.current.confirm(otp);
+      otpCompletedRef.current = true;
       const verifiedPhone = result.phoneNumber || e164Phone;
-      const existing = await lookupCustomer(verifiedPhone);
-      if (existing && (existing as any).banned && !isOwnerPhone(verifiedPhone)) {
-        setError(
-          (existing as any).bannedReason
-            ? `تم حظر هذا الحساب: ${(existing as any).bannedReason}`
-            : "تم حظر هذا الحساب من قِبل الإدارة."
-        );
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        return;
-      }
-      // Owner phones bypass PIN entirely
-      if (isOwnerPhone(verifiedPhone) && existing) {
-        await finishLogin(existing.name, existing.role as any, { ...existing, phone: verifiedPhone });
-      } else if (forgotPinModeRef.current && existing) {
-        // Forgot-PIN flow: OTP verified → set new PIN
-        forgotPinModeRef.current = false;
-        setPin("");
-        setConfirmPin("");
-        setPinPurpose("reset");
-        setStep("setPin");
-      } else if (existing) {
-        // Existing user (no forgot-pin) — should not normally happen since
-        // existing users skip OTP. But if reached, route by pin presence.
-        if (existing.pin) {
-          setStep("enterPin");
-        } else {
-          setPinPurpose("existingNoPin");
-          setStep("setPin");
-        }
-      } else {
-        // Always store new accounts under E.164
-        setStep("name");
-      }
+      await proceedAfterOtpVerified(verifiedPhone);
     } catch (e: any) {
       const msg = String(e?.message || e);
       if (__DEV__) console.log("[OTP verify ERROR]", { msg });
+
+      // If confirm threw expired or session-expired, check whether Android auto-verified in background!
+      const fallbackPhone = getCurrentAuthPhone();
+      if (fallbackPhone && samePhone(fallbackPhone, e164Phone)) {
+        if (__DEV__) console.log("[PhoneAuth] Caught expired error, but phone is authenticated in background:", fallbackPhone);
+        otpCompletedRef.current = true;
+        await proceedAfterOtpVerified(fallbackPhone);
+        return;
+      }
+
       let friendly = "كود التحقق غير صحيح";
       if (msg.includes("expired") || msg.includes("session-expired")) {
         friendly = "انتهت صلاحية الكود، أعد إرساله";
       }
       setError(friendly);
     } finally {
+      submittingRef.current = false;
       setLoading(false);
     }
   };
@@ -611,8 +704,11 @@ export default function LoginScreen() {
                     onPress={() => setShowCountryPicker(true)}
                     style={[styles.countryCodeBox, { borderLeftColor: colors.border }]}
                   >
-                    <Text style={{ fontSize: 18 }}>{country.flag}</Text>
-                    <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 14 }}>
+                    <Text style={{ fontSize: 18 }} maxFontSizeMultiplier={1.15}>{country.flag}</Text>
+                    <Text
+                      style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 13 }}
+                      maxFontSizeMultiplier={1.2}
+                    >
                       {country.dial}
                     </Text>
                     <Icon name="chevron-down" size={14} color={colors.mutedForeground} />
@@ -626,6 +722,7 @@ export default function LoginScreen() {
                     keyboardType="phone-pad"
                     textAlign="right"
                     returnKeyType="done"
+                    maxFontSizeMultiplier={1.25}
                     onSubmitEditing={handlePhoneSubmit}
                   />
                   <Icon name="phone" size={18} color={colors.mutedForeground} />
@@ -693,7 +790,15 @@ export default function LoginScreen() {
                   placeholder="_ _ _ _ _ _"
                   placeholderTextColor={colors.mutedForeground}
                   value={otp}
-                  onChangeText={(val) => { setOtp(val); setError(""); }}
+                  onChangeText={(val) => {
+                    const clean = val
+                      .replace(/[\u0660-\u0669]/g, (c) => String(c.charCodeAt(0) - 0x0660))
+                      .replace(/[\u06F0-\u06F9]/g, (c) => String(c.charCodeAt(0) - 0x06F0))
+                      .replace(/\D/g, "")
+                      .slice(0, 6);
+                    setOtp(clean);
+                    setError("");
+                  }}
                   keyboardType="numeric"
                   textAlign="center"
                   maxLength={6}
@@ -938,21 +1043,29 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: "row-reverse",
     alignItems: "center",
-    paddingHorizontal: 14,
-    gap: 10,
-    height: 52,
+    paddingHorizontal: 12,
+    gap: 8,
+    minHeight: 52,
     borderWidth: 1,
   },
-  input: { flex: 1, fontSize: 16, height: "100%" },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    minWidth: 0,
+    flexShrink: 1,
+    paddingVertical: 0,
+    height: "100%",
+  },
   countryCodeBox: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: 3,
     borderLeftWidth: 1,
-    paddingLeft: 8,
+    paddingLeft: 6,
     paddingRight: 4,
-    marginLeft: 4,
-    height: 30,
+    marginLeft: 2,
+    height: 32,
+    flexShrink: 0,
   },
   backRow: { flexDirection: "row-reverse", marginBottom: -4 },
   divider: { borderTopWidth: 1, marginVertical: 4 },

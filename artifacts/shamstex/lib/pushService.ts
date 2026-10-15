@@ -139,6 +139,18 @@ export async function registerForPushNotifications(
     }
 
     if (expoPushToken) {
+      try {
+        const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default;
+        const currentE164 = migrateLocalToE164(phone);
+        const prevRegisteredPhone = await AsyncStorage.getItem("@shamstex/active_push_phone");
+        if (prevRegisteredPhone && prevRegisteredPhone !== currentE164 && prevRegisteredPhone !== phone) {
+          // Device switched accounts: wipe token from the old account's record immediately
+          await FS.deletePushToken(migrateLocalToE164(prevRegisteredPhone), expoPushToken);
+          await FS.deletePushToken(prevRegisteredPhone, expoPushToken);
+        }
+        await AsyncStorage.setItem("@shamstex/active_push_phone", currentE164);
+      } catch {}
+
       // Push-token documents are keyed by phone. Keep the key canonical so
       // status notifications can find the token even when an old order stores
       // the customer's local-format phone.

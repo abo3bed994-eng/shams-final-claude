@@ -376,6 +376,10 @@ export interface AppSettings {
   minVersion?: string;
   latestVersion?: string;
   updateUrl?: string;
+  forceUpdateEnabled?: boolean;
+  flexibleUpdateEnabled?: boolean;
+  updateTitle?: string;
+  updateMessage?: string;
   stealthIconEnabled?: boolean;
   suspendOrdersOutsideHours?: boolean;
   notificationTemplates?: { id: string; title: string; body: string }[];
@@ -451,6 +455,14 @@ const DEFAULT_SETTINGS: AppSettings = {
     productOrder: [],
     productCategories: {},
   },
+  minVersion: "",
+  latestVersion: "",
+  updateUrl: "",
+  forceUpdateEnabled: false,
+  flexibleUpdateEnabled: false,
+  updateTitle: "",
+  updateMessage: "",
+
   globalColors: [
     { name: "أبيض", hex: "#FFFFFF", quantity: 50 },
     { name: "أسود", hex: "#0A0A0A", quantity: 50 },
@@ -1345,6 +1357,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const setUser = useCallback(async (u: User | null) => {
+    const prev = userRef.current;
     setUserState(u);
     if (u) {
       // Reset one-shot guards so a future ban/role-change in this app process
@@ -1353,33 +1366,46 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       roleChangeAlertShownRef.current = false;
       await persistUserSafe(u);
     } else {
+      // Remove this device push token from Firestore and sign out of
+      // Firebase Auth so status notifications stop reaching a device that is
+      // no longer on the account that received them.
+      try {
+        const { FS } = await import("@/lib/firebase");
+        let tokenToClear: string | undefined;
+        try {
+          const Notifications = await import("expo-notifications");
+          const Constants = (await import("expo-constants")).default;
+          const projectId =
+            Constants?.expoConfig?.extra?.eas?.projectId ??
+            Constants?.easConfig?.projectId ??
+            "06be38ce-b248-4e89-be24-7f123d135be3";
+          const tokenData = await Notifications.getExpoPushTokenAsync({ projectId }).catch(() => null);
+          if (tokenData?.data) tokenToClear = tokenData.data;
+          await Notifications.dismissAllNotificationsAsync().catch(() => {});
+        } catch {}
+
+        const phoneToClean = prev?.phone || (await AsyncStorage.getItem("@shamstex/active_push_phone").catch(() => null));
+        if (phoneToClean) {
+          const e164 = migrateLocalToE164(phoneToClean);
+          await FS.deletePushToken(e164, tokenToClear);
+          if (e164 !== phoneToClean) {
+            await FS.deletePushToken(phoneToClean, tokenToClear);
+          }
+        } else if (tokenToClear) {
+          await FS.deletePushToken("", tokenToClear);
+        }
+      } catch {}
+
       await AsyncStorage.multiRemove([
         "user",
         "notifications",
         "orders",
         "returnRequests",
         "registered_customers",
+        "@shamstex/active_push_phone",
       ]).catch(() => {});
       await deleteSecureItem("sessionToken");
-      // Remove this device\u2019s push token from Firestore and sign out of
-      // Firebase Auth so status notifications stop reaching a device that is
-      // no longer on the account that received them.
-      try {
-        const { FS } = await import("@/lib/firebase");
-        const prev = userRef.current;
-        let tokenToClear: string | undefined;
-        try {
-          const Notifications = await import("expo-notifications");
-          const tokenData = await Notifications.getExpoPushTokenAsync().catch(() => null);
-          if (tokenData?.data) tokenToClear = tokenData.data;
-          await Notifications.dismissAllNotificationsAsync().catch(() => {});
-        } catch {}
-        if (prev?.phone) {
-          await FS.deletePushToken(migrateLocalToE164(prev.phone), tokenToClear);
-        } else if (tokenToClear) {
-          await FS.deletePushToken("", tokenToClear);
-        }
-      } catch {}
+
       try {
         const { signOut } = await import("@/lib/phoneAuth");
         await signOut();
