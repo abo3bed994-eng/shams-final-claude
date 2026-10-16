@@ -389,7 +389,7 @@ export default function LoginScreen() {
 
   const handleVerifyPin = async () => {
     if (pin.length !== 4) {
-      setError("الرمز السري يجب أن يكون 4 أرقام");
+      setError("الرقم السري يجب أن يكون 4 أرقام");
       return;
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -412,7 +412,7 @@ export default function LoginScreen() {
         } catch {}
       }
       if (!ok) {
-        setError("الرمز السري غير صحيح");
+        setError("الرقم السري غير صحيح");
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         return;
       }
@@ -463,11 +463,11 @@ export default function LoginScreen() {
 
   const handleSetPinSubmit = async () => {
     if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
-      setError("الرمز السري يجب أن يكون 4 أرقام");
+      setError("الرقم السري يجب أن يكون 4 أرقام");
       return;
     }
     if (pin !== confirmPin) {
-      setError("الرمزان غير متطابقين");
+      setError("الرقمان السريان غير متطابقين");
       return;
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -491,10 +491,10 @@ export default function LoginScreen() {
       if (existing) {
         await finishLogin(existing.name, (existing.role as any) || "customer", { ...existing, phone: e164Phone });
       } else {
-        setError("تعذّر حفظ الرمز السري، حاول مرة أخرى");
+        setError("تعذّر حفظ الرقم السري، حاول مرة أخرى");
       }
     } catch (e: any) {
-      setError("تعذّر حفظ الرمز السري");
+      setError("تعذّر حفظ الرقم السري");
     } finally {
       setLoading(false);
     }
@@ -850,10 +850,10 @@ export default function LoginScreen() {
                 <Icon name="lock" size={28} color={colors.gold} />
               </View>
               <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
-                الرمز السري
+                الرقم السري
               </Text>
               <Text style={[styles.cardSubtitle, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
-                أدخل الرمز السري المكوّن من 4 أرقام
+                أدخل الرقم السري المكوّن من 4 أرقام
               </Text>
               <View style={[styles.inputWrapper, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
@@ -880,7 +880,7 @@ export default function LoginScreen() {
               <GoldButton label="دخول" onPress={handleVerifyPin} loading={loading} disabled={pin.length !== 4} style={{ width: "100%" }} />
               <Pressable onPress={handleForgotPin} disabled={loading}>
                 <Text style={{ color: colors.gold, fontFamily: "Cairo_500Medium", fontSize: 13, textAlign: "center" }}>
-                  نسيت الرمز السري؟ إعادة تعيين عبر SMS
+                  نسيت الرقم السري؟ إعادة تعيين عبر SMS
                 </Text>
               </Pressable>
             </>
@@ -897,16 +897,16 @@ export default function LoginScreen() {
                 <Icon name="shield" size={28} color={colors.gold} />
               </View>
               <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
-                {pinPurpose === "reset" ? "إعادة تعيين الرمز السري" : "إنشاء رمز سري"}
+                {pinPurpose === "reset" ? "إعادة تعيين الرقم السري" : "تعيين رقم سري"}
               </Text>
               <Text style={[styles.cardSubtitle, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
-                اختر رمزاً مكوّناً من 4 أرقام لتسجيل الدخول السريع
+                أدخل رقم سري جديد من 4 أرقام
               </Text>
               <View style={[styles.inputWrapper, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
                 <TextInput
                   style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_700Bold", letterSpacing: 12 }]}
-                  placeholder="رمز جديد"
+                  placeholder="رقم سري جديد"
                   placeholderTextColor={colors.mutedForeground}
                   value={pin}
                   onChangeText={(v) => { setPin(v.replace(/\D/g, "").slice(0, 4)); setError(""); }}
@@ -921,7 +921,7 @@ export default function LoginScreen() {
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
                 <TextInput
                   style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_700Bold", letterSpacing: 12 }]}
-                  placeholder="تأكيد الرمز"
+                  placeholder="تأكيد الرقم السري"
                   placeholderTextColor={colors.mutedForeground}
                   value={confirmPin}
                   onChangeText={(v) => { setConfirmPin(v.replace(/\D/g, "").slice(0, 4)); setError(""); }}
