@@ -56,7 +56,20 @@ export default function ContactScreen() {
             style={styles.logoImg}
             resizeMode="contain"
           />
-          <Text style={[styles.brandName, { color: colors.gold, fontFamily: language === "ar" ? "Cairo_700Bold" : "Cairo_700Bold" }]}>
+          <Text
+            style={[
+              styles.brandName,
+              {
+                color: colors.gold,
+                fontFamily: "Cairo_700Bold",
+                letterSpacing: language === "ar" ? 0 : 0.5,
+              },
+            ]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}
+            maxFontSizeMultiplier={1.15}
+          >
             {t("tagline")}
           </Text>
         </View>
@@ -200,8 +213,10 @@ const styles = StyleSheet.create({
     height: 180,
   },
   brandName: {
-    fontSize: 24,
-    letterSpacing: 2,
+    fontSize: 20,
+    letterSpacing: 0,
+    textAlign: "center",
+    paddingHorizontal: 16,
   },
   tagline: {
     fontSize: 13,

@@ -125,6 +125,10 @@ export default function LoadingScreen({
                   fontFamily: taglineFontFamily ?? "Cairo_700Bold",
                 },
               ]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.8}
+              maxFontSizeMultiplier={1.15}
             >
               {taglineText}
             </Text>
@@ -167,10 +171,12 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   tagline: {
-    fontSize: 22,
-    letterSpacing: 1.5,
+    fontSize: 20,
+    letterSpacing: 0,
     textAlign: "center",
-    lineHeight: 34,
+    lineHeight: 30,
+    paddingHorizontal: 16,
+    maxWidth: "100%",
   },
   tagLine: {
     height: 1.5,

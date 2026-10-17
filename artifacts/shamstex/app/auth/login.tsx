@@ -669,7 +669,20 @@ export default function LoginScreen() {
             style={styles.logoImg}
             resizeMode="contain"
           />
-          <Text style={[styles.brand, { color: colors.gold, fontFamily: language === "ar" ? "Cairo_700Bold" : "Cairo_700Bold" }]}>
+          <Text
+            style={[
+              styles.brand,
+              {
+                color: colors.gold,
+                fontFamily: "Cairo_700Bold",
+                letterSpacing: language === "ar" ? 0 : 0.5,
+              },
+            ]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}
+            maxFontSizeMultiplier={1.15}
+          >
             {t("tagline")}
           </Text>
         </View>
@@ -1034,7 +1047,7 @@ const styles = StyleSheet.create({
   },
   header: { alignItems: "center", gap: 4 },
   logoImg: { width: 120, height: 120 },
-  brand: { fontSize: 20, letterSpacing: 1.5, lineHeight: 30, textAlign: "center" },
+  brand: { fontSize: 19, letterSpacing: 0, lineHeight: 28, textAlign: "center", paddingHorizontal: 12, maxWidth: "100%" },
   subtitle: { fontSize: 14, letterSpacing: 1 },
   card: { padding: 24, borderWidth: 1, gap: 16 },
   stepIcon: { alignItems: "center", marginBottom: 4 },
