@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { KeyboardAwareScroll } from "@/components/KeyboardAware";
+import AppTextInput from "@/components/AppTextInput";
 import Icon from "@/components/Icon";
 import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
@@ -258,7 +259,7 @@ export default function AddProductScreen() {
               <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
                 {field.label}
               </Text>
-              <TextInput
+              <AppTextInput
                 style={[
                   styles.textInput,
                   {
@@ -415,7 +416,7 @@ export default function AddProductScreen() {
             <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
               الحد الأدنى لكل لون ({unit === "kilo" ? "كغ" : "متر"})
             </Text>
-            <TextInput
+            <AppTextInput
               style={[styles.textInput, { color: colors.gold, backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4, fontFamily: "Cairo_700Bold" }]}
               value={minimumOrderQuantity}
               onChangeText={(value) => { if (/^\d*\.?\d*$/.test(value)) setMinimumOrderQuantity(value); }}
@@ -448,7 +449,7 @@ export default function AddProductScreen() {
                 <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
                   {field.label}
                 </Text>
-                <TextInput
+                <AppTextInput
                   style={[
                     styles.textInput,
                     {
@@ -474,7 +475,7 @@ export default function AddProductScreen() {
             <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
               سعر العرض للزبون (اختياري)
             </Text>
-            <TextInput
+            <AppTextInput
               style={[
                 styles.textInput,
                 {

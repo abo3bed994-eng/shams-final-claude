@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import AppTextInput from "@/components/AppTextInput";
 import Icon from "@/components/Icon";
 import { useColors } from "@/hooks/useColors";
 import { CITIES_BY_GOVERNORATE } from "@/constants/governorates";
@@ -72,7 +73,7 @@ export default function CityPicker({ governorate, value, onChange, invalid, plac
               </Pressable>
             </View>
             <View style={{ padding: 10, borderBottomWidth: 1, borderBottomColor: colors.border }}>
-              <TextInput
+              <AppTextInput
                 value={search}
                 onChangeText={setSearch}
                 placeholder="بحث..."
@@ -91,7 +92,7 @@ export default function CityPicker({ governorate, value, onChange, invalid, plac
                 }}
               />
             </View>
-            <ScrollView contentContainerStyle={{ padding: 8 }} keyboardShouldPersistTaps="handled">
+            <ScrollView contentContainerStyle={{ padding: 8 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" nestedScrollEnabled={true}>
               {filtered.length === 0 ? (
                 <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 13, textAlign: "center", paddingVertical: 20 }}>
                   لا توجد نتائج

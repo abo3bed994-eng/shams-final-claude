@@ -19,6 +19,7 @@ import { useColors } from "@/hooks/useColors";
 import { useApp, Notification } from "@/context/AppContext";
 import GoldHeader from "@/components/GoldHeader";
 import Icon from "@/components/Icon";
+import AppTextInput from "@/components/AppTextInput";
 import { notifyAll, notifyByRoles, notifyUserByPhone } from "@/lib/pushService";
 import { useAdminGuard } from "@/hooks/useAdminGuard";
 
@@ -364,6 +365,8 @@ export default function AdminNotificationsScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[styles.content, { paddingBottom: bottomPad + 40 }]}
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          nestedScrollEnabled={true}
         >
           <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border, borderRadius: colors.radius }]}>
             <View style={styles.sectionHeader}>
@@ -423,7 +426,7 @@ export default function AdminNotificationsScreen() {
 
               <View style={[styles.searchBox, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="search" size={16} color={colors.mutedForeground} />
-                <TextInput
+                <AppTextInput
                   style={[styles.searchInput, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}
                   value={searchQuery}
                   onChangeText={setSearchQuery}
@@ -520,7 +523,7 @@ export default function AdminNotificationsScreen() {
               <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
                 العنوان
               </Text>
-              <TextInput
+              <AppTextInput
                 style={[
                   styles.input,
                   {
@@ -543,7 +546,7 @@ export default function AdminNotificationsScreen() {
               <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
                 الرسالة
               </Text>
-              <TextInput
+              <AppTextInput
                 style={[
                   styles.textArea,
                   {
@@ -751,7 +754,7 @@ export default function AdminNotificationsScreen() {
             </Text>
             <View style={{ gap: 6 }}>
               <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>العنوان</Text>
-              <TextInput
+              <AppTextInput
                 value={tmplTitle}
                 onChangeText={setTmplTitle}
                 placeholder="مثال: عرض خاص"
@@ -766,7 +769,7 @@ export default function AdminNotificationsScreen() {
             </View>
             <View style={{ gap: 6 }}>
               <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>النص</Text>
-              <TextInput
+              <AppTextInput
                 value={tmplBody}
                 onChangeText={setTmplBody}
                 placeholder="نص الإشعار..."

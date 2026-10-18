@@ -1,3 +1,4 @@
+import AppTextInput from "@/components/AppTextInput";
 import React, { useMemo, useState } from "react";
 import {
   Alert,
@@ -447,7 +448,7 @@ export default function OrdersScreen() {
               <View style={[styles.searchRow, { borderBottomColor: colors.border, backgroundColor: colors.background }]}>
                 <View style={[styles.searchBox, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: colors.radius - 2 }]}>
                   <Icon name="search" size={16} color={colors.mutedForeground} />
-                  <TextInput
+                  <AppTextInput
                     value={search}
                     onChangeText={setSearch}
                     placeholder={t("searchOrders")}

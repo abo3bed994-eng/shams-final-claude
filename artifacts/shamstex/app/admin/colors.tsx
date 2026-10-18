@@ -1,3 +1,4 @@
+import AppTextInput from "@/components/AppTextInput";
 import React, { useCallback, useState } from "react";
 import {
   Alert,
@@ -121,7 +122,7 @@ export default function AdminColorsScreen() {
             </Pressable>
 
             <View style={styles.colorFields}>
-              <TextInput
+              <AppTextInput
                 style={[styles.smallInput, {
                   color: colors.foreground,
                   backgroundColor: colors.input,
@@ -136,7 +137,7 @@ export default function AdminColorsScreen() {
               />
               <View style={styles.hexEditRow}>
                 <View style={[styles.colorSwatchSm, { backgroundColor: hexValid ? color.hex : "#444" }]} />
-                <TextInput
+                <AppTextInput
                   style={[styles.hexSmall, {
                     color: colors.foreground,
                     backgroundColor: colors.input,
@@ -209,7 +210,7 @@ export default function AdminColorsScreen() {
               </Text>
               <View style={styles.hexRow}>
                 <View style={[styles.colorPreview, { backgroundColor: newHex.match(/^#[0-9A-Fa-f]{6}$/) ? newHex : "#444" }]} />
-                <TextInput
+                <AppTextInput
                   style={[styles.hexInput, { flex: 1, color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_400Regular" }]}
                   value={newHex}
                   onChangeText={setNewHex}
@@ -219,7 +220,7 @@ export default function AdminColorsScreen() {
                   maxLength={7}
                   textAlign="right"
                 />
-                <TextInput
+                <AppTextInput
                   style={[styles.hexInput, { flex: 2, color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_400Regular" }]}
                   value={newName}
                   onChangeText={setNewName}

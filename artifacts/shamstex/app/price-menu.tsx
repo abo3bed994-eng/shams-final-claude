@@ -1,3 +1,4 @@
+import AppTextInput from "@/components/AppTextInput";
 import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Image, Platform, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from "react-native";
 import * as Print from "expo-print";
@@ -260,7 +261,7 @@ export default function PriceMenuScreen() {
 
         <View style={[styles.searchBox, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Icon name="search" size={19} color={colors.mutedForeground} />
-          <TextInput
+          <AppTextInput
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholder="ابحث باسم الخامة"

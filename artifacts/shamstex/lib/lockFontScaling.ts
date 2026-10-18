@@ -1,10 +1,15 @@
 import React from "react";
 import * as ReactNative from "react-native";
 
-const enforceProps = (props: any) => {
-  if (!props) return { allowFontScaling: false, maxFontSizeMultiplier: 1 };
-  if (props.allowFontScaling === false && props.maxFontSizeMultiplier === 1) return props;
-  return { ...props, allowFontScaling: false, maxFontSizeMultiplier: 1 };
+const enforceProps = (type: any, props: any) => {
+  let p = props ? { ...props } : {};
+  p.allowFontScaling = false;
+  p.maxFontSizeMultiplier = p.maxFontSizeMultiplier ?? 1;
+  // If multiline TextInput on Android, disable internal scrolling by default so outer ScrollView scrolls smoothly
+  if (p.multiline && p.scrollEnabled === undefined) {
+    p.scrollEnabled = false;
+  }
+  return p;
 };
 
 const isTextTarget = (type: any): boolean => {
@@ -23,7 +28,7 @@ const isTextTarget = (type: any): boolean => {
 // 1. Monkey-patch React.createElement
 const origCreateElement = React.createElement;
 (React as any).createElement = function (type: any, props: any, ...children: any[]) {
-  const p = isTextTarget(type) ? enforceProps(props) : props;
+  const p = isTextTarget(type) ? enforceProps(type, props) : props;
   return origCreateElement.call(this, type, p, ...children);
 };
 
@@ -34,13 +39,13 @@ try {
     if (typeof jsxRuntime.jsx === "function") {
       const origJsx = jsxRuntime.jsx;
       jsxRuntime.jsx = function (type: any, props: any, key: any) {
-        return origJsx(type, isTextTarget(type) ? enforceProps(props) : props, key);
+        return origJsx(type, isTextTarget(type) ? enforceProps(type, props) : props, key);
       };
     }
     if (typeof jsxRuntime.jsxs === "function") {
       const origJsxs = jsxRuntime.jsxs;
       jsxRuntime.jsxs = function (type: any, props: any, key: any) {
-        return origJsxs(type, isTextTarget(type) ? enforceProps(props) : props, key);
+        return origJsxs(type, isTextTarget(type) ? enforceProps(type, props) : props, key);
       };
     }
   }
@@ -53,7 +58,7 @@ try {
   if (jsxDevRuntime && typeof jsxDevRuntime.jsxDEV === "function") {
     const origJsxDEV = jsxDevRuntime.jsxDEV;
     jsxDevRuntime.jsxDEV = function (type: any, props: any, key: any, isStatic: any, source: any, self: any) {
-      return origJsxDEV(type, isTextTarget(type) ? enforceProps(props) : props, key, isStatic, source, self);
+      return origJsxDEV(type, isTextTarget(type) ? enforceProps(type, props) : props, key, isStatic, source, self);
     };
   }
 } catch {

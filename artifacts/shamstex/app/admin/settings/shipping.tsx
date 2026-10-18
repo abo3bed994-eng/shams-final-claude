@@ -1,3 +1,4 @@
+import AppTextInput from "@/components/AppTextInput";
 import React from "react";
 import { Alert, Pressable, Switch, Text, TextInput, View } from "react-native";
 import Icon from "@/components/Icon";
@@ -96,7 +97,7 @@ export default function ShippingSettings() {
               <View key={p.id} style={{ padding: 10, borderWidth: 1, borderColor: colors.border, borderRadius: 10, backgroundColor: colors.surface, gap: 8 }}>
                 <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
                   <Icon name="package" size={16} color={enabled ? colors.gold : colors.mutedForeground} />
-                  <TextInput
+                  <AppTextInput
                     value={p.name}
                     onChangeText={(v) => updateProvider(p.id, { name: v })}
                     placeholder="اسم شركة الشحن"

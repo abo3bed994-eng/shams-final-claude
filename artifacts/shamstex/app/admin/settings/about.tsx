@@ -1,5 +1,6 @@
 import React from "react";
-import { Text, TextInput, View } from "react-native";
+import { Text, View } from "react-native";
+import AppTextInput from "@/components/AppTextInput";
 import { useAdminGuard } from "@/hooks/useAdminGuard";
 import { Card, Field, SettingsScreen, useSettingsDraft, styles } from "./_shared";
 
@@ -17,7 +18,7 @@ export default function AboutSettings() {
         />
         <View style={{ gap: 5 }}>
           <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>نص النبذة</Text>
-          <TextInput
+          <AppTextInput
             style={[styles.multiline, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_400Regular" }]}
             value={draft.aboutText}
             onChangeText={(v) => setDraft((d) => ({ ...d, aboutText: v }))}

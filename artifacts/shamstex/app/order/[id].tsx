@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Alert, Image, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { KeyboardAwareScroll } from "@/components/KeyboardAware";
+import AppTextInput from "@/components/AppTextInput";
 import { useLocalSearchParams, router } from "expo-router";
 import Icon from "@/components/Icon";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -608,7 +609,7 @@ export default function OrderDetailScreen() {
                   )}
                   {showMsgInput && order.status !== "cancelled" && !isLockedByOther && (
                     <View style={{ gap: 8, marginTop: 2 }}>
-                      <TextInput
+                      <AppTextInput
                         style={[styles.msgInput, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.foreground, fontFamily: "Cairo_400Regular", borderRadius: colors.radius - 4 }]}
                         placeholder="مثال: الصنف غير متوفر حالياً..."
                         placeholderTextColor={colors.mutedForeground}
@@ -868,14 +869,14 @@ export default function OrderDetailScreen() {
                     </Pressable>
                   ) : (
                     <View style={{ gap: 6, padding: 10, borderRadius: colors.radius - 6, borderWidth: 1, borderColor: colors.gold + "55", backgroundColor: colors.gold + "08" }}>
-                      <TextInput
+                      <AppTextInput
                         value={overrideHandle}
                         onChangeText={setOverrideHandle}
                         placeholder="رقم/حساب السداد"
                         placeholderTextColor={colors.mutedForeground}
                         style={{ backgroundColor: colors.input, borderColor: colors.border, borderWidth: 1, borderRadius: 8, padding: 10, color: colors.foreground, textAlign: "right", fontFamily: "Cairo_400Regular" }}
                       />
-                      <TextInput
+                      <AppTextInput
                         value={overrideName}
                         onChangeText={setOverrideName}
                         placeholder="اسم صاحب الحساب (اختياري)"
@@ -1080,7 +1081,7 @@ export default function OrderDetailScreen() {
                           >
                             <Icon name="minus" size={12} color={colors.gold} />
                           </Pressable>
-                          <TextInput
+                          <AppTextInput
                             style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 13, minWidth: 40, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 2 }}
                             value={weightTexts[`b_${index}`] !== undefined ? weightTexts[`b_${index}`] : String(boltsOf(item.weight, item))}
                             keyboardType="number-pad"
@@ -1130,7 +1131,7 @@ export default function OrderDetailScreen() {
                           >
                             <Icon name="minus" size={12} color={colors.gold} />
                           </Pressable>
-                          <TextInput
+                          <AppTextInput
                             style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, minWidth: 40, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 2 }}
                             value={weightTexts[`w_${index}`] !== undefined ? weightTexts[`w_${index}`] : String(item.weight ?? 1)}
                             keyboardType="decimal-pad"
@@ -1217,7 +1218,7 @@ export default function OrderDetailScreen() {
                           >
                             <Icon name="minus" size={12} color={colors.gold} />
                           </Pressable>
-                          <TextInput
+                          <AppTextInput
                             style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, minWidth: 40, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 2 }}
                             value={weightTexts[`q_${index}`] !== undefined ? weightTexts[`q_${index}`] : String(item.quantity)}
                             keyboardType="number-pad"
@@ -1266,7 +1267,7 @@ export default function OrderDetailScreen() {
                           >
                             <Icon name="minus" size={12} color={colors.gold} />
                           </Pressable>
-                          <TextInput
+                          <AppTextInput
                             style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, minWidth: 40, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 2 }}
                             value={weightTexts[`a_${index}`] !== undefined ? weightTexts[`a_${index}`] : String(item.actualWeight ?? (item.quantity * blt(unitOf(item))))}
                             keyboardType="decimal-pad"
@@ -1341,7 +1342,7 @@ export default function OrderDetailScreen() {
                           <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 10 }}>
                             الوزن الفعلي:
                           </Text>
-                          <TextInput
+                          <AppTextInput
                             value={weightTexts[`c_${index}_${companionIndex}`] ?? String(companionAmount(companion))}
                             onChangeText={(value) => {
                               if (/^\d*\.?\d*$/.test(value)) {
@@ -2057,7 +2058,7 @@ export default function OrderDetailScreen() {
                                 >
                                   <Icon name="minus" size={10} color="#C0392B" />
                                 </Pressable>
-                                <TextInput
+                                <AppTextInput
                                   style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 12, minWidth: 36, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 1 }}
                                   value={returnBoltTexts[index] !== undefined ? returnBoltTexts[index] : String(curBolts)}
                                   keyboardType="number-pad"
@@ -2090,7 +2091,7 @@ export default function OrderDetailScreen() {
                                 >
                                   <Icon name="minus" size={10} color="#C0392B" />
                                 </Pressable>
-                                <TextInput
+                                <AppTextInput
                                   style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 12, minWidth: 36, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.border, paddingVertical: 1 }}
                                   value={returnWeightTexts[index] !== undefined ? returnWeightTexts[index] : String(curWeight)}
                                   keyboardType="decimal-pad"
@@ -2120,7 +2121,7 @@ export default function OrderDetailScreen() {
                     })}
                   </View>
 
-                  <TextInput
+                  <AppTextInput
                     style={[styles.returnInput, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.foreground, fontFamily: "Cairo_400Regular", borderRadius: colors.radius - 4 }]}
                     placeholder="سبب الاسترجاع..."
                     placeholderTextColor={colors.mutedForeground}
@@ -2510,7 +2511,7 @@ export default function OrderDetailScreen() {
                   </Pressable>
                 ))}
             </View>
-            <TextInput
+            <AppTextInput
               value={waybillNumberInput}
               onChangeText={setWaybillNumberInput}
               placeholder="رقم البوليصة"
@@ -2704,7 +2705,7 @@ export default function OrderDetailScreen() {
                   <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 13, textAlign: "right" }}>
                     متوفر فقط ({u === "meter" ? "بالمتر" : "بالكيلو"}):
                   </Text>
-                  <TextInput
+                  <AppTextInput
                     style={{ backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, borderRadius: colors.radius - 4, color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 16, paddingHorizontal: 14, paddingVertical: 12, textAlign: "right" }}
                     placeholder="اتركه فارغًا إذا كان غير متوفر نهائيًا"
                     placeholderTextColor={colors.mutedForeground}

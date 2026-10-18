@@ -1,3 +1,4 @@
+import AppTextInput from "@/components/AppTextInput";
 import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import Icon from "@/components/Icon";
@@ -54,7 +55,7 @@ export default function FabricSpecsEditor({
           <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
             العرض (سم)
           </Text>
-          <TextInput
+          <AppTextInput
             style={[styles.textInput, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4, fontFamily: "Cairo_600SemiBold" }]}
             value={width}
             onChangeText={setWidth}
@@ -68,7 +69,7 @@ export default function FabricSpecsEditor({
           <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
             المقطع / GSM (جم/م²)
           </Text>
-          <TextInput
+          <AppTextInput
             style={[styles.textInput, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4, fontFamily: "Cairo_600SemiBold" }]}
             value={gsm}
             onChangeText={setGsm}
@@ -108,7 +109,7 @@ export default function FabricSpecsEditor({
                   </Text>
                 ) : (
                   <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
-                    <TextInput
+                    <AppTextInput
                       style={[styles.percentInput, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4, fontFamily: "Cairo_700Bold" }]}
                       value={entry.percent ? String(entry.percent) : ""}
                       onChangeText={(v) => setPercent(idx, Number(v.replace(/[^0-9]/g, "")) || 0)}

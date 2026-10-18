@@ -1,3 +1,4 @@
+import AppTextInput from "@/components/AppTextInput";
 import React, { useCallback, useMemo, useState } from "react";
 import {
   Animated,
@@ -195,7 +196,7 @@ export default function ProductsScreen() {
               ]}
             >
               <Icon name="search" size={18} color={colors.mutedForeground} />
-              <TextInput
+              <AppTextInput
                 style={[styles.searchInput, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}
                 placeholder={t("searchProducts")}
                 placeholderTextColor={colors.mutedForeground}

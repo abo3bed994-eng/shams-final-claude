@@ -1,3 +1,4 @@
+import AppTextInput from "@/components/AppTextInput";
 import React, { useCallback, useMemo, useState } from "react";
 import {
   Alert,
@@ -265,7 +266,7 @@ export default function AdminProductsScreen() {
         <View style={[styles.searchRow, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
           <View style={[styles.searchBox, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: colors.radius }]}>
             <Icon name="search" size={17} color={colors.mutedForeground} />
-            <TextInput
+            <AppTextInput
               value={search}
               onChangeText={setSearch}
               placeholder="ابحث عن خامة"

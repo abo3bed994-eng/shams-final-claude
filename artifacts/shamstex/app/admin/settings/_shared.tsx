@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import AppTextInput from "@/components/AppTextInput";
 import { router } from "expo-router";
 import { KeyboardAwareScroll } from "@/components/KeyboardAware";
 import * as Haptics from "expo-haptics";
@@ -102,7 +103,7 @@ export function Field({
   return (
     <View style={{ gap: 5 }}>
       <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>{label}</Text>
-      <TextInput
+      <AppTextInput
         style={[
           styles.input,
           { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_400Regular" },

@@ -1,3 +1,4 @@
+import AppTextInput from "@/components/AppTextInput";
 import React, { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import Icon from "@/components/Icon";
@@ -46,7 +47,7 @@ export default function YarnsSettings() {
         )}
         <View style={styles.addRow}>
           <GoldButton label="إضافة" onPress={addYarn} size="sm" style={{ minWidth: 80 }} disabled={!newYarn.trim()} />
-          <TextInput
+          <AppTextInput
             style={[styles.addInput, { flex: 1, color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_400Regular" }]}
             value={newYarn}
             onChangeText={setNewYarn}

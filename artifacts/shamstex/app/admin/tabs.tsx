@@ -1,3 +1,4 @@
+import AppTextInput from "@/components/AppTextInput";
 import React, { useState } from "react";
 import {
   Alert,
@@ -142,7 +143,7 @@ export default function AdminTabsScreen() {
           >
             {editingId === tab.id ? (
               <View style={styles.editForm}>
-                <TextInput
+                <AppTextInput
                   style={[
                     styles.editInput,
                     {
@@ -211,7 +212,7 @@ export default function AdminTabsScreen() {
             <Text style={[styles.addTitle, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
               تبويب جديد
             </Text>
-            <TextInput
+            <AppTextInput
               style={[
                 styles.editInput,
                 {

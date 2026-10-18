@@ -41,7 +41,16 @@ type KeyboardAwareScrollProps = React.ComponentProps<typeof ScrollView> & {
 
 export const KeyboardAwareScroll = React.forwardRef<ScrollView, KeyboardAwareScrollProps>(
   function KeyboardAwareScroll(
-    { children, bottomOffset = 24, androidBehavior, style, ...props },
+    {
+      children,
+      bottomOffset = 24,
+      androidBehavior,
+      style,
+      keyboardShouldPersistTaps = "handled",
+      keyboardDismissMode = "on-drag",
+      nestedScrollEnabled = true,
+      ...props
+    },
     ref
   ) {
     if (KC?.KeyboardAwareScrollView) {
@@ -51,6 +60,9 @@ export const KeyboardAwareScroll = React.forwardRef<ScrollView, KeyboardAwareScr
           ref={ref as any}
           bottomOffset={bottomOffset}
           style={[{ flex: 1 }, style]}
+          keyboardShouldPersistTaps={keyboardShouldPersistTaps}
+          keyboardDismissMode={keyboardDismissMode}
+          nestedScrollEnabled={nestedScrollEnabled}
           {...props}
         >
           {children}
@@ -62,7 +74,14 @@ export const KeyboardAwareScroll = React.forwardRef<ScrollView, KeyboardAwareScr
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : androidBehavior}
       >
-        <ScrollView ref={ref} style={style} {...props}>
+        <ScrollView
+          ref={ref}
+          style={style}
+          keyboardShouldPersistTaps={keyboardShouldPersistTaps}
+          keyboardDismissMode={keyboardDismissMode}
+          nestedScrollEnabled={nestedScrollEnabled}
+          {...props}
+        >
           {children}
         </ScrollView>
       </KeyboardAvoidingView>

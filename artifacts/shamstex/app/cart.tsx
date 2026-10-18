@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { KeyboardAwareScroll } from "@/components/KeyboardAware";
+import AppTextInput from "@/components/AppTextInput";
 import { router, useLocalSearchParams } from "expo-router";
 import Icon from "@/components/Icon";
 import * as Haptics from "expo-haptics";
@@ -500,7 +501,7 @@ export default function CartScreen() {
               </Text>
             </View>
 
-            <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
+            <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" nestedScrollEnabled={true}>
               {selectedPayment === "bank_transfer" && pm && (
                 <View style={styles.paymentInfoSection}>
                   <View style={[styles.paymentInfoBanner, { backgroundColor: colors.gold + "11", borderColor: colors.gold + "33", borderRadius: colors.radius - 4 }]}>
@@ -795,7 +796,7 @@ export default function CartScreen() {
                           >
                             <Icon name="minus" size={14} color={colors.gold} />
                           </Pressable>
-                          <TextInput
+                          <AppTextInput
                             style={[styles.stepperInput, { color: colors.gold, borderBottomColor: colors.border }]}
                             value={weightTexts[bKey] !== undefined ? weightTexts[bKey] : String(bolts)}
                             keyboardType="number-pad"
@@ -829,7 +830,7 @@ export default function CartScreen() {
                           >
                             <Icon name="minus" size={14} color={colors.gold} />
                           </Pressable>
-                          <TextInput
+                          <AppTextInput
                             style={[styles.stepperInput, { color: colors.foreground, borderBottomColor: colors.border }]}
                             value={weightTexts[wKey] !== undefined ? weightTexts[wKey] : String(item.weight ?? 1)}
                             keyboardType="decimal-pad"
@@ -919,7 +920,7 @@ export default function CartScreen() {
                       >
                         <Icon name="minus" size={14} color={colors.gold} />
                       </Pressable>
-                      <TextInput
+                      <AppTextInput
                         style={[styles.stepperInput, { color: colors.gold, borderBottomColor: colors.border }]}
                         value={weightTexts[qKey] !== undefined ? weightTexts[qKey] : String(item.quantity)}
                         keyboardType="number-pad"
@@ -962,7 +963,7 @@ export default function CartScreen() {
                         >
                           <Icon name="minus" size={14} color={colors.gold} />
                         </Pressable>
-                        <TextInput
+                        <AppTextInput
                           style={[styles.stepperInput, { color: colors.gold, borderBottomColor: colors.border, fontSize: 16 }]}
                           value={weightTexts[awKey] !== undefined ? weightTexts[awKey] : String(fmt(aw))}
                           keyboardType="decimal-pad"
@@ -1011,7 +1012,7 @@ export default function CartScreen() {
               <Text style={[styles.notesLabel, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
                 ملاحظات
               </Text>
-              <TextInput
+              <AppTextInput
                 style={[
                   styles.notesInput,
                   {
@@ -1235,7 +1236,7 @@ export default function CartScreen() {
                       {showAddAddressForm && (
                         <View style={{ padding: 12, borderRadius: 8, borderWidth: 1, borderColor: colors.gold + "55", backgroundColor: colors.surface, gap: 8 }}>
                           <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, textAlign: "right" }}>عنوان جديد</Text>
-                          <TextInput
+                          <AppTextInput
                             value={newAddrLabel}
                             onChangeText={setNewAddrLabel}
                             placeholder="اسم مختصر (مثل: المنزل، الشغل) — اختياري"
@@ -1270,7 +1271,7 @@ export default function CartScreen() {
                             { ph: "المبنى / رقم العقار (اختياري)", val: newAddrBuilding, set: setNewAddrBuilding, req: false },
                             { ph: "علامة مميزة (اختياري)", val: newAddrLandmark, set: setNewAddrLandmark, req: false },
                           ].map((f) => (
-                            <TextInput
+                            <AppTextInput
                               key={f.ph}
                               value={f.val}
                               onChangeText={f.set}

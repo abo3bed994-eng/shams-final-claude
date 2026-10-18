@@ -20,6 +20,7 @@ import { useApp } from "@/context/AppContext";
 import { useTranslation } from "@/lib/i18n";
 import GoldButton from "@/components/GoldButton";
 import Icon from "@/components/Icon";
+import AppTextInput from "@/components/AppTextInput";
 import CountryPicker from "@/components/CountryPicker";
 import { COUNTRIES, DEFAULT_COUNTRY, Country } from "@/lib/countries";
 import { isValidLocal, toE164, migrateLocalToE164, samePhone } from "@/lib/phoneUtils";
@@ -642,6 +643,8 @@ export default function LoginScreen() {
           { paddingTop: topPad + 12, paddingBottom: bottomPad },
         ]}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        nestedScrollEnabled={true}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topBar}>
@@ -726,7 +729,7 @@ export default function LoginScreen() {
                     </Text>
                     <Icon name="chevron-down" size={14} color={colors.mutedForeground} />
                   </Pressable>
-                  <TextInput
+                  <AppTextInput
                     style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}
                     placeholder={t("phone")}
                     placeholderTextColor={colors.mutedForeground}
@@ -798,7 +801,7 @@ export default function LoginScreen() {
                 ]}
               >
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
-                <TextInput
+                <AppTextInput
                   style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_700Bold", letterSpacing: 8 }]}
                   placeholder="_ _ _ _ _ _"
                   placeholderTextColor={colors.mutedForeground}
@@ -870,7 +873,7 @@ export default function LoginScreen() {
               </Text>
               <View style={[styles.inputWrapper, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
-                <TextInput
+                <AppTextInput
                   style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_700Bold", letterSpacing: 12 }]}
                   placeholder="• • • •"
                   placeholderTextColor={colors.mutedForeground}
@@ -917,7 +920,7 @@ export default function LoginScreen() {
               </Text>
               <View style={[styles.inputWrapper, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
-                <TextInput
+                <AppTextInput
                   style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_700Bold", letterSpacing: 12 }]}
                   placeholder="رقم سري جديد"
                   placeholderTextColor={colors.mutedForeground}
@@ -932,7 +935,7 @@ export default function LoginScreen() {
               </View>
               <View style={[styles.inputWrapper, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
-                <TextInput
+                <AppTextInput
                   style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_700Bold", letterSpacing: 12 }]}
                   placeholder="تأكيد الرقم السري"
                   placeholderTextColor={colors.mutedForeground}
@@ -979,7 +982,7 @@ export default function LoginScreen() {
                 ]}
               >
                 <Icon name="user" size={18} color={colors.mutedForeground} />
-                <TextInput
+                <AppTextInput
                   style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}
                   placeholder={t("nameLabel")}
                   placeholderTextColor={colors.mutedForeground}

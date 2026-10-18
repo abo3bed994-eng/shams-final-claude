@@ -1,3 +1,4 @@
+import AppTextInput from "@/components/AppTextInput";
 import React, { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import Icon from "@/components/Icon";
@@ -79,7 +80,7 @@ export default function CategoriesSettings() {
         })}
         <View style={styles.addRow}>
           <GoldButton label="إضافة" onPress={addCategory} size="sm" style={{ minWidth: 80 }} disabled={!newCategory.trim()} />
-          <TextInput
+          <AppTextInput
             style={[styles.addInput, { flex: 1, color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_400Regular" }]}
             value={newCategory}
             onChangeText={setNewCategory}
@@ -115,7 +116,7 @@ export default function CategoriesSettings() {
                 )}
                 <View style={styles.addRow}>
                   <GoldButton label="إضافة" onPress={() => addSubcategory(cat)} size="sm" style={{ minWidth: 80 }} disabled={!(newSubMap[cat] ?? "").trim()} />
-                  <TextInput
+                  <AppTextInput
                     style={[styles.addInput, { flex: 1, color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_400Regular" }]}
                     value={newSubMap[cat] ?? ""}
                     onChangeText={(v) => setNewSubMap((p) => ({ ...p, [cat]: v }))}

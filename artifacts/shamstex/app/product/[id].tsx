@@ -1,3 +1,4 @@
+import AppTextInput from "@/components/AppTextInput";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
@@ -367,7 +368,7 @@ export default function ProductDetailScreen() {
                   ]}
                 >
                   <View style={styles.colorRowLeft}>
-                    <TextInput
+                    <AppTextInput
                       maxFontSizeMultiplier={1.15}
                       style={[styles.weightInput, {
                         width: weightInputWidth,
@@ -939,7 +940,7 @@ export default function ProductDetailScreen() {
                       {material.name}
                     </Text>
                     <View style={styles.companionModalInputRow}>
-                      <TextInput
+                      <AppTextInput
                         value={companionEditor?.values[material.id] ?? ""}
                         onChangeText={(value) => {
                           if (!/^\d*([.]\d*)?$/.test(value)) return;

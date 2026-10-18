@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Alert, Image, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Image, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import AppTextInput from "@/components/AppTextInput";
 import { useLocalSearchParams, router } from "expo-router";
 import Icon from "@/components/Icon";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -105,6 +106,9 @@ export default function ReturnDetailScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.content, { paddingBottom: bottomPad + 40 }]}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        nestedScrollEnabled={true}
       >
         <View style={[styles.statusCard, {
           backgroundColor: isCancelled ? "#E74C3C11" : stepColor + "11",
@@ -339,7 +343,7 @@ export default function ReturnDetailScreen() {
                 <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>
                   سيتم إبلاغ العميل بالإلغاء مع السبب
                 </Text>
-                <TextInput
+                <AppTextInput
                   value={cancelReason}
                   onChangeText={setCancelReason}
                   placeholder="سبب الإلغاء..."

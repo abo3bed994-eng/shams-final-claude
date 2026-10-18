@@ -1,3 +1,4 @@
+import AppTextInput from "@/components/AppTextInput";
 import React, { useState } from "react";
 import {
   Alert,
@@ -128,7 +129,7 @@ export default function AdminPricesScreen() {
                 </>
               ) : (
                 <View style={{ flex: 1, gap: 10 }}>
-                  <TextInput
+                  <AppTextInput
                     style={[
                       styles.editInput,
                       {
@@ -150,7 +151,7 @@ export default function AdminPricesScreen() {
                       <Text style={[styles.priceInputLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                         سعر التاجر
                       </Text>
-                      <TextInput
+                      <AppTextInput
                         style={[
                           styles.editInput,
                           {
@@ -171,7 +172,7 @@ export default function AdminPricesScreen() {
                       <Text style={[styles.priceInputLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                         سعر الزبون
                       </Text>
-                      <TextInput
+                      <AppTextInput
                         style={[
                           styles.editInput,
                           {

@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import Icon from "@/components/Icon";
+import AppTextInput from "@/components/AppTextInput";
 import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
@@ -689,7 +690,7 @@ export default function AdminUsersScreen() {
           >
             <Icon name="x" size={14} color={colors.foreground} />
           </Pressable>
-          <TextInput
+          <AppTextInput
             style={[styles.nameInput, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.gold, fontFamily: "Cairo_500Medium" }]}
             value={editingNameValue}
             onChangeText={setEditingNameValue}
@@ -1285,7 +1286,7 @@ export default function AdminUsersScreen() {
       <View style={[styles.searchBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <View style={[styles.searchInputContainer, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
           <Icon name="search" size={16} color={colors.mutedForeground} />
-          <TextInput
+          <AppTextInput
             style={[styles.searchInput, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}
             placeholder={activeTab === "customers" ? "بحث بالاسم أو رقم الهاتف..." : "بحث في فريق العمل..."}
             placeholderTextColor={colors.mutedForeground + "88"}
@@ -1361,6 +1362,9 @@ export default function AdminUsersScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.content, { paddingBottom: bottomPad + 40 }]}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        nestedScrollEnabled={true}
       >
         {activeTab === "customers" ? (
           <>

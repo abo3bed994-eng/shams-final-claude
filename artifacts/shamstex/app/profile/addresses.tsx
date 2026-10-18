@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from "react-native";
+import AppTextInput from "@/components/AppTextInput";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -110,7 +111,7 @@ export default function AddressesScreen() {
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <ScrollView
         contentContainerStyle={{ padding: 16, gap: 12, paddingBottom: bottomPad + 40 }}
-        keyboardShouldPersistTaps="handled"
+        keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" nestedScrollEnabled={true}
       >
         {addresses.length === 0 && !showForm && (
           <View style={{ alignItems: "center", padding: 24, gap: 10, borderRadius: colors.radius, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border }}>
@@ -186,7 +187,7 @@ export default function AddressesScreen() {
             <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 14, textAlign: "right" }}>
               {editingId ? "تعديل العنوان" : "عنوان جديد"}
             </Text>
-            <TextInput
+            <AppTextInput
               value={form.label}
               onChangeText={(v) => setForm((prev) => ({ ...prev, label: v }))}
               placeholder="اسم مختصر (مثل: المنزل، الشغل) — اختياري"
@@ -221,7 +222,7 @@ export default function AddressesScreen() {
               { key: "building" as const, ph: "المبنى / رقم العقار (اختياري)", req: false },
               { key: "landmark" as const, ph: "علامة مميزة (اختياري)", req: false },
             ].map((f) => (
-              <TextInput
+              <AppTextInput
                 key={f.key}
                 value={form[f.key]}
                 onChangeText={(v) => setForm((prev) => ({ ...prev, [f.key]: v }))}

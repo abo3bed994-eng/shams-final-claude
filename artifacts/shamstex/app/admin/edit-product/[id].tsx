@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { KeyboardAwareScroll } from "@/components/KeyboardAware";
+import AppTextInput from "@/components/AppTextInput";
 import Icon from "@/components/Icon";
 import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
@@ -216,7 +217,7 @@ export default function EditProductScreen() {
               <Text style={[{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Cairo_400Regular" }]}>
                 {f.label}
               </Text>
-              <TextInput
+              <AppTextInput
                 style={[styles.textInput, { color: colors.foreground, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_400Regular" }]}
                 value={f.value}
                 onChangeText={f.onChange}
@@ -329,7 +330,7 @@ export default function EditProductScreen() {
             <Text style={[{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Cairo_400Regular" }]}>
               الحد الأدنى لكل لون ({unit === "kilo" ? "كغ" : "متر"})
             </Text>
-            <TextInput
+            <AppTextInput
               style={[styles.textInput, { color: colors.gold, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_700Bold" }]}
               value={minimumOrderQuantity}
               onChangeText={(value) => { if (/^\d*\.?\d*$/.test(value)) setMinimumOrderQuantity(value); }}
@@ -357,7 +358,7 @@ export default function EditProductScreen() {
                 <Text style={[{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Cairo_400Regular" }]}>
                   {f.label}
                 </Text>
-                <TextInput
+                <AppTextInput
                   style={[styles.textInput, { color: colors.gold, backgroundColor: colors.input, borderColor: colors.border, fontFamily: "Cairo_700Bold" }]}
                   value={f.value}
                   onChangeText={f.onChange}
@@ -372,7 +373,7 @@ export default function EditProductScreen() {
             <Text style={[{ color: colors.mutedForeground, fontSize: 11, textAlign: "right", fontFamily: "Cairo_400Regular" }]}>
               سعر العرض للزبون (اختياري) — اتركه فارغاً لإلغاء العرض
             </Text>
-            <TextInput
+            <AppTextInput
               style={[styles.textInput, { color: "#C0392B", backgroundColor: colors.input, borderColor: offerPrice.trim() ? "#C0392B" : colors.border, fontFamily: "Cairo_700Bold" }]}
               value={offerPrice}
               onChangeText={setOfferPrice}

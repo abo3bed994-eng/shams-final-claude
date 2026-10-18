@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import AppTextInput from "@/components/AppTextInput";
 import { useColors } from "@/hooks/useColors";
 import { COUNTRIES, Country } from "@/lib/countries";
 import Icon from "@/components/Icon";
@@ -39,7 +40,7 @@ export default function CountryPicker({ visible, selected, onClose, onSelect }: 
 
           <View style={[styles.searchBox, { backgroundColor: colors.input, borderColor: colors.border }]}>
             <Icon name="search" size={16} color={colors.mutedForeground} />
-            <TextInput
+            <AppTextInput
               value={search}
               onChangeText={setSearch}
               placeholder="ابحث..."
@@ -49,7 +50,7 @@ export default function CountryPicker({ visible, selected, onClose, onSelect }: 
             />
           </View>
 
-          <ScrollView style={{ maxHeight: 420 }} keyboardShouldPersistTaps="handled">
+          <ScrollView style={{ maxHeight: 420 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" nestedScrollEnabled={true}>
             {filtered.map((c) => {
               const active = c.iso === selected.iso;
               return (

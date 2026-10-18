@@ -1,3 +1,4 @@
+import AppTextInput from "@/components/AppTextInput";
 import React, { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Image, Pressable, Text, TextInput, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
@@ -354,7 +355,7 @@ export default function PriceMenuSettingsScreen() {
           <Pressable onPress={addCategory} style={[styles.arrowBtn, { backgroundColor: colors.gold, borderRadius: 8 }]}>
             <Icon name="plus" size={18} color={colors.background} />
           </Pressable>
-          <TextInput
+          <AppTextInput
             value={newCategory}
             onChangeText={setNewCategory}
             placeholder="اسم قسم جديد"
