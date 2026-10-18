@@ -97,12 +97,12 @@
     },
     "extra": {
       "eas": {
-        "projectId": "259a6c4c-4501-4ab4-ab35-62ebc9a4ba9d"
+        "projectId": "0fabe669-f585-4876-b076-774ecd01c24d"
       }
     },
-    "owner": "shams.tex",
+    "owner": "shams_tex",
     "updates": {
-      "url": "https://u.expo.dev/259a6c4c-4501-4ab4-ab35-62ebc9a4ba9d"
+      "url": "https://u.expo.dev/0fabe669-f585-4876-b076-774ecd01c24d"
     }
   }
 }
