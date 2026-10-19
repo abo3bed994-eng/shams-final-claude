@@ -167,7 +167,7 @@ export default function PriceMenuScreen() {
         </Pressable>
         <View style={styles.headerTitle}>
           <Text style={[styles.title, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>قائمة الأسعار</Text>
-          <Text style={[styles.subtitle, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>{priceLabel}</Text>
+          <Text numberOfLines={1} style={[styles.subtitle, { color: colors.gold, fontFamily: "Cairo_600SemiBold" }]}>{priceLabel}</Text>
         </View>
         {!isMerchant && (
           <View style={styles.headerActions}>
@@ -208,9 +208,11 @@ export default function PriceMenuScreen() {
           <View style={styles.heroOverlay}>
             <Icon name="file-text" size={28} color={colors.gold} />
             <Text style={[styles.heroTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>قائمة أسعار شمس تكس</Text>
-            <Text style={[styles.heroCaption, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
-              {priceLabel}
-            </Text>
+            <View style={[styles.priceBadge, { backgroundColor: colors.gold + "1F", borderColor: colors.gold + "66" }]}>
+              <Text style={[styles.heroCaption, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
+                {priceLabel}
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -242,6 +244,9 @@ export default function PriceMenuScreen() {
                     ]}
                   >
                     <Text
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.8}
                       style={[
                         styles.pricingToggleText,
                         {
@@ -337,19 +342,28 @@ const styles = StyleSheet.create({
   searchInput: { flex: 1, minHeight: 46, fontSize: 14, paddingVertical: 0 },
   clearSearch: { width: 30, height: 30, alignItems: "center", justifyContent: "center" },
   hero: { minHeight: 116, borderRadius: 16, borderWidth: 1, overflow: "hidden", justifyContent: "center" },
-  heroOverlay: { alignItems: "center", gap: 5, padding: 18 },
+  heroOverlay: { alignItems: "center", gap: 8, padding: 18 },
   heroTitle: { fontSize: 20 },
-  heroCaption: { fontSize: 12 },
+  priceBadge: {
+    marginTop: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 5,
+    borderRadius: 20,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  heroCaption: { fontSize: 15, textAlign: "center" },
   pricingToggleCard: {
     flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 12,
+    gap: 8,
     padding: 10,
     borderRadius: 14,
     borderWidth: 1,
   },
-  pricingToggleLabel: { fontSize: 12 },
+  pricingToggleLabel: { fontSize: 13, flexShrink: 0 },
   pricingToggleOptions: {
     flex: 1,
     flexDirection: "row-reverse",
@@ -362,12 +376,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 34,
-    paddingHorizontal: 8,
+    minHeight: 36,
+    paddingHorizontal: 4,
     borderWidth: 1,
     borderRadius: 9,
   },
-  pricingToggleText: { fontSize: 11, textAlign: "center" },
+  pricingToggleText: { fontSize: 12, textAlign: "center" },
   section: { borderRadius: 14, borderWidth: 1, paddingHorizontal: 14, overflow: "hidden" },
   sectionTitleRow: { flexDirection: "row-reverse", alignItems: "center", gap: 8, paddingVertical: 12, borderBottomWidth: 2 },
   sectionTitle: { fontSize: 16 },

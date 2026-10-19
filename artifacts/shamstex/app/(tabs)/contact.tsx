@@ -67,7 +67,7 @@ export default function ContactScreen() {
             ]}
             numberOfLines={1}
             adjustsFontSizeToFit
-            minimumFontScale={0.8}
+            minimumFontScale={0.65}
             maxFontSizeMultiplier={1.15}
           >
             {t("tagline")}
@@ -207,16 +207,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
     paddingVertical: 16,
+    width: "100%",
   },
   logoImg: {
     width: 180,
     height: 180,
   },
   brandName: {
-    fontSize: 20,
+    fontSize: 18,
     letterSpacing: 0,
     textAlign: "center",
-    paddingHorizontal: 16,
+    paddingHorizontal: 0,
+    width: "100%",
   },
   tagline: {
     fontSize: 13,

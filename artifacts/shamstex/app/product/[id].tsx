@@ -62,6 +62,8 @@ export default function ProductDetailScreen() {
   const [companionEditor, setCompanionEditor] = useState<{
     colorName: string;
     values: Record<string, string>;
+    targetColors: string[];
+    allColors: boolean;
   } | null>(null);
   const [orderType, setOrderType] = useState<"weight" | "pieces">("pieces");
   const [imgIdx, setImgIdx] = useState(0);
@@ -279,6 +281,22 @@ export default function ProductDetailScreen() {
     setCompanionEditor({
       colorName,
       values: { ...(companionPercentages[colorName] ?? {}) },
+      targetColors: [colorName],
+      allColors: false,
+    });
+  };
+
+  const openCompanionEditorForAllColors = () => {
+    const chosenColors = orderType === "weight"
+      ? Object.entries(colorWeights).filter(([_, weight]) => weight > 0).map(([name]) => name)
+      : Object.entries(selectedColors).filter(([_, quantity]) => quantity > 0).map(([name]) => name);
+    if (chosenColors.length < 2) return;
+
+    setCompanionEditor({
+      colorName: chosenColors[0],
+      values: {},
+      targetColors: [chosenColors[0]],
+      allColors: false,
     });
   };
 
@@ -319,6 +337,28 @@ export default function ProductDetailScreen() {
       ? colorWeights[companionEditor.colorName] ?? 0
       : (selectedColors[companionEditor.colorName] ?? 0) * (product.unit === "meter" ? 100 : 20)
     : 0;
+  const selectedOrderColors = orderType === "weight"
+    ? Object.entries(colorWeights).filter(([_, weight]) => weight > 0).map(([name]) => name)
+    : Object.entries(selectedColors).filter(([_, quantity]) => quantity > 0).map(([name]) => name);
+
+  const setCompanionEditorColors = (targetColors: string[], allColors = false) => {
+    if (!companionEditor) return;
+    setCompanionEditor((current) => current ? {
+      ...current,
+      targetColors,
+      allColors,
+      colorName: targetColors[0] ?? current.colorName,
+    } : current);
+  };
+
+  const toggleCompanionTargetColor = (colorName: string) => {
+    if (!companionEditor) return;
+    const currentTargets = companionEditor.allColors ? selectedOrderColors : companionEditor.targetColors;
+    const nextTargets = currentTargets.includes(colorName)
+      ? currentTargets.filter((name) => name !== colorName)
+      : [...currentTargets, colorName];
+    setCompanionEditorColors(nextTargets, false);
+  };
   const formatCompanionAmount = (amount: number) => {
     const rounded = Number(amount.toFixed(2));
     return Number.isFinite(rounded) ? String(rounded) : "0";
@@ -919,6 +959,46 @@ export default function ProductDetailScreen() {
               </Pressable>
             </View>
 
+            {selectedOrderColors.length > 1 && companionEditor && (
+              <View style={{ gap: 8 }}>
+                <Text style={[styles.companionModalSubtitle, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>تطبيق النسبة على الألوان</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.companionTargetsRow}>
+                  <Pressable
+                    onPress={() => setCompanionEditorColors([companionEditor.colorName], false)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: !companionEditor.allColors && companionEditor.targetColors.length === 1 }}
+                    style={[styles.companionTargetChip, { backgroundColor: !companionEditor.allColors && companionEditor.targetColors.length === 1 ? colors.gold + "2A" : colors.surface, borderColor: !companionEditor.allColors && companionEditor.targetColors.length === 1 ? colors.gold : colors.border }]}
+                  >
+                    <Text style={[styles.companionTargetText, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>اللون الحالي</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => setCompanionEditorColors(selectedOrderColors, true)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: companionEditor.allColors }}
+                    style={[styles.companionTargetChip, { backgroundColor: companionEditor.allColors ? colors.gold + "2A" : colors.surface, borderColor: companionEditor.allColors ? colors.gold : colors.border }]}
+                  >
+                    <Text style={[styles.companionTargetText, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>الكل</Text>
+                  </Pressable>
+                  {selectedOrderColors.map((colorName) => {
+                    const color = product.colors.find((item) => item.name === colorName);
+                    const selected = !companionEditor.allColors && companionEditor.targetColors.includes(colorName);
+                    return (
+                      <Pressable
+                        key={colorName}
+                        onPress={() => toggleCompanionTargetColor(colorName)}
+                        accessibilityRole="button"
+                        accessibilityState={{ selected }}
+                        style={[styles.companionTargetChip, { backgroundColor: selected ? colors.gold + "2A" : colors.surface, borderColor: selected ? colors.gold : colors.border }]}
+                      >
+                        {color && <View style={[styles.colorSwatch, { width: 15, height: 15, backgroundColor: color.hex, borderColor: colors.border, borderWidth: color.hex === "#FFFFFF" || color.hex === "#FEFEFE" ? 1 : 0 }]} />}
+                        <Text style={[styles.companionTargetText, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>{colorName}</Text>
+                      </Pressable>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            )}
+
             {editorColor && (
               <View style={[styles.companionModalColor, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                 <View style={[styles.colorSwatch, { backgroundColor: editorColor.hex, borderColor: colors.border, borderWidth: editorColor.hex === "#FFFFFF" || editorColor.hex === "#FEFEFE" ? 1 : 0 }]} />
@@ -990,8 +1070,13 @@ export default function ProductDetailScreen() {
                     Object.entries(companionEditor.values).forEach(([materialId, value]) => {
                       if (Number(value) > 0) cleaned[materialId] = value;
                     });
-                    if (Object.keys(cleaned).length > 0) next[companionEditor.colorName] = cleaned;
-                    else delete next[companionEditor.colorName];
+                    const targetColors = companionEditor.allColors
+                      ? selectedOrderColors
+                      : companionEditor.targetColors;
+                    targetColors.forEach((colorName) => {
+                      if (Object.keys(cleaned).length > 0) next[colorName] = { ...cleaned };
+                      else delete next[colorName];
+                    });
                     return next;
                   });
                   setCompanionEditor(null);
@@ -1155,6 +1240,9 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   companionModalColorText: { flex: 1, textAlign: "right", fontSize: 15 },
+  companionTargetsRow: { flexDirection: "row-reverse", gap: 8, paddingVertical: 2 },
+  companionTargetChip: { minHeight: 36, flexDirection: "row-reverse", alignItems: "center", justifyContent: "center", gap: 6, paddingHorizontal: 10, borderRadius: 18, borderWidth: 1 },
+  companionTargetText: { fontSize: 12 },
   companionModalMaterial: { gap: 8 },
   companionModalMaterialName: { textAlign: "right", fontSize: 14 },
   companionModalInputRow: { flexDirection: "row-reverse", alignItems: "center", gap: 8 },

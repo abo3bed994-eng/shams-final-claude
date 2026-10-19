@@ -127,7 +127,7 @@ export default function LoadingScreen({
               ]}
               numberOfLines={1}
               adjustsFontSizeToFit
-              minimumFontScale={0.8}
+              minimumFontScale={0.65}
               maxFontSizeMultiplier={1.15}
             >
               {taglineText}
@@ -169,14 +169,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 24,
     gap: 10,
+    width: "100%",
+    paddingHorizontal: 16,
   },
   tagline: {
-    fontSize: 20,
+    fontSize: 18,
     letterSpacing: 0,
     textAlign: "center",
-    lineHeight: 30,
-    paddingHorizontal: 16,
-    maxWidth: "100%",
+    lineHeight: 28,
+    paddingHorizontal: 0,
+    width: "100%",
   },
   tagLine: {
     height: 1.5,
