@@ -284,7 +284,9 @@ export default function AdminUsersScreen() {
       if (newRole === "supervisor") perms = [...SUPERVISOR_PERMISSIONS];
 
       saveCustomerChange({ ...updated, role: newRole, permissions: perms, upgradeStatus: undefined, lastUpdated: new Date().toISOString() } as any);
-      if (updated.role !== "customer" && newRole === "customer" && updated.phone) {
+      if (updated.role === "employee" && newRole === "merchant" && updated.phone) {
+        FS.saveSession(migrateLocalToE164(updated.phone), `revoked_promoted_merchant_${Date.now()}`).catch(() => {});
+      } else if (updated.role !== "customer" && newRole === "customer" && updated.phone) {
         FS.saveSession(migrateLocalToE164(updated.phone), `revoked_${Date.now()}`).catch(() => {});
       }
 

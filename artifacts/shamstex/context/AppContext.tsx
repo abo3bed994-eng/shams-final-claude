@@ -868,7 +868,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             return;
           }
           if (me.role !== "customer" && myDoc.role === "customer") {
-            forceLogoutRoleChanged();
+            forceLogoutRoleChanged("customer");
+            return;
+          }
+          if (me.role === "employee" && myDoc.role === "merchant") {
+            forceLogoutRoleChanged("merchant");
             return;
           }
         }
@@ -986,13 +990,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const roleChangeAlertShownRef = React.useRef<boolean>(false);
 
   // Helper to force-logout when an account is demoted/role-changed by an admin
-  const forceLogoutRoleChanged = useCallback(async () => {
+  const forceLogoutRoleChanged = useCallback(async (newRole?: UserRole) => {
     if (roleChangeAlertShownRef.current) return;
     roleChangeAlertShownRef.current = true;
     const previousUser = userRef.current;
+    userRef.current = null;
     try {
       const Notifications = await import("expo-notifications");
-      const tokenData = await Notifications.getExpoPushTokenAsync().catch(() => null);
+      let projectId = "259a6c4c-4501-4ab4-ab35-62ebc9a4ba9d";
+      try {
+        const Constants = (await import("expo-constants")).default;
+        projectId =
+          Constants?.expoConfig?.extra?.eas?.projectId ??
+          Constants?.easConfig?.projectId ??
+          projectId;
+      } catch (_) {}
+      const tokenData = await Notifications.getExpoPushTokenAsync({ projectId }).catch(() => null);
       await Notifications.dismissAllNotificationsAsync().catch(() => {});
       if (previousUser?.phone) {
         await FS.deletePushToken(migrateLocalToE164(previousUser.phone), tokenData?.data);
@@ -1015,11 +1028,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setReturnRequests([]);
     setCart([]);
     setEditingOrderId(null);
-    Alert.alert(
-      "تم تغيير دورك",
-      "تم إعادتك كعميل من قِبل الإدارة. يرجى تسجيل الدخول مجدداً بحساب العميل.",
-      [{ text: "حسناً" }]
-    );
+
+    const isPromotedToMerchant =
+      previousUser?.role === "employee" && (newRole === "merchant" || (!newRole && (previousUser as any)?.lastTargetRole === "merchant"));
+    const alertTitle = isPromotedToMerchant ? "تمت ترقيتك إلى تاجر" : "تم تغيير دورك";
+    const alertMessage = isPromotedToMerchant
+      ? "تمت ترقيتك إلى تاجر. يرجى تسجيل الدخول مجدداً للاستفادة من أسعار الجملة."
+      : "تم إعادتك كعميل من قِبل الإدارة. يرجى تسجيل الدخول مجدداً بحساب العميل.";
+
+    Alert.alert(alertTitle, alertMessage, [{ text: "حسناً" }]);
     try {
       const { router } = await import("expo-router");
       router.replace("/auth/login" as any);
@@ -1070,7 +1087,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (cancelled || !remoteToken) return;
         if (remoteToken !== localToken) {
           if (remoteToken.startsWith("revoked_")) {
-            forceLogoutRoleChanged();
+            const isMerchant = remoteToken.includes("promoted_merchant");
+            forceLogoutRoleChanged(isMerchant ? "merchant" : "customer");
             return;
           }
           // Another device took over this account → log out FULLY immediately
@@ -1257,7 +1275,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (roleChanged) {
-        forceLogoutRoleChanged();
+        forceLogoutRoleChanged(freshRecord.role);
         return;
       }
 
@@ -1312,10 +1330,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               setUserState(parsedUser);
             }
           } else {
-            setUserState(parsedUser);
+            // Missing secureToken means user was logged out; clean up stray user key
+            await AsyncStorage.removeItem("user");
+            setUserState(null);
           }
         } catch {
-          setUserState(parsedUser);
+          if (secureToken) {
+            setUserState(parsedUser);
+          } else {
+            await AsyncStorage.removeItem("user");
+            setUserState(null);
+          }
         }
       }
       if (customersData) setRegisteredCustomersState(JSON.parse(customersData));
@@ -1349,6 +1374,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Safely persist a user object to AsyncStorage WITHOUT the sessionToken.
   // Token is moved to secure storage. Use this everywhere instead of raw AsyncStorage.setItem("user", ...).
   const persistUserSafe = async (u: User) => {
+    if (!u || !userRef.current) return;
     if (u.sessionToken) {
       try { await setSecureItem("sessionToken", u.sessionToken); } catch {}
     }
@@ -1357,7 +1383,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const setUser = useCallback(async (u: User | null) => {
-    const prev = userRef.current;
+    const prev = u ? userRef.current : (userRef.current || user);
+    userRef.current = u;
     setUserState(u);
     if (u) {
       // Reset one-shot guards so a future ban/role-change in this app process
@@ -1424,6 +1451,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // remotely (e.g. admin removes a staff member). Clears local state and shows
   // an Arabic alert, then redirects to the login screen.
   const forceLogoutAccountRemoved = useCallback(async () => {
+    userRef.current = null;
     try {
       await AsyncStorage.multiRemove([
         "user",
@@ -1571,7 +1599,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const currentUser = userRef.current;
     if (currentUser && samePhone(currentUser.phone, updatedUser.phone)) {
       if (currentUser.role !== updatedUser.role && updatedUser.role === "customer") {
-        forceLogoutRoleChanged();
+        forceLogoutRoleChanged("customer");
+        return;
+      }
+      if (currentUser.role === "employee" && updatedUser.role === "merchant") {
+        forceLogoutRoleChanged("merchant");
         return;
       }
       const synced: User = {
