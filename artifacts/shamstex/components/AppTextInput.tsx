@@ -121,7 +121,7 @@ export const AppTextInput = forwardRef<TextInput, AppTextInputProps>(
     if (innerStyle.textAlignVertical === undefined && props.textAlignVertical === undefined) {
       innerStyle.textAlignVertical = "center";
     }
-    if (innerStyle.includeFontPadding === undefined && props.includeFontPadding === undefined) {
+    if (innerStyle.includeFontPadding === undefined) {
       innerStyle.includeFontPadding = false;
     }
 

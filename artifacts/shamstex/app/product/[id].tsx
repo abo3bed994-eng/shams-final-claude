@@ -1211,7 +1211,6 @@ export default function ProductDetailScreen() {
                             placeholderTextColor={colors.mutedForeground}
                             textAlign="center"
                             textAlignVertical="center"
-                            includeFontPadding={false}
                             style={[
                               styles.companionRowInput,
                               {
@@ -1365,8 +1364,7 @@ export default function ProductDetailScreen() {
                                   placeholderTextColor={colors.mutedForeground}
                                   textAlign="center"
                                   textAlignVertical="center"
-                                  includeFontPadding={false}
-                                  style={[
+                                        style={[
                                     styles.companionRowInput,
                                     {
                                       color: colors.foreground,
