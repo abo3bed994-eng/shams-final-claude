@@ -5,6 +5,7 @@ import {
   Animated,
   BackHandler,
   Image,
+  KeyboardAvoidingView,
   Modal,
   Platform,
   Pressable,
@@ -45,7 +46,7 @@ export default function ProductDetailScreen() {
   // fixed-width weight input + the two round buttons squeeze the color name
   // out of the row. Shrink the input responsively so the name always fits.
   const isNarrow = windowWidth < 390;
-  const weightInputWidth = isNarrow ? 72 : 104;
+  const weightInputWidth = isNarrow ? 66 : 82;
   const imgScrollRef = useRef<ScrollView>(null);
   const viewerScrollRef = useRef<ScrollView>(null);
   const product = products.find((p) => p.id === id);
@@ -60,6 +61,7 @@ export default function ProductDetailScreen() {
   const [weightTexts, setWeightTexts] = useState<Record<string, string>>({});
   const [companionPercentages, setCompanionPercentages] = useState<Record<string, Record<string, string>>>({});
   const [companionEditor, setCompanionEditor] = useState<{
+    selectedMaterialId: string;
     mode: "all" | "per_color";
     allPercentage: string;
     perColorValues: Record<string, string>;
@@ -272,15 +274,106 @@ export default function ProductDetailScreen() {
     isColorSelected(colorName) &&
     companionMaterials.some((material) => Number(companionPercentages[colorName]?.[material.id] ?? 0) > 0);
 
-  const openCompanionEditor = (_colorName?: string) => {
+  const commitCurrentEditorToPercentages = (
+    currentPercentages: Record<string, Record<string, string>>,
+    editor: {
+      selectedMaterialId: string;
+      mode: "all" | "per_color";
+      allPercentage: string;
+      perColorValues: Record<string, string>;
+    }
+  ) => {
+    const materialId = editor.selectedMaterialId;
+    const activeMat = companionMaterials.find((m) => m.id === materialId) ?? companionMaterials[0];
+    const maxPct = Math.min(100, Math.max(0, activeMat?.maxPercentage ?? 100));
+
+    const next = { ...currentPercentages };
+    if (editor.mode === "all") {
+      const val = editor.allPercentage.trim();
+      const numVal = Math.min(maxPct, Number(val) || 0);
+      selectedOrderColors.forEach((colorName) => {
+        if (val && numVal > 0) {
+          next[colorName] = {
+            ...(next[colorName] ?? {}),
+            [materialId]: String(numVal),
+          };
+        } else {
+          if (next[colorName]) {
+            delete next[colorName][materialId];
+            if (Object.keys(next[colorName]).length === 0) delete next[colorName];
+          }
+        }
+      });
+    } else {
+      selectedOrderColors.forEach((colorName) => {
+        const val = (editor.perColorValues[colorName] ?? "").trim();
+        const numVal = Math.min(maxPct, Number(val) || 0);
+        if (val && numVal > 0) {
+          next[colorName] = {
+            ...(next[colorName] ?? {}),
+            [materialId]: String(numVal),
+          };
+        } else {
+          if (next[colorName]) {
+            delete next[colorName][materialId];
+            if (Object.keys(next[colorName]).length === 0) delete next[colorName];
+          }
+        }
+      });
+    }
+    return next;
+  };
+
+  const handleSelectCompanionTab = (newMatId: string) => {
+    if (!companionEditor || companionEditor.selectedMaterialId === newMatId) return;
+
+    // 1. Commit current changes to state
+    const updated = commitCurrentEditorToPercentages(companionPercentages, companionEditor);
+    setCompanionPercentages(updated);
+
+    // 2. Prepare values for the new companion material tab
+    const perColorValues: Record<string, string> = {};
+    let allSame = true;
+    let firstVal: string | null = null;
+
+    selectedOrderColors.forEach((c) => {
+      const val = updated[c]?.[newMatId] ?? "";
+      perColorValues[c] = val;
+      if (firstVal === null) {
+        firstVal = val;
+      } else if (firstVal !== val) {
+        allSame = false;
+      }
+    });
+
+    const isAll = allSame && firstVal !== null && firstVal !== "";
+
+    setCompanionEditor({
+      selectedMaterialId: newMatId,
+      mode: "all", // Default to all as required
+      allPercentage: isAll ? (firstVal ?? "") : "",
+      perColorValues,
+    });
+  };
+
+  const handleSaveCompanionEditor = () => {
+    if (!companionEditor) return;
+    const updated = commitCurrentEditorToPercentages(companionPercentages, companionEditor);
+    setCompanionPercentages(updated);
+    setCompanionEditor(null);
+  };
+
+  const openCompanionEditor = (_colorName?: string, preferredMaterialId?: string) => {
     const chosenColors = selectedOrderColors;
     if (chosenColors.length === 0) {
       showToast("اختر لوناً وحدد الكمية أولاً لإضافة خامة مرافقة", "error");
       return;
     }
 
-    const firstMaterial = companionMaterials[0];
-    const materialId = firstMaterial?.id ?? "default";
+    const activeMaterial =
+      (preferredMaterialId && companionMaterials.find((m) => m.id === preferredMaterialId)) ||
+      companionMaterials[0];
+    const materialId = activeMaterial?.id ?? "default";
 
     const perColorValues: Record<string, string> = {};
     let allSame = true;
@@ -299,7 +392,8 @@ export default function ProductDetailScreen() {
     const isAll = allSame && firstVal !== null && firstVal !== "";
 
     setCompanionEditor({
-      mode: isAll ? "all" : "per_color",
+      selectedMaterialId: materialId,
+      mode: "all", // Requirement 5: Default is always "all"
       allPercentage: isAll ? (firstVal ?? "") : "",
       perColorValues,
     });
@@ -924,7 +1018,10 @@ export default function ProductDetailScreen() {
         animationType="fade"
         onRequestClose={() => setCompanionEditor(null)}
       >
-        <View style={styles.companionModalBackdrop}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.companionModalBackdrop}
+        >
           <Pressable
             style={StyleSheet.absoluteFill}
             onPress={() => setCompanionEditor(null)}
@@ -936,7 +1033,7 @@ export default function ProductDetailScreen() {
               {
                 backgroundColor: colors.card,
                 borderColor: colors.border,
-                maxHeight: Math.min(windowHeight * 0.9, 720),
+                maxHeight: Math.min(windowHeight * 0.88, 640),
               },
             ]}
           >
@@ -969,233 +1066,135 @@ export default function ProductDetailScreen() {
               </Pressable>
             </View>
 
-            {/* Two Options at the top (A8) */}
-            {companionEditor && (
-              <View style={{ gap: 10 }}>
-                {/* Option 1: جميع الألوان */}
-                <View
-                  style={[
-                    styles.companionOptionBox,
-                    {
-                      backgroundColor:
-                        companionEditor.mode === "all" ? colors.gold + "14" : colors.surface,
-                      borderColor:
-                        companionEditor.mode === "all" ? colors.gold : colors.border,
-                    },
-                  ]}
+            {/* Multiple Companion Materials Tabs (Point 7) */}
+            {companionMaterials.length > 1 && companionEditor && (
+              <View style={[styles.companionTabsContainer, { borderColor: colors.border }]}>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.companionTabsContent}
                 >
-                  <Pressable
-                    onPress={() => setCompanionEditor((c) => (c ? { ...c, mode: "all" } : c))}
-                    style={{ flex: 1, flexDirection: "row-reverse", alignItems: "center", gap: 8 }}
-                  >
-                    <View
-                      style={[
-                        styles.radioCircle,
-                        {
-                          borderColor:
-                            companionEditor.mode === "all" ? colors.gold : colors.mutedForeground,
-                        },
-                      ]}
-                    >
-                      {companionEditor.mode === "all" && (
-                        <View style={[styles.radioInner, { backgroundColor: colors.gold }]} />
-                      )}
-                    </View>
-                    <Text
-                      style={{
-                        color: colors.foreground,
-                        fontFamily: "Cairo_700Bold",
-                        fontSize: 14,
-                      }}
-                    >
-                      جميع الألوان
-                    </Text>
-                  </Pressable>
-
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                    {(() => {
-                      const maxPct = Math.min(
-                        100,
-                        Math.max(0, companionMaterials[0]?.maxPercentage ?? 100)
-                      );
-                      const pct = Math.min(maxPct, Number(companionEditor.allPercentage) || 0);
-                      const totalBase = selectedOrderColors.reduce(
-                        (sum, c) => sum + getColorBaseAmount(c),
-                        0
-                      );
-                      const allWeight = (totalBase * pct) / 100;
-                      return allWeight > 0 ? (
-                        <Text
-                          style={{
-                            color: colors.success,
-                            fontFamily: "Cairo_700Bold",
-                            fontSize: 13,
-                          }}
-                        >
-                          {formatCompanionAmount(allWeight)} كغ
-                        </Text>
-                      ) : null;
-                    })()}
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                      <AppTextInput
-                        value={companionEditor.allPercentage}
-                        onFocus={() => {
-                          if (companionEditor.mode !== "all") {
-                            setCompanionEditor((c) => (c ? { ...c, mode: "all" } : c));
-                          }
-                        }}
-                        onChangeText={(value) => {
-                          if (!/^\d*([.]\d*)?$/.test(value)) return;
-                          const maxPct = Math.min(
-                            100,
-                            Math.max(0, companionMaterials[0]?.maxPercentage ?? 100)
-                          );
-                          const num = Number(value);
-                          const nextVal =
-                            value !== "" && Number.isFinite(num) && num > maxPct
-                              ? String(maxPct)
-                              : value;
-                          setCompanionEditor((c) =>
-                            c ? { ...c, mode: "all", allPercentage: nextVal } : c
-                          );
-                        }}
-                        keyboardType="decimal-pad"
-                        placeholder="0"
-                        placeholderTextColor={colors.mutedForeground}
-                        textAlign="center"
+                  {companionMaterials.map((mat) => {
+                    const isSelected = mat.id === companionEditor.selectedMaterialId;
+                    const hasVal = selectedOrderColors.some((c) => {
+                      if (isSelected) {
+                        if (companionEditor.mode === "all") {
+                          return Number(companionEditor.allPercentage || 0) > 0;
+                        }
+                        return Number(companionEditor.perColorValues[c] || 0) > 0;
+                      }
+                      return Number(companionPercentages[c]?.[mat.id] || 0) > 0;
+                    });
+                    return (
+                      <Pressable
+                        key={mat.id}
+                        onPress={() => handleSelectCompanionTab(mat.id)}
                         style={[
-                          styles.companionRowInput,
+                          styles.companionTabItem,
                           {
-                            color: colors.foreground,
-                            backgroundColor: colors.input,
-                            borderColor: colors.border,
+                            backgroundColor: isSelected ? colors.gold : colors.surface,
+                            borderColor: isSelected ? colors.gold : colors.border,
                           },
                         ]}
-                      />
-                      <Text
-                        style={{
-                          color: colors.mutedForeground,
-                          fontFamily: "Cairo_600SemiBold",
-                          fontSize: 14,
-                        }}
                       >
-                        %
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-
-                {/* Option 2: تحديد الألوان */}
-                <Pressable
-                  onPress={() => setCompanionEditor((c) => (c ? { ...c, mode: "per_color" } : c))}
-                  style={[
-                    styles.companionOptionBox,
-                    {
-                      backgroundColor:
-                        companionEditor.mode === "per_color" ? colors.gold + "14" : colors.surface,
-                      borderColor:
-                        companionEditor.mode === "per_color" ? colors.gold : colors.border,
-                    },
-                  ]}
-                >
-                  <View
-                    style={{ flex: 1, flexDirection: "row-reverse", alignItems: "center", gap: 8 }}
-                  >
-                    <View
-                      style={[
-                        styles.radioCircle,
-                        {
-                          borderColor:
-                            companionEditor.mode === "per_color"
-                              ? colors.gold
-                              : colors.mutedForeground,
-                        },
-                      ]}
-                    >
-                      {companionEditor.mode === "per_color" && (
-                        <View style={[styles.radioInner, { backgroundColor: colors.gold }]} />
-                      )}
-                    </View>
-                    <Text
-                      style={{
-                        color: colors.foreground,
-                        fontFamily: "Cairo_700Bold",
-                        fontSize: 14,
-                      }}
-                    >
-                      تحديد الألوان
-                    </Text>
-                  </View>
-                </Pressable>
+                        <Text
+                          style={[
+                            styles.companionTabItemText,
+                            {
+                              color: isSelected ? "#000" : colors.foreground,
+                              fontFamily: isSelected ? "Cairo_700Bold" : "Cairo_500Medium",
+                            },
+                          ]}
+                        >
+                          {mat.name} {hasVal ? "✓" : ""}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </ScrollView>
               </View>
             )}
 
-            {/* Per-color list (Option 2) */}
-            {companionEditor && companionEditor.mode === "per_color" && (
-              <ScrollView
-                style={{ maxHeight: 260, flexShrink: 1 }}
-                contentContainerStyle={{ gap: 4, paddingVertical: 2 }}
-                nestedScrollEnabled={true}
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={true}
-              >
-                {selectedOrderColors.map((colorName) => {
-                  const color = product.colors.find((item) => item.name === colorName);
-                  const maxPct = Math.min(
-                    100,
-                    Math.max(0, companionMaterials[0]?.maxPercentage ?? 100)
-                  );
-                  const pctVal = companionEditor.perColorValues[colorName] ?? "";
-                  const pct = Math.min(maxPct, Number(pctVal) || 0);
-                  const colorWeight = (getColorBaseAmount(colorName) * pct) / 100;
+            {/* Active Material Options & Inputs */}
+            {(() => {
+              if (!companionEditor) return null;
+              const activeMaterial =
+                companionMaterials.find((m) => m.id === companionEditor.selectedMaterialId) ??
+                companionMaterials[0];
+              const maxPct = Math.min(100, Math.max(0, activeMaterial?.maxPercentage ?? 100));
 
-                  return (
+              return (
+                <>
+                  {/* Two Options at the top (Point 6: جميع الألوان المحددة / تحديد ألوان معينة) */}
+                  <View style={{ gap: 10 }}>
+                    {/* Option 1: جميع الألوان المحددة */}
                     <View
-                      key={colorName}
-                      style={[styles.companionColorRow, { borderBottomColor: colors.border }]}
+                      style={[
+                        styles.companionOptionBox,
+                        {
+                          backgroundColor:
+                            companionEditor.mode === "all" ? colors.gold + "14" : colors.surface,
+                          borderColor:
+                            companionEditor.mode === "all" ? colors.gold : colors.border,
+                        },
+                      ]}
                     >
-                      {/* Physical Left: Color Swatch + Name */}
-                      <View style={styles.companionColorRowLeft}>
+                      <Pressable
+                        onPress={() => setCompanionEditor((c) => (c ? { ...c, mode: "all" } : c))}
+                        style={{ flex: 1, flexDirection: "row-reverse", alignItems: "center", gap: 8 }}
+                      >
                         <View
                           style={[
-                            styles.colorSwatch,
+                            styles.radioCircle,
                             {
-                              width: 18,
-                              height: 18,
-                              borderRadius: 9,
-                              backgroundColor: color?.hex ?? "#ccc",
-                              borderColor: colors.border,
-                              borderWidth:
-                                color?.hex === "#FFFFFF" || color?.hex === "#FEFEFE" ? 1 : 0,
+                              borderColor:
+                                companionEditor.mode === "all" ? colors.gold : colors.mutedForeground,
                             },
                           ]}
-                        />
-                        <Text
-                          numberOfLines={1}
-                          style={[
-                            styles.companionColorRowName,
-                            { color: colors.foreground, fontFamily: "Cairo_600SemiBold" },
-                          ]}
                         >
-                          {colorName}
+                          {companionEditor.mode === "all" && (
+                            <View style={[styles.radioInner, { backgroundColor: colors.gold }]} />
+                          )}
+                        </View>
+                        <Text
+                          style={{
+                            color: colors.foreground,
+                            fontFamily: "Cairo_700Bold",
+                            fontSize: 14,
+                          }}
+                        >
+                          جميع الألوان المحددة
                         </Text>
-                      </View>
+                      </Pressable>
 
-                      {/* Physical Right: Weight + Percentage Input + % */}
-                      <View style={styles.companionColorRowRight}>
-                        {colorWeight > 0 ? (
-                          <Text
-                            style={[
-                              styles.companionColorRowWeight,
-                              { color: colors.success, fontFamily: "Cairo_700Bold" },
-                            ]}
-                          >
-                            {formatCompanionAmount(colorWeight)} كغ
-                          </Text>
-                        ) : null}
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                        {(() => {
+                          const pct = Math.min(maxPct, Number(companionEditor.allPercentage) || 0);
+                          const totalBase = selectedOrderColors.reduce(
+                            (sum, c) => sum + getColorBaseAmount(c),
+                            0
+                          );
+                          const allWeight = (totalBase * pct) / 100;
+                          return allWeight > 0 ? (
+                            <Text
+                              style={{
+                                color: colors.success,
+                                fontFamily: "Cairo_700Bold",
+                                fontSize: 13,
+                              }}
+                            >
+                              {formatCompanionAmount(allWeight)} كغ
+                            </Text>
+                          ) : null;
+                        })()}
                         <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
                           <AppTextInput
-                            value={pctVal}
+                            value={companionEditor.allPercentage}
+                            onFocus={() => {
+                              if (companionEditor.mode !== "all") {
+                                setCompanionEditor((c) => (c ? { ...c, mode: "all" } : c));
+                              }
+                            }}
                             onChangeText={(value) => {
                               if (!/^\d*([.]\d*)?$/.test(value)) return;
                               const num = Number(value);
@@ -1204,21 +1203,15 @@ export default function ProductDetailScreen() {
                                   ? String(maxPct)
                                   : value;
                               setCompanionEditor((c) =>
-                                c
-                                  ? {
-                                      ...c,
-                                      perColorValues: {
-                                        ...c.perColorValues,
-                                        [colorName]: nextVal,
-                                      },
-                                    }
-                                  : c
+                                c ? { ...c, mode: "all", allPercentage: nextVal } : c
                               );
                             }}
                             keyboardType="decimal-pad"
                             placeholder="0"
                             placeholderTextColor={colors.mutedForeground}
                             textAlign="center"
+                            textAlignVertical="center"
+                            includeFontPadding={false}
                             style={[
                               styles.companionRowInput,
                               {
@@ -1240,57 +1233,208 @@ export default function ProductDetailScreen() {
                         </View>
                       </View>
                     </View>
-                  );
-                })}
-              </ScrollView>
-            )}
 
-            {/* Total Weight at the bottom (A4) */}
-            {companionEditor && (
-              <View style={[styles.companionTotalRow, { borderTopColor: colors.border }]}>
-                <Text
-                  style={[
-                    styles.companionTotalLabel,
-                    { color: colors.foreground, fontFamily: "Cairo_700Bold" },
-                  ]}
-                >
-                  الوزن الإجمالي
-                </Text>
-                {(() => {
-                  const maxPct = Math.min(
-                    100,
-                    Math.max(0, companionMaterials[0]?.maxPercentage ?? 100)
-                  );
-                  let totalW = 0;
-                  if (companionEditor.mode === "all") {
-                    const pct = Math.min(maxPct, Number(companionEditor.allPercentage) || 0);
-                    const totalBase = selectedOrderColors.reduce(
-                      (sum, c) => sum + getColorBaseAmount(c),
-                      0
-                    );
-                    totalW = (totalBase * pct) / 100;
-                  } else {
-                    selectedOrderColors.forEach((c) => {
-                      const pct = Math.min(
-                        maxPct,
-                        Number(companionEditor.perColorValues[c]) || 0
-                      );
-                      totalW += (getColorBaseAmount(c) * pct) / 100;
-                    });
-                  }
-                  return (
-                    <Text
+                    {/* Option 2: تحديد ألوان معينة */}
+                    <Pressable
+                      onPress={() => setCompanionEditor((c) => (c ? { ...c, mode: "per_color" } : c))}
                       style={[
-                        styles.companionTotalValue,
-                        { color: colors.success, fontFamily: "Cairo_700Bold" },
+                        styles.companionOptionBox,
+                        {
+                          backgroundColor:
+                            companionEditor.mode === "per_color" ? colors.gold + "14" : colors.surface,
+                          borderColor:
+                            companionEditor.mode === "per_color" ? colors.gold : colors.border,
+                        },
                       ]}
                     >
-                      {formatCompanionAmount(totalW)} كغ
+                      <View
+                        style={{ flex: 1, flexDirection: "row-reverse", alignItems: "center", gap: 8 }}
+                      >
+                        <View
+                          style={[
+                            styles.radioCircle,
+                            {
+                              borderColor:
+                                companionEditor.mode === "per_color"
+                                  ? colors.gold
+                                  : colors.mutedForeground,
+                            },
+                          ]}
+                        >
+                          {companionEditor.mode === "per_color" && (
+                            <View style={[styles.radioInner, { backgroundColor: colors.gold }]} />
+                          )}
+                        </View>
+                        <Text
+                          style={{
+                            color: colors.foreground,
+                            fontFamily: "Cairo_700Bold",
+                            fontSize: 14,
+                          }}
+                        >
+                          تحديد ألوان معينة
+                        </Text>
+                      </View>
+                    </Pressable>
+                  </View>
+
+                  {/* Per-color list (Option 2) */}
+                  {companionEditor.mode === "per_color" && (
+                    <ScrollView
+                      style={{ maxHeight: 220, flexShrink: 1 }}
+                      contentContainerStyle={{ gap: 4, paddingVertical: 2 }}
+                      nestedScrollEnabled={true}
+                      keyboardShouldPersistTaps="handled"
+                      keyboardDismissMode="on-drag"
+                      showsVerticalScrollIndicator={true}
+                    >
+                      {selectedOrderColors.map((colorName) => {
+                        const color = product.colors.find((item) => item.name === colorName);
+                        const pctVal = companionEditor.perColorValues[colorName] ?? "";
+                        const pct = Math.min(maxPct, Number(pctVal) || 0);
+                        const colorWeight = (getColorBaseAmount(colorName) * pct) / 100;
+
+                        return (
+                          <View
+                            key={colorName}
+                            style={[styles.companionColorRow, { borderBottomColor: colors.border }]}
+                          >
+                            {/* Physical Left: Color Swatch + Name */}
+                            <View style={styles.companionColorRowLeft}>
+                              <View
+                                style={[
+                                  styles.colorSwatch,
+                                  {
+                                    width: 18,
+                                    height: 18,
+                                    borderRadius: 9,
+                                    backgroundColor: color?.hex ?? "#ccc",
+                                    borderColor: colors.border,
+                                    borderWidth:
+                                      color?.hex === "#FFFFFF" || color?.hex === "#FEFEFE" ? 1 : 0,
+                                  },
+                                ]}
+                              />
+                              <Text
+                                numberOfLines={1}
+                                style={[
+                                  styles.companionColorRowName,
+                                  { color: colors.foreground, fontFamily: "Cairo_600SemiBold" },
+                                ]}
+                              >
+                                {colorName}
+                              </Text>
+                            </View>
+
+                            {/* Physical Right: Weight + Percentage Input + % */}
+                            <View style={styles.companionColorRowRight}>
+                              {colorWeight > 0 ? (
+                                <Text
+                                  style={[
+                                    styles.companionColorRowWeight,
+                                    { color: colors.success, fontFamily: "Cairo_700Bold" },
+                                  ]}
+                                >
+                                  {formatCompanionAmount(colorWeight)} كغ
+                                </Text>
+                              ) : null}
+                              <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                                <AppTextInput
+                                  value={pctVal}
+                                  onChangeText={(value) => {
+                                    if (!/^\d*([.]\d*)?$/.test(value)) return;
+                                    const num = Number(value);
+                                    const nextVal =
+                                      value !== "" && Number.isFinite(num) && num > maxPct
+                                        ? String(maxPct)
+                                        : value;
+                                    setCompanionEditor((c) =>
+                                      c
+                                        ? {
+                                            ...c,
+                                            perColorValues: {
+                                              ...c.perColorValues,
+                                              [colorName]: nextVal,
+                                            },
+                                          }
+                                        : c
+                                    );
+                                  }}
+                                  keyboardType="decimal-pad"
+                                  placeholder="0"
+                                  placeholderTextColor={colors.mutedForeground}
+                                  textAlign="center"
+                                  textAlignVertical="center"
+                                  includeFontPadding={false}
+                                  style={[
+                                    styles.companionRowInput,
+                                    {
+                                      color: colors.foreground,
+                                      backgroundColor: colors.input,
+                                      borderColor: colors.border,
+                                    },
+                                  ]}
+                                />
+                                <Text
+                                  style={{
+                                    color: colors.mutedForeground,
+                                    fontFamily: "Cairo_600SemiBold",
+                                    fontSize: 14,
+                                  }}
+                                >
+                                  %
+                                </Text>
+                              </View>
+                            </View>
+                          </View>
+                        );
+                      })}
+                    </ScrollView>
+                  )}
+
+                  {/* Total Weight at the bottom (Point 4) */}
+                  <View style={[styles.companionTotalRow, { borderTopColor: colors.border }]}>
+                    <Text
+                      style={[
+                        styles.companionTotalLabel,
+                        { color: colors.foreground, fontFamily: "Cairo_700Bold" },
+                      ]}
+                    >
+                      الوزن الإجمالي
                     </Text>
-                  );
-                })()}
-              </View>
-            )}
+                    {(() => {
+                      let totalW = 0;
+                      if (companionEditor.mode === "all") {
+                        const pct = Math.min(maxPct, Number(companionEditor.allPercentage) || 0);
+                        const totalBase = selectedOrderColors.reduce(
+                          (sum, c) => sum + getColorBaseAmount(c),
+                          0
+                        );
+                        totalW = (totalBase * pct) / 100;
+                      } else {
+                        selectedOrderColors.forEach((c) => {
+                          const pct = Math.min(
+                            maxPct,
+                            Number(companionEditor.perColorValues[c]) || 0
+                          );
+                          totalW += (getColorBaseAmount(c) * pct) / 100;
+                        });
+                      }
+                      return (
+                        <Text
+                          style={[
+                            styles.companionTotalValue,
+                            { color: colors.success, fontFamily: "Cairo_700Bold" },
+                          ]}
+                        >
+                          {formatCompanionAmount(totalW)} كغ
+                        </Text>
+                      );
+                    })()}
+                  </View>
+                </>
+              );
+            })()}
 
             {/* Actions: Cancel & Save */}
             <View style={styles.companionModalActions}>
@@ -1312,57 +1456,7 @@ export default function ProductDetailScreen() {
                 </Text>
               </Pressable>
               <Pressable
-                onPress={() => {
-                  if (!companionEditor) return;
-                  const materialId = companionMaterials[0]?.id;
-                  if (!materialId) {
-                    setCompanionEditor(null);
-                    return;
-                  }
-                  setCompanionPercentages((current) => {
-                    const next = { ...current };
-                    const maxPct = Math.min(
-                      100,
-                      Math.max(0, companionMaterials[0]?.maxPercentage ?? 100)
-                    );
-
-                    if (companionEditor.mode === "all") {
-                      const val = companionEditor.allPercentage.trim();
-                      const numVal = Math.min(maxPct, Number(val) || 0);
-                      selectedOrderColors.forEach((colorName) => {
-                        if (val && numVal > 0) {
-                          next[colorName] = {
-                            ...(next[colorName] ?? {}),
-                            [materialId]: String(numVal),
-                          };
-                        } else {
-                          if (next[colorName]) {
-                            delete next[colorName][materialId];
-                            if (Object.keys(next[colorName]).length === 0) delete next[colorName];
-                          }
-                        }
-                      });
-                    } else {
-                      selectedOrderColors.forEach((colorName) => {
-                        const val = (companionEditor.perColorValues[colorName] ?? "").trim();
-                        const numVal = Math.min(maxPct, Number(val) || 0);
-                        if (val && numVal > 0) {
-                          next[colorName] = {
-                            ...(next[colorName] ?? {}),
-                            [materialId]: String(numVal),
-                          };
-                        } else {
-                          if (next[colorName]) {
-                            delete next[colorName][materialId];
-                            if (Object.keys(next[colorName]).length === 0) delete next[colorName];
-                          }
-                        }
-                      });
-                    }
-                    return next;
-                  });
-                  setCompanionEditor(null);
-                }}
+                onPress={handleSaveCompanionEditor}
                 style={[styles.companionModalButton, { backgroundColor: colors.success }]}
               >
                 <Text
@@ -1376,7 +1470,7 @@ export default function ProductDetailScreen() {
               </Pressable>
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       <Modal
@@ -1519,14 +1613,37 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   companionRowInput: {
-    width: 60,
+    width: 58,
     minHeight: 38,
     height: 38,
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 4,
+    paddingVertical: 0,
     fontSize: 15,
     fontFamily: "Cairo_700Bold",
+    textAlign: "center",
+    textAlignVertical: "center",
+    includeFontPadding: false,
+  },
+  companionTabsContainer: {
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    marginBottom: 4,
+  },
+  companionTabsContent: {
+    flexDirection: "row-reverse",
+    gap: 8,
+    paddingHorizontal: 2,
+  },
+  companionTabItem: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  companionTabItemText: {
+    fontSize: 13,
   },
   companionColorRow: {
     flexDirection: "row",
@@ -1658,13 +1775,14 @@ const styles = StyleSheet.create({
   qtyText: { fontSize: 15, minWidth: 22, textAlign: "center" },
   weightInput: {
     fontSize: 16,
-    width: 104,
-    paddingVertical: 9,
-    paddingHorizontal: 10,
+    width: 82,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
     borderRadius: 8,
     borderWidth: 1.5,
     textAlign: "center",
     textAlignVertical: "center",
+    includeFontPadding: false,
   },
   weightTotalBox: {
     flexDirection: "row-reverse",

@@ -802,7 +802,7 @@ export default function LoginScreen() {
               >
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
                 <AppTextInput
-                  style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_700Bold", letterSpacing: 8 }]}
+                  style={[styles.inputOtp, { color: colors.foreground }]}
                   placeholder="_ _ _ _ _ _"
                   placeholderTextColor={colors.mutedForeground}
                   value={otp}
@@ -874,7 +874,7 @@ export default function LoginScreen() {
               <View style={[styles.inputWrapper, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
                 <AppTextInput
-                  style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_700Bold", letterSpacing: 12 }]}
+                  style={[styles.inputPin, { color: colors.foreground }]}
                   placeholder="• • • •"
                   placeholderTextColor={colors.mutedForeground}
                   value={pin}
@@ -921,7 +921,7 @@ export default function LoginScreen() {
               <View style={[styles.inputWrapper, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
                 <AppTextInput
-                  style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_700Bold", letterSpacing: 12 }]}
+                  style={[styles.inputPin, { color: colors.foreground }]}
                   placeholder="رقم سري جديد"
                   placeholderTextColor={colors.mutedForeground}
                   value={pin}
@@ -936,7 +936,7 @@ export default function LoginScreen() {
               <View style={[styles.inputWrapper, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
                 <AppTextInput
-                  style={[styles.input, { color: colors.foreground, fontFamily: "Cairo_700Bold", letterSpacing: 12 }]}
+                  style={[styles.inputPin, { color: colors.foreground }]}
                   placeholder="تأكيد الرقم السري"
                   placeholderTextColor={colors.mutedForeground}
                   value={confirmPin}
@@ -1061,16 +1061,40 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 12,
     gap: 8,
-    minHeight: 52,
+    height: 50,
     borderWidth: 1,
   },
   input: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
     minWidth: 0,
     flexShrink: 1,
     paddingVertical: 0,
-    height: "100%",
+    height: 44,
+    textAlignVertical: "center",
+    includeFontPadding: false,
+  },
+  inputOtp: {
+    flex: 1,
+    fontSize: 18,
+    fontFamily: "Cairo_700Bold",
+    letterSpacing: 4,
+    height: 44,
+    paddingVertical: 0,
+    textAlign: "center",
+    textAlignVertical: "center",
+    includeFontPadding: false,
+  },
+  inputPin: {
+    flex: 1,
+    fontSize: 18,
+    fontFamily: "Cairo_700Bold",
+    letterSpacing: 6,
+    height: 44,
+    paddingVertical: 0,
+    textAlign: "center",
+    textAlignVertical: "center",
+    includeFontPadding: false,
   },
   countryCodeBox: {
     flexDirection: "row",

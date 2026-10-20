@@ -118,6 +118,13 @@ export const AppTextInput = forwardRef<TextInput, AppTextInputProps>(
       innerStyle.height = "100%";
     }
 
+    if (innerStyle.textAlignVertical === undefined && props.textAlignVertical === undefined) {
+      innerStyle.textAlignVertical = "center";
+    }
+    if (innerStyle.includeFontPadding === undefined && props.includeFontPadding === undefined) {
+      innerStyle.includeFontPadding = false;
+    }
+
     return (
       <View style={[styles.wrapper, wrapperLayout, wrapperStyle]}>
         <TextInput
