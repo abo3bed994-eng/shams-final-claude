@@ -1019,7 +1019,7 @@ export default function ProductDetailScreen() {
         onRequestClose={() => setCompanionEditor(null)}
       >
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          behavior={Platform.OS === "ios" ? "padding" : "position"}
           style={styles.companionModalBackdrop}
         >
           <Pressable

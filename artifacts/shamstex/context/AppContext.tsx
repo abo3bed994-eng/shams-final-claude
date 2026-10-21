@@ -2870,7 +2870,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                 sound: "notification.wav",
                 data: { id: notification.id },
               },
-              trigger: { channelId: "default_v3" },
+              trigger: { channelId: "default_v4" },
             });
           } catch {}
         }
