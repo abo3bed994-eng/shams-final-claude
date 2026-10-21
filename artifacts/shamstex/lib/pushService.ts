@@ -240,19 +240,15 @@ export async function notifyStaffNewOrder(
         if (st.role === "admin") {
           targetTokens.push(st.expoPushToken);
         } else if (st.role === "supervisor") {
-          if (st.supervisorScope === "branch" && st.branchId) {
-            if (isShipping && st.canHandleShipping) {
-              targetTokens.push(st.expoPushToken);
-            } else if (!isShipping && st.branchId === orderBranchId) {
+          if (st.supervisorScope === "branch") {
+            if (isShipping ? !!st.canHandleShipping : !!orderBranchId && st.branchId === orderBranchId) {
               targetTokens.push(st.expoPushToken);
             }
           } else {
             targetTokens.push(st.expoPushToken);
           }
         } else if (st.role === "employee") {
-          if (isShipping && st.canHandleShipping) {
-            targetTokens.push(st.expoPushToken);
-          } else if (!isShipping && (!st.branchId || st.branchId === orderBranchId)) {
+          if (isShipping ? !!st.canHandleShipping : !!orderBranchId && st.branchId === orderBranchId) {
             targetTokens.push(st.expoPushToken);
           }
         }
@@ -261,12 +257,13 @@ export async function notifyStaffNewOrder(
       console.warn("Error filtering staff tokens by branch:", e);
     }
 
-    // Fallback: if no tokens matched, ensure all staff roles receive notification
+    // If branch filtering found no eligible recipient (or the scoped query failed),
+    // only administrators are a safe fallback. Never broaden a branch order to
+    // employees or supervisors from other branches.
     if (targetTokens.length === 0) {
-      targetTokens = await FS.getPushTokensByRoles(["admin", "supervisor", "employee"]);
-    } else {
-      targetTokens = Array.from(new Set(targetTokens));
+      targetTokens = await FS.getPushTokensByRoles(["admin"]);
     }
+    targetTokens = Array.from(new Set(targetTokens));
 
     await sendExpoPush(
       targetTokens,

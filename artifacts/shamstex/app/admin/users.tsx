@@ -190,6 +190,12 @@ export default function AdminUsersScreen() {
     } else {
       registerCustomer(updatedUser);
     }
+    FS.syncStaffPushTokenInfo(updatedUser.phone, updatedUser.role, {
+      branchId: updatedUser.branchId,
+      canHandleShipping: updatedUser.canHandleShipping,
+      supervisorScope: updatedUser.supervisorScope,
+      permissions: updatedUser.permissions ?? [],
+    }).catch(() => {});
   };
 
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;

@@ -57,8 +57,18 @@ function RootLayoutNav() {
 
   // Register for push notifications whenever a user logs in
   useEffect(() => {
-    if (user && pushRegistered.current !== user.phone) {
-      pushRegistered.current = user.phone;
+    const registrationKey = user
+      ? JSON.stringify([
+          user.phone,
+          user.role,
+          user.branchId ?? null,
+          user.canHandleShipping ?? null,
+          user.supervisorScope ?? null,
+          user.permissions ?? [],
+        ])
+      : null;
+    if (user && pushRegistered.current !== registrationKey) {
+      pushRegistered.current = registrationKey;
       registerForPushNotifications(user.phone, user.role, {
         branchId: user.branchId,
         canHandleShipping: user.canHandleShipping,

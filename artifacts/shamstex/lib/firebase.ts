@@ -553,6 +553,38 @@ export const FS = {
     await setDoc(doc(db, "pushTokens", canonical), payload, { merge: true });
   },
 
+  async syncStaffPushTokenInfo(
+    phone: string,
+    role: string,
+    extra: {
+      branchId?: string;
+      canHandleShipping?: boolean;
+      supervisorScope?: "branch" | "all";
+      permissions?: string[];
+    }
+  ) {
+    if (!phone) return;
+    const canonical = migrateLocalToE164(phone);
+    const refs = [doc(db, "pushTokens", canonical)];
+    if (phone !== canonical) refs.push(doc(db, "pushTokens", phone));
+    await Promise.all(refs.map(async (ref) => {
+      try {
+        const snap = await getDoc(ref);
+        if (!snap.exists()) return;
+        await updateDoc(ref, {
+          role,
+          branchId: extra.branchId || deleteField(),
+          canHandleShipping: extra.canHandleShipping ?? deleteField(),
+          supervisorScope: extra.supervisorScope || deleteField(),
+          permissions: extra.permissions ?? deleteField(),
+          updatedAt: new Date().toISOString(),
+        });
+      } catch (e) {
+        console.warn("syncStaffPushTokenInfo error:", e);
+      }
+    }));
+  },
+
   async deletePushToken(phone: string, expoPushToken?: string) {
     if (phone) {
       const canonical = migrateLocalToE164(phone);
