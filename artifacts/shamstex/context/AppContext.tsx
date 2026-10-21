@@ -2867,10 +2867,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               content: {
                 title: notification.title,
                 body: notification.body,
-                sound: true,
+                sound: "notification.wav",
                 data: { id: notification.id },
               },
-              trigger: null,
+              trigger: { channelId: "default_v3" },
             });
           } catch {}
         }

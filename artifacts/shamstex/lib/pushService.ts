@@ -85,7 +85,7 @@ export async function registerForPushNotifications(
 
     if (Platform.OS === "android") {
       const SHAMS_VIBRATION_PATTERN = [0, 150, 100, 150, 100, 450, 100, 150];
-      await Notifications.setNotificationChannelAsync("orders_v2", {
+      await Notifications.setNotificationChannelAsync("orders_v3", {
         name: "طلبات جديدة",
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: SHAMS_VIBRATION_PATTERN,
@@ -94,7 +94,7 @@ export async function registerForPushNotifications(
         enableVibrate: true,
         showBadge: true,
       });
-      await Notifications.setNotificationChannelAsync("messages_v3", {
+      await Notifications.setNotificationChannelAsync("messages_v4", {
         name: "رسائل وتحديثات",
         importance: Notifications.AndroidImportance.HIGH,
         vibrationPattern: SHAMS_VIBRATION_PATTERN,
@@ -103,7 +103,7 @@ export async function registerForPushNotifications(
         enableVibrate: true,
         showBadge: true,
       });
-      await Notifications.setNotificationChannelAsync("default_v2", {
+      await Notifications.setNotificationChannelAsync("default_v3", {
         name: "إشعارات عامة",
         importance: Notifications.AndroidImportance.HIGH,
         vibrationPattern: SHAMS_VIBRATION_PATTERN,
@@ -172,7 +172,7 @@ export async function sendExpoPush(
   title: string,
   body: string,
   data?: Record<string, any>,
-  channelId = "messages_v3"
+  channelId = "messages_v4"
 ): Promise<void> {
   const validTokens = Array.from(
     new Set(
@@ -273,7 +273,7 @@ export async function notifyStaffNewOrder(
       "🛍️ طلب جديد!",
       `طلب جديد من ${customerName} — #${orderId.slice(0, 8)}`,
       { type: "new_order", orderId },
-      "orders_v2"
+      "orders_v3"
     );
   } catch (err) {
     console.warn("notifyStaffNewOrder error:", err);
@@ -320,7 +320,7 @@ export async function notifyUpgradeRequest(
       "👑 طلب ترقية إلى تاجر",
       `طلب من ${userName} (${userPhone}) للترقية إلى حساب تاجر`,
       { type: "upgrade_request", actionType: "upgrade_request", actionUserId: userId },
-      "messages_v3"
+      "messages_v4"
     );
   } catch (err) {
     console.warn("notifyUpgradeRequest error:", err);
@@ -340,7 +340,7 @@ export async function notifyUserByPhone(
     const token =
       await FS.getPushTokenByPhone(normalizedPhone) ||
       (normalizedPhone !== phone ? await FS.getPushTokenByPhone(phone) : null);
-    if (token) await sendExpoPush([token], title, body, data, "messages_v3");
+    if (token) await sendExpoPush([token], title, body, data, "messages_v4");
   } catch (err) {
     console.warn("notifyUserByPhone error:", err);
   }
@@ -357,7 +357,7 @@ export async function notifyByRoles(
 ): Promise<void> {
   try {
     const tokens = await FS.getPushTokensByRoles(roles);
-    await sendExpoPush(tokens, title, body, data, "messages_v3");
+    await sendExpoPush(tokens, title, body, data, "messages_v4");
   } catch (err) {
     console.warn("notifyByRoles error:", err);
   }
@@ -373,7 +373,7 @@ export async function notifyAll(
 ): Promise<void> {
   try {
     const all = await FS.getAllPushTokens();
-    await sendExpoPush(all.map((t) => t.expoPushToken), title, body, data, "messages_v3");
+    await sendExpoPush(all.map((t) => t.expoPushToken), title, body, data, "messages_v4");
   } catch (err) {
     console.warn("notifyAll error:", err);
   }
