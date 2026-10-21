@@ -129,7 +129,7 @@ export default function NotificationsScreen() {
             </Text>
           )}
           <Text style={[styles.notifTime, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
-            {new Date(notif.createdAt).toLocaleDateString("ar-EG")}
+            {new Date(notif.createdAt).toLocaleDateString("ar-EG-u-nu-latn")}
           </Text>
         </View>
       </Pressable>

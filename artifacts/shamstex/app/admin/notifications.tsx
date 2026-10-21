@@ -715,7 +715,7 @@ export default function AdminNotificationsScreen() {
                         <Text style={{ color: badge.color, fontFamily: "Cairo_600SemiBold", fontSize: 10 }}>{badge.label}</Text>
                       </View>
                       <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11, flex: 1, textAlign: "right" }}>
-                        {new Date(n.createdAt).toLocaleDateString("ar-EG", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        {new Date(n.createdAt).toLocaleDateString("ar-EG-u-nu-latn", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                       </Text>
                     </View>
                     <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14, textAlign: "right" }}>

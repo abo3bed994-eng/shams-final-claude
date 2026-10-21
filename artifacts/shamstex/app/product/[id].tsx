@@ -1019,7 +1019,7 @@ export default function ProductDetailScreen() {
         onRequestClose={() => setCompanionEditor(null)}
       >
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.companionModalBackdrop}
         >
           <Pressable
@@ -1034,6 +1034,7 @@ export default function ProductDetailScreen() {
                 backgroundColor: colors.card,
                 borderColor: colors.border,
                 maxHeight: Math.min(windowHeight * 0.88, 640),
+              flexShrink: 1,
               },
             ]}
           >
@@ -1046,7 +1047,9 @@ export default function ProductDetailScreen() {
                     { color: colors.foreground, fontFamily: "Cairo_700Bold" },
                   ]}
                 >
-                  الخامة المرافقة
+                  {companionMaterials.length === 1
+                    ? `الخامة المرافقة: ${companionMaterials[0].name}`
+                    : "الخامة المرافقة"}
                 </Text>
                 <Text
                   style={[
@@ -1280,7 +1283,7 @@ export default function ProductDetailScreen() {
                   {/* Per-color list (Option 2) */}
                   {companionEditor.mode === "per_color" && (
                     <ScrollView
-                      style={{ maxHeight: 220, flexShrink: 1 }}
+                      style={{ maxHeight: 220, flexShrink: 1, minHeight: 0 }}
                       contentContainerStyle={{ gap: 4, paddingVertical: 2 }}
                       nestedScrollEnabled={true}
                       keyboardShouldPersistTaps="handled"

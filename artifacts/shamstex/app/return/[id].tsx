@@ -47,7 +47,7 @@ export default function ReturnDetailScreen() {
   const retStep = isCancelled ? -1 : RETURN_STEPS.findIndex((s) => s.key === ret.status);
   const stepColor = isCancelled ? "#E74C3C" : "#C0392B";
 
-  const date = new Date(ret.createdAt).toLocaleDateString("ar-EG", {
+  const date = new Date(ret.createdAt).toLocaleDateString("ar-EG-u-nu-latn", {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -231,7 +231,7 @@ export default function ReturnDetailScreen() {
               <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>
                 بواسطة: {ret.cancelledByName}
                 {ret.cancelledAt
-                  ? ` — ${new Date(ret.cancelledAt).toLocaleDateString("ar-EG", { day: "numeric", month: "long", year: "numeric" })}`
+                  ? ` — ${new Date(ret.cancelledAt).toLocaleDateString("ar-EG-u-nu-latn", { day: "numeric", month: "long", year: "numeric" })}`
                   : ""}
               </Text>
             )}

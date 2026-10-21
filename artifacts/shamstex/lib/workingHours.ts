@@ -80,7 +80,7 @@ export function formatNextOpenTime(next: Date | null, now: Date = new Date()): s
   const tomorrow = new Date(now);
   tomorrow.setDate(tomorrow.getDate() + 1);
   const isTomorrow = next.toDateString() === tomorrow.toDateString();
-  const time = next.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" });
+  const time = next.toLocaleTimeString("ar-EG-u-nu-latn", { hour: "2-digit", minute: "2-digit" });
   if (sameDay) return `اليوم الساعة ${time}`;
   if (isTomorrow) return `غداً الساعة ${time}`;
   const dayLabel = DAY_NAMES_AR[next.getDay()];

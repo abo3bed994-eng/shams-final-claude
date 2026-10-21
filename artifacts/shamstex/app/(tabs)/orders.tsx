@@ -320,7 +320,7 @@ export default function OrdersScreen() {
 
         <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", marginTop: 6 }}>
           <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 10 }}>
-            {new Date(ret.createdAt).toLocaleDateString("ar-EG")}
+            {new Date(ret.createdAt).toLocaleDateString("ar-EG-u-nu-latn")}
           </Text>
           <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 4 }}>
             <Text style={{ color: colors.gold, fontFamily: "Cairo_500Medium", fontSize: 11 }}>{t("details")}</Text>

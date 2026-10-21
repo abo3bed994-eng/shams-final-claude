@@ -662,7 +662,7 @@ export default function AdminUsersScreen() {
 
   const formatDate = (dateStr: string | undefined) => {
     if (!dateStr) return "";
-    return new Date(dateStr).toLocaleDateString("ar-EG", { year: "numeric", month: "short", day: "numeric" });
+    return new Date(dateStr).toLocaleDateString("ar-EG-u-nu-latn", { year: "numeric", month: "short", day: "numeric" });
   };
 
   const formatRelative = (dateStr: string | null) => {
@@ -818,7 +818,7 @@ export default function AdminUsersScreen() {
             </View>
             {totalSpent > 0 && (
               <Text style={{ color: colors.mutedForeground + "99", fontFamily: "Cairo_400Regular", fontSize: 10 }}>
-                {totalSpent.toLocaleString("ar-EG")} ج.م
+                {totalSpent.toLocaleString("ar-EG-u-nu-latn")} ج.م
               </Text>
             )}
           </View>
@@ -834,7 +834,7 @@ export default function AdminUsersScreen() {
                 </View>
                 <View style={[styles.orderStatDivider, { backgroundColor: colors.border }]} />
                 <View style={styles.orderStatItem}>
-                  <Text style={[styles.orderStatNum, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>{totalSpent.toLocaleString("ar-EG")}</Text>
+                  <Text style={[styles.orderStatNum, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>{totalSpent.toLocaleString("ar-EG-u-nu-latn")}</Text>
                   <Text style={[styles.orderStatLabel, { color: colors.mutedForeground }]}>ج.م إجمالي</Text>
                 </View>
                 <View style={[styles.orderStatDivider, { backgroundColor: colors.border }]} />

@@ -71,7 +71,7 @@ export default function OrderCard({ order, onPress, isAdmin, onStatusChange, onP
 
   const totalItems = order.items.reduce((sum, item) => sum + item.quantity, 0);
   const invoiceTotal = order.totalWithFee ?? order.total;
-  const date = new Date(order.createdAt).toLocaleDateString("ar-EG", {
+  const date = new Date(order.createdAt).toLocaleDateString("ar-EG-u-nu-latn", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -162,7 +162,7 @@ export default function OrderCard({ order, onPress, isAdmin, onStatusChange, onP
             قيمة الفاتورة النهائية
           </Text>
           <Text style={[styles.total, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
-            {invoiceTotal > 0 ? `${invoiceTotal.toLocaleString("ar-EG")} ج.م` : "بانتظار التسعير"}
+            {invoiceTotal > 0 ? `${invoiceTotal.toLocaleString("ar-EG-u-nu-latn")} ج.م` : "بانتظار التسعير"}
           </Text>
         </View>
 

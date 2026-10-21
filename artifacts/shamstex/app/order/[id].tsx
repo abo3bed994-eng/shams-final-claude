@@ -306,7 +306,7 @@ export default function OrderDetailScreen() {
     );
   }
 
-  const date = new Date(order.createdAt).toLocaleDateString("ar-EG", {
+  const date = new Date(order.createdAt).toLocaleDateString("ar-EG-u-nu-latn", {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -406,7 +406,7 @@ export default function OrderDetailScreen() {
           </Text>
           {isScheduled && order.scheduledFor && (
             <Text style={{ color: activeColor, fontFamily: "Cairo_600SemiBold", fontSize: 13, marginTop: 8, textAlign: "center" }}>
-              سيصل الطلب {new Date(order.scheduledFor).toLocaleString("ar-EG", { weekday: "long", hour: "2-digit", minute: "2-digit" })}
+              سيصل الطلب {new Date(order.scheduledFor).toLocaleString("ar-EG-u-nu-latn", { weekday: "long", hour: "2-digit", minute: "2-digit" })}
             </Text>
           )}
         </View>
@@ -453,7 +453,7 @@ export default function OrderDetailScreen() {
               </Text>
               {order.editedAt && (
                 <Text style={{ color: "#F39C1299", fontFamily: "Cairo_400Regular", fontSize: 11, textAlign: "right" }}>
-                  {new Date(order.editedAt).toLocaleDateString("ar-EG", { day: "numeric", month: "short", year: "numeric" })} — {new Date(order.editedAt).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" })}
+                  {new Date(order.editedAt).toLocaleDateString("ar-EG-u-nu-latn", { day: "numeric", month: "short", year: "numeric" })} — {new Date(order.editedAt).toLocaleTimeString("ar-EG-u-nu-latn", { hour: "2-digit", minute: "2-digit" })}
                 </Text>
               )}
             </View>

@@ -124,7 +124,7 @@ function ReturnCard({ ret, isStaff, colors, onUpdateStatus }: {
       )}
 
       <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 10, textAlign: "right", marginTop: 6 }}>
-        {new Date(ret.createdAt).toLocaleDateString("ar-EG")}
+        {new Date(ret.createdAt).toLocaleDateString("ar-EG-u-nu-latn")}
       </Text>
 
       {isStaff && ret.status !== "settled" && (

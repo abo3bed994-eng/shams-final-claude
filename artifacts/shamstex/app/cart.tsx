@@ -517,7 +517,7 @@ export default function CartScreen() {
 
                   <View style={[styles.amountBox, { backgroundColor: colors.gold + "11", borderColor: colors.gold + "44", borderRadius: colors.radius - 4 }]}>
                     <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 13 }}>المبلغ المطلوب</Text>
-                    <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 24 }}>{totalPrice.toLocaleString("ar-EG")} ج.م</Text>
+                    <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 24 }}>{totalPrice.toLocaleString("ar-EG-u-nu-latn")} ج.م</Text>
                   </View>
                 </View>
               )}
@@ -557,16 +557,16 @@ export default function CartScreen() {
                   <View style={[styles.amountBox, { backgroundColor: "#9B59B6" + "11", borderColor: "#9B59B6" + "33", borderRadius: colors.radius - 4 }]}>
                     <View style={styles.feeBreakdown}>
                       <View style={styles.feeRow}>
-                        <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>{totalPrice.toLocaleString("ar-EG")} ج.م</Text>
+                        <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>{totalPrice.toLocaleString("ar-EG-u-nu-latn")} ج.م</Text>
                         <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 13 }}>سعر الطلب</Text>
                       </View>
                       <View style={styles.feeRow}>
-                        <Text style={{ color: "#E74C3C", fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>+{feeAmount.toLocaleString("ar-EG")} ج.م</Text>
+                        <Text style={{ color: "#E74C3C", fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>+{feeAmount.toLocaleString("ar-EG-u-nu-latn")} ج.م</Text>
                         <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 13 }}>رسوم المحفظة ({ewalletFee}%)</Text>
                       </View>
                       <View style={[styles.feeDivider, { backgroundColor: colors.border }]} />
                       <View style={styles.feeRow}>
-                        <Text style={{ color: "#9B59B6", fontFamily: "Cairo_700Bold", fontSize: 22 }}>{totalWithFee.toLocaleString("ar-EG")} ج.م</Text>
+                        <Text style={{ color: "#9B59B6", fontFamily: "Cairo_700Bold", fontSize: 22 }}>{totalWithFee.toLocaleString("ar-EG-u-nu-latn")} ج.م</Text>
                         <Text style={{ color: "#9B59B6", fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>الإجمالي</Text>
                       </View>
                     </View>
@@ -606,7 +606,7 @@ export default function CartScreen() {
 
                   <View style={[styles.amountBox, { backgroundColor: "#2ECC71" + "11", borderColor: "#2ECC71" + "33", borderRadius: colors.radius - 4 }]}>
                     <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 13 }}>المبلغ المطلوب</Text>
-                    <Text style={{ color: "#2ECC71", fontFamily: "Cairo_700Bold", fontSize: 24 }}>{totalPrice.toLocaleString("ar-EG")} ج.م</Text>
+                    <Text style={{ color: "#2ECC71", fontFamily: "Cairo_700Bold", fontSize: 24 }}>{totalPrice.toLocaleString("ar-EG-u-nu-latn")} ج.م</Text>
                     <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 4 }}>
                       <Icon name="check-circle" size={14} color="#2ECC71" />
                       <Text style={{ color: "#2ECC71", fontFamily: "Cairo_500Medium", fontSize: 12 }}>بدون رسوم إضافية</Text>
@@ -1419,15 +1419,15 @@ export default function CartScreen() {
                     {selectedPayment === "ewallet" && feeAmount > 0 ? (
                       <>
                         <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textDecorationLine: "line-through" }}>
-                          {hasPiecesOrder ? "≈ " : ""}{totalPrice.toLocaleString("ar-EG")} ج.م
+                          {hasPiecesOrder ? "≈ " : ""}{totalPrice.toLocaleString("ar-EG-u-nu-latn")} ج.م
                         </Text>
                         <Text style={[styles.totalPrice, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
-                          {hasPiecesOrder ? "≈ " : ""}{totalWithFee.toLocaleString("ar-EG")} ج.م
+                          {hasPiecesOrder ? "≈ " : ""}{totalWithFee.toLocaleString("ar-EG-u-nu-latn")} ج.م
                         </Text>
                       </>
                     ) : (
                       <Text style={[styles.totalPrice, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
-                        {hasPiecesOrder ? "≈ " : ""}{totalPrice.toLocaleString("ar-EG")} ج.م
+                        {hasPiecesOrder ? "≈ " : ""}{totalPrice.toLocaleString("ar-EG-u-nu-latn")} ج.م
                       </Text>
                     )}
                   </View>
