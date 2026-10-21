@@ -1019,7 +1019,7 @@ export default function ProductDetailScreen() {
         onRequestClose={() => setCompanionEditor(null)}
       >
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "position"}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={styles.companionModalBackdrop}
         >
           <Pressable
@@ -1170,28 +1170,8 @@ export default function ProductDetailScreen() {
                         </Text>
                       </Pressable>
 
-                      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                        {(() => {
-                          const pct = Math.min(maxPct, Number(companionEditor.allPercentage) || 0);
-                          const totalBase = selectedOrderColors.reduce(
-                            (sum, c) => sum + getColorBaseAmount(c),
-                            0
-                          );
-                          const allWeight = (totalBase * pct) / 100;
-                          return allWeight > 0 ? (
-                            <Text
-                              style={{
-                                color: colors.success,
-                                fontFamily: "Cairo_700Bold",
-                                fontSize: 13,
-                              }}
-                            >
-                              {formatCompanionAmount(allWeight)} كغ
-                            </Text>
-                          ) : null;
-                        })()}
-                        <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                          <AppTextInput
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                        <AppTextInput
                             value={companionEditor.allPercentage}
                             onFocus={() => {
                               if (companionEditor.mode !== "all") {
@@ -1233,7 +1213,6 @@ export default function ProductDetailScreen() {
                             %
                           </Text>
                         </View>
-                      </View>
                     </View>
 
                     {/* Option 2: تحديد ألوان معينة */}
@@ -1586,10 +1565,11 @@ const styles = StyleSheet.create({
   },
   companionModalBackdrop: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.48)",
+    backgroundColor: "rgba(0,0,0,0.55)",
     alignItems: "center",
     justifyContent: "center",
-    padding: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 20,
   },
   companionOptionBox: {
     flexDirection: "row-reverse",
@@ -1687,7 +1667,7 @@ const styles = StyleSheet.create({
   },
   companionModalCard: {
     width: "100%",
-    maxWidth: 430,
+    alignSelf: "stretch",
     borderRadius: 20,
     borderWidth: 1,
     padding: 18,
