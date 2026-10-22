@@ -11,6 +11,8 @@ import { migrateLocalToE164, samePhone } from "@/lib/phoneUtils";
 let _Notifications: typeof import("expo-notifications") | null = null;
 let _Device: typeof import("expo-device") | null = null;
 let _initDone = false;
+let pushRegistrationGeneration = 0;
+let activePushRegistrationPhone: string | null = null;
 
 async function getNotifications() {
   if (!_Notifications) {
@@ -53,6 +55,15 @@ async function initHandler() {
 }
 
 /**
+ * Invalidate any in-flight registration when the current user signs out.
+ * A late token lookup must never reattach this device to the previous account.
+ */
+export function invalidatePendingPushRegistration(): void {
+  pushRegistrationGeneration += 1;
+  activePushRegistrationPhone = null;
+}
+
+/**
  * Register this device for push notifications.
  * Saves the Expo push token to Firestore.
  * Totally safe — will not throw even if push is unavailable.
@@ -67,6 +78,13 @@ export async function registerForPushNotifications(
     permissions?: string[];
   }
 ): Promise<string | null> {
+  const registrationGeneration = ++pushRegistrationGeneration;
+  const registrationPhone = migrateLocalToE164(phone);
+  activePushRegistrationPhone = registrationPhone;
+  const registrationIsCurrent = () =>
+    registrationGeneration === pushRegistrationGeneration &&
+    activePushRegistrationPhone === registrationPhone;
+
   try {
     const Device = await getDevice();
     if (!Device || !Device.isDevice) return null;
@@ -139,22 +157,26 @@ export async function registerForPushNotifications(
     }
 
     if (expoPushToken) {
+      if (!registrationIsCurrent()) return null;
       try {
         const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default;
-        const currentE164 = migrateLocalToE164(phone);
+        const currentE164 = registrationPhone;
         const prevRegisteredPhone = await AsyncStorage.getItem("@shamstex/active_push_phone");
+        if (!registrationIsCurrent()) return null;
         if (prevRegisteredPhone && prevRegisteredPhone !== currentE164 && prevRegisteredPhone !== phone) {
           // Device switched accounts: wipe token from the old account's record immediately
           await FS.deletePushToken(migrateLocalToE164(prevRegisteredPhone), expoPushToken);
           await FS.deletePushToken(prevRegisteredPhone, expoPushToken);
         }
+        if (!registrationIsCurrent()) return null;
         await AsyncStorage.setItem("@shamstex/active_push_phone", currentE164);
       } catch {}
 
       // Push-token documents are keyed by phone. Keep the key canonical so
       // status notifications can find the token even when an old order stores
       // the customer's local-format phone.
-      await FS.savePushToken(migrateLocalToE164(phone), role, expoPushToken, extra);
+      if (!registrationIsCurrent()) return null;
+      await FS.savePushToken(registrationPhone, role, expoPushToken, extra, registrationIsCurrent);
     }
     return expoPushToken;
   } catch (err) {

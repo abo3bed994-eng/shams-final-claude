@@ -1393,6 +1393,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       roleChangeAlertShownRef.current = false;
       await persistUserSafe(u);
     } else {
+      // Invalidate any pending token registration before cleanup starts, so a
+      // delayed registration cannot restore this device token to the old user.
+      try {
+        const { invalidatePendingPushRegistration } = await import("@/lib/pushService");
+        invalidatePendingPushRegistration();
+      } catch {}
+
       // Remove this device push token from Firestore and sign out of
       // Firebase Auth so status notifications stop reaching a device that is
       // no longer on the account that received them.

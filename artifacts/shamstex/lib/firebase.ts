@@ -524,20 +524,24 @@ export const FS = {
       canHandleShipping?: boolean;
       supervisorScope?: "branch" | "all";
       permissions?: string[];
-    }
+    },
+    isCurrentRegistration?: () => boolean
   ) {
-    if (!phone || !expoPushToken) return;
+    if (!phone || !expoPushToken || (isCurrentRegistration && !isCurrentRegistration())) return;
     const canonical = migrateLocalToE164(phone);
     try {
       const snap = await getDocs(query(collection(db, "pushTokens"), where("expoPushToken", "==", expoPushToken)));
+      if (isCurrentRegistration && !isCurrentRegistration()) return;
       for (const d of snap.docs) {
         if (d.id !== canonical && d.id !== phone) {
+          if (isCurrentRegistration && !isCurrentRegistration()) return;
           await deleteDoc(d.ref).catch(() => {
             updateDoc(d.ref, { expoPushToken: "" }).catch(() => {});
           });
         }
       }
     } catch (_) {}
+    if (isCurrentRegistration && !isCurrentRegistration()) return;
 
     const payload: Record<string, any> = {
       phone: canonical,
@@ -550,6 +554,7 @@ export const FS = {
     if (extra?.supervisorScope) payload.supervisorScope = extra.supervisorScope;
     if (extra?.permissions) payload.permissions = extra.permissions;
 
+    if (isCurrentRegistration && !isCurrentRegistration()) return;
     await setDoc(doc(db, "pushTokens", canonical), payload, { merge: true });
   },
 
