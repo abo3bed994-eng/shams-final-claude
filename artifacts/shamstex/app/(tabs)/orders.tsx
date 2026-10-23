@@ -389,12 +389,12 @@ export default function OrdersScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { paddingTop: topPad + 8, borderBottomColor: colors.border }]}>
-        <View style={{ flex: 1 }}>
-          <Text style={[styles.title, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
+        <View style={{ flex: 1, alignItems: "flex-end" }}>
+          <Text style={[styles.title, { color: colors.foreground, fontFamily: "Cairo_700Bold", textAlign: "right" }]}>
             {isStaff ? t("manageOrders") : t("myOrders")}
           </Text>
           {!isStaff && myOrders.length > 0 && (
-            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, marginTop: 2 }}>
+            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, marginTop: 2, textAlign: "right" }}>
               {myOrders.length} {t("orders")}
             </Text>
           )}
@@ -552,7 +552,7 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     borderBottomWidth: 1,
   },
-  title: { fontSize: 22 },
+  title: { fontSize: 22, textAlign: "right" },
   cartBtn: { width: 42, height: 42, alignItems: "center", justifyContent: "center", position: "relative" as const },
   cartHeaderIconWrap: { position: "relative" as const, width: 24, height: 24, overflow: "visible" as const },
   cartBadge: {

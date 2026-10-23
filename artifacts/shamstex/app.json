@@ -2,7 +2,7 @@
   "expo": {
     "name": "Shams Tex",
     "slug": "shamstex",
-    "version": "1.1.0",
+    "version": "1.1.4",
     "orientation": "portrait",
     "icon": "./assets/images/app-icon.png",
     "scheme": "shamstex",
@@ -34,7 +34,7 @@
         "android.permission.RECORD_AUDIO",
         "android.permission.POST_NOTIFICATIONS"
       ],
-      "versionCode": 11
+      "versionCode": 14
     },
     "web": {
       "favicon": "./assets/images/favicon.png"

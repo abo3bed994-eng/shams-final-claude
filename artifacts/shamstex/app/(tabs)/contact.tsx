@@ -40,7 +40,7 @@ export default function ContactScreen() {
         ]}
       >
         <Text
-          style={[styles.title, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}
+          style={[styles.title, { color: colors.foreground, fontFamily: "Cairo_700Bold", textAlign: "right" }]}
         >
           {t("contactUs")}
         </Text>
@@ -197,8 +197,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,
+    alignItems: "flex-end",
   },
-  title: { fontSize: 22 },
+  title: { fontSize: 22, textAlign: "right", width: "100%" },
   content: {
     padding: 16,
     gap: 24,

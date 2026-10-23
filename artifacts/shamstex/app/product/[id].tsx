@@ -1,12 +1,14 @@
 import AppTextInput from "@/components/AppTextInput";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   Animated,
   BackHandler,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
+  PanResponder,
   Platform,
   Pressable,
   ScrollView,
@@ -29,6 +31,171 @@ import { useCartPulse } from "@/hooks/useCartPulse";
 import GoldButton from "@/components/GoldButton";
 import GoldHeader from "@/components/GoldHeader";
 import { KeyboardAwareScroll } from "@/components/KeyboardAware";
+
+interface ZoomableImageProps {
+  uri: string;
+  width: number;
+  height: number;
+  onDismiss: () => void;
+  onZoomChange?: (isZoomed: boolean) => void;
+}
+
+function ZoomableImage({ uri, width, height, onDismiss, onZoomChange }: ZoomableImageProps) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const translateX = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(0)).current;
+
+  const currentScale = useRef(1);
+  const currentTranslateX = useRef(0);
+  const currentTranslateY = useRef(0);
+
+  const initialDist = useRef(0);
+  const initialScale = useRef(1);
+  const lastTap = useRef(0);
+  const isPinching = useRef(false);
+
+  useEffect(() => {
+    const sId = scale.addListener((v) => {
+      currentScale.current = v.value;
+    });
+    const xId = translateX.addListener((v) => {
+      currentTranslateX.current = v.value;
+    });
+    const yId = translateY.addListener((v) => {
+      currentTranslateY.current = v.value;
+    });
+    return () => {
+      scale.removeListener(sId);
+      translateX.removeListener(xId);
+      translateY.removeListener(yId);
+    };
+  }, [scale, translateX, translateY]);
+
+  const resetZoom = useCallback(() => {
+    Animated.parallel([
+      Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
+      Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
+      Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
+    ]).start(() => {
+      currentScale.current = 1;
+      currentTranslateX.current = 0;
+      currentTranslateY.current = 0;
+      onZoomChange?.(false);
+    });
+  }, [scale, translateX, translateY, onZoomChange]);
+
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: (_, gestureState) => {
+          return gestureState.numberActiveTouches === 2 || currentScale.current > 1;
+        },
+        onPanResponderGrant: (evt) => {
+          const touches = evt.nativeEvent.touches;
+          if (touches.length === 2) {
+            isPinching.current = true;
+            initialDist.current = Math.hypot(
+              touches[0].pageX - touches[1].pageX,
+              touches[0].pageY - touches[1].pageY
+            );
+            initialScale.current = currentScale.current;
+          } else {
+            isPinching.current = false;
+          }
+        },
+        onPanResponderMove: (evt, gestureState) => {
+          const touches = evt.nativeEvent.touches;
+          if (touches.length === 2) {
+            isPinching.current = true;
+            const dist = Math.hypot(
+              touches[0].pageX - touches[1].pageX,
+              touches[0].pageY - touches[1].pageY
+            );
+            if (initialDist.current > 0) {
+              const nextScale = Math.max(1, Math.min(4, initialScale.current * (dist / initialDist.current)));
+              scale.setValue(nextScale);
+              onZoomChange?.(nextScale > 1.05);
+            }
+          } else if (touches.length === 1 && currentScale.current > 1 && !isPinching.current) {
+            const maxTx = (width * (currentScale.current - 1)) / 2;
+            const maxTy = (height * (currentScale.current - 1)) / 2;
+            const nextX = Math.max(-maxTx, Math.min(maxTx, currentTranslateX.current + gestureState.dx));
+            const nextY = Math.max(-maxTy, Math.min(maxTy, currentTranslateY.current + gestureState.dy));
+            translateX.setValue(nextX);
+            translateY.setValue(nextY);
+          }
+        },
+        onPanResponderRelease: (_, gestureState) => {
+          isPinching.current = false;
+          if (currentScale.current <= 1.05) {
+            resetZoom();
+            const now = Date.now();
+            if (now - lastTap.current < 300) {
+              Animated.parallel([
+                Animated.spring(scale, { toValue: 2.5, useNativeDriver: true }),
+              ]).start(() => {
+                currentScale.current = 2.5;
+                onZoomChange?.(true);
+              });
+              lastTap.current = 0;
+            } else {
+              lastTap.current = now;
+              if (Math.abs(gestureState.dx) < 6 && Math.abs(gestureState.dy) < 6) {
+                setTimeout(() => {
+                  if (Date.now() - lastTap.current >= 280 && lastTap.current !== 0) {
+                    onDismiss();
+                  }
+                }, 300);
+              }
+            }
+          } else {
+            const now = Date.now();
+            if (now - lastTap.current < 300) {
+              resetZoom();
+              lastTap.current = 0;
+            } else {
+              lastTap.current = now;
+              const maxTx = (width * (currentScale.current - 1)) / 2;
+              const maxTy = (height * (currentScale.current - 1)) / 2;
+              Animated.parallel([
+                Animated.spring(translateX, {
+                  toValue: Math.max(-maxTx, Math.min(maxTx, currentTranslateX.current + gestureState.dx)),
+                  useNativeDriver: true,
+                }),
+                Animated.spring(translateY, {
+                  toValue: Math.max(-maxTy, Math.min(maxTy, currentTranslateY.current + gestureState.dy)),
+                  useNativeDriver: true,
+                }),
+              ]).start();
+            }
+          }
+        },
+      }),
+    [width, height, scale, translateX, translateY, resetZoom, onDismiss, onZoomChange]
+  );
+
+  return (
+    <View
+      style={{ width, height, justifyContent: "center", alignItems: "center", overflow: "hidden" }}
+      {...panResponder.panHandlers}
+    >
+      <Animated.Image
+        source={{ uri }}
+        style={{
+          width,
+          height,
+          transform: [
+            { scale },
+            { translateX },
+            { translateY },
+          ],
+        }}
+        resizeMode="contain"
+      />
+    </View>
+  );
+}
 
 const KG_STEP = 0.5;
 
@@ -70,6 +237,24 @@ export default function ProductDetailScreen() {
   const [imgIdx, setImgIdx] = useState(0);
   const [viewerVisible, setViewerVisible] = useState(false);
   const [viewerIdx, setViewerIdx] = useState(0);
+  const [isViewerZoomed, setIsViewerZoomed] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const perColorScrollRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      (e) => setKeyboardHeight(e.endCoordinates.height)
+    );
+    const hideSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => setKeyboardHeight(0)
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
   const imgWidth = windowWidth - 32;
 
   const confirmLeave = React.useCallback(() => {
@@ -1016,15 +1201,27 @@ export default function ProductDetailScreen() {
         visible={companionEditor !== null}
         transparent
         animationType="fade"
-        onRequestClose={() => setCompanionEditor(null)}
+        onRequestClose={() => {
+          Keyboard.dismiss();
+          setCompanionEditor(null);
+        }}
       >
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
-          style={styles.companionModalBackdrop}
+          style={[
+            styles.companionModalBackdrop,
+            keyboardHeight > 0 && {
+              justifyContent: "flex-end",
+              paddingBottom: Math.min(keyboardHeight + 10, windowHeight * 0.45),
+            },
+          ]}
         >
           <Pressable
             style={StyleSheet.absoluteFill}
-            onPress={() => setCompanionEditor(null)}
+            onPress={() => {
+              Keyboard.dismiss();
+              setCompanionEditor(null);
+            }}
             accessibilityLabel="إغلاق بطاقة الخامة المرافقة"
           />
           <View
@@ -1033,8 +1230,8 @@ export default function ProductDetailScreen() {
               {
                 backgroundColor: colors.card,
                 borderColor: colors.border,
-                maxHeight: Math.min(windowHeight * 0.88, 640),
-              flexShrink: 1,
+                maxHeight: Math.min(windowHeight * (keyboardHeight > 0 ? 0.55 : 0.88), 640),
+                flexShrink: 1,
               },
             ]}
           >
@@ -1262,6 +1459,7 @@ export default function ProductDetailScreen() {
                   {/* Per-color list (Option 2) */}
                   {companionEditor.mode === "per_color" && (
                     <ScrollView
+                      ref={perColorScrollRef}
                       style={{ maxHeight: 220, flexShrink: 1, minHeight: 0 }}
                       contentContainerStyle={{ gap: 4, paddingVertical: 2 }}
                       nestedScrollEnabled={true}
@@ -1269,7 +1467,7 @@ export default function ProductDetailScreen() {
                       keyboardDismissMode="on-drag"
                       showsVerticalScrollIndicator={true}
                     >
-                      {selectedOrderColors.map((colorName) => {
+                      {selectedOrderColors.map((colorName, colorIdx) => {
                         const color = product.colors.find((item) => item.name === colorName);
                         const pctVal = companionEditor.perColorValues[colorName] ?? "";
                         const pct = Math.min(maxPct, Number(pctVal) || 0);
@@ -1322,6 +1520,14 @@ export default function ProductDetailScreen() {
                               <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
                                 <AppTextInput
                                   value={pctVal}
+                                  onFocus={() => {
+                                    setTimeout(() => {
+                                      perColorScrollRef.current?.scrollTo({
+                                        y: colorIdx * 56,
+                                        animated: true,
+                                      });
+                                    }, 100);
+                                  }}
                                   onChangeText={(value) => {
                                     if (!/^\d*([.]\d*)?$/.test(value)) return;
                                     const num = Number(value);
@@ -1471,23 +1677,21 @@ export default function ProductDetailScreen() {
             ref={viewerScrollRef}
             horizontal
             pagingEnabled
+            scrollEnabled={!isViewerZoomed}
             showsHorizontalScrollIndicator={false}
             onLayout={() =>
               viewerScrollRef.current?.scrollTo({ x: viewerIdx * windowWidth, animated: false })
             }
           >
             {(product.images ?? []).map((uri, i) => (
-              <Pressable
+              <ZoomableImage
                 key={i}
-                style={{ width: windowWidth, height: windowHeight, justifyContent: "center" }}
-                onPress={() => setViewerVisible(false)}
-              >
-                <Image
-                  source={{ uri }}
-                  style={{ width: windowWidth, height: windowHeight }}
-                  resizeMode="contain"
-                />
-              </Pressable>
+                uri={uri}
+                width={windowWidth}
+                height={windowHeight}
+                onDismiss={() => setViewerVisible(false)}
+                onZoomChange={setIsViewerZoomed}
+              />
             ))}
           </ScrollView>
         </View>

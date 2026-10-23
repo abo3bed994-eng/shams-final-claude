@@ -319,7 +319,7 @@ export async function notifyUpgradeRequest(
           targetTokens.push(st.expoPushToken);
         } else if (st.role === "supervisor") {
           const perms: string[] = st.permissions || [];
-          if (perms.includes("approve_upgrades") || !st.permissions) {
+          if (perms.length === 0 || perms.includes("approve_upgrades")) {
             targetTokens.push(st.expoPushToken);
           }
         }
@@ -328,18 +328,29 @@ export async function notifyUpgradeRequest(
       console.warn("Error finding upgrade request tokens:", e);
     }
 
-    if (targetTokens.length === 0) {
-      targetTokens = await FS.getPushTokensByRoles(["admin"]);
-    } else {
-      targetTokens = Array.from(new Set(targetTokens));
-    }
+    // Always fetch all admin tokens
+    try {
+      const adminTokens = await FS.getPushTokensByRoles(["admin"]);
+      targetTokens.push(...adminTokens);
+    } catch (_) {}
 
+    // Direct lookup for primary manager/owner (+201221131138 and local format)
+    try {
+      const ownerToken =
+        (await FS.getPushTokenByPhone("+201221131138")) ||
+        (await FS.getPushTokenByPhone("01221131138"));
+      if (ownerToken) targetTokens.push(ownerToken);
+    } catch (_) {}
+
+    targetTokens = Array.from(new Set(targetTokens.filter(Boolean)));
+
+    // Use "orders_v4" so it fires with MAX importance, notification.wav sound, and vibration
     await sendExpoPush(
       targetTokens,
       "👑 طلب ترقية إلى تاجر",
       `طلب من ${userName} (${userPhone}) للترقية إلى حساب تاجر`,
       { type: "upgrade_request", actionType: "upgrade_request", actionUserId: userId },
-      "messages_v5"
+      "orders_v4"
     );
   } catch (err) {
     console.warn("notifyUpgradeRequest error:", err);
