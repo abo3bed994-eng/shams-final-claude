@@ -49,135 +49,225 @@ function ZoomableImage({ uri, width, height, onDismiss, onZoomChange }: Zoomable
   const currentTranslateX = useRef(0);
   const currentTranslateY = useRef(0);
 
-  const initialDist = useRef(0);
-  const initialScale = useRef(1);
-  const lastTap = useRef(0);
+  const startTranslateX = useRef(0);
+  const startTranslateY = useRef(0);
+  const startScale = useRef(1);
+  const pinchStartDist = useRef(0);
   const isPinching = useRef(false);
 
-  useEffect(() => {
-    const sId = scale.addListener((v) => {
-      currentScale.current = v.value;
-    });
-    const xId = translateX.addListener((v) => {
-      currentTranslateX.current = v.value;
-    });
-    const yId = translateY.addListener((v) => {
-      currentTranslateY.current = v.value;
-    });
-    return () => {
-      scale.removeListener(sId);
-      translateX.removeListener(xId);
-      translateY.removeListener(yId);
-    };
-  }, [scale, translateX, translateY]);
+  const lastTapTime = useRef(0);
+  const singleTapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const resetZoom = useCallback(() => {
-    Animated.parallel([
-      Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
-      Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
-      Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
-    ]).start(() => {
+  const notifyZoom = useCallback(
+    (zoomed: boolean) => {
+      onZoomChange?.(zoomed);
+    },
+    [onZoomChange]
+  );
+
+  const clampTranslation = (tx: number, ty: number, s: number) => {
+    const maxTx = Math.max(0, (width * (s - 1)) / 2);
+    const maxTy = Math.max(0, (height * (s - 1)) / 2);
+    return {
+      x: Math.max(-maxTx, Math.min(maxTx, tx)),
+      y: Math.max(-maxTy, Math.min(maxTy, ty)),
+    };
+  };
+
+  const resetZoom = useCallback(
+    (animated = true) => {
+      if (singleTapTimer.current) {
+        clearTimeout(singleTapTimer.current);
+        singleTapTimer.current = null;
+      }
       currentScale.current = 1;
       currentTranslateX.current = 0;
       currentTranslateY.current = 0;
-      onZoomChange?.(false);
-    });
-  }, [scale, translateX, translateY, onZoomChange]);
+      notifyZoom(false);
+
+      if (animated) {
+        Animated.parallel([
+          Animated.spring(scale, { toValue: 1, friction: 7, tension: 50, useNativeDriver: true }),
+          Animated.spring(translateX, { toValue: 0, friction: 7, tension: 50, useNativeDriver: true }),
+          Animated.spring(translateY, { toValue: 0, friction: 7, tension: 50, useNativeDriver: true }),
+        ]).start();
+      } else {
+        scale.setValue(1);
+        translateX.setValue(0);
+        translateY.setValue(0);
+      }
+    },
+    [scale, translateX, translateY, notifyZoom]
+  );
+
+  const zoomTo = useCallback(
+    (targetScale: number) => {
+      if (singleTapTimer.current) {
+        clearTimeout(singleTapTimer.current);
+        singleTapTimer.current = null;
+      }
+      currentScale.current = targetScale;
+      currentTranslateX.current = 0;
+      currentTranslateY.current = 0;
+      notifyZoom(targetScale > 1.05);
+
+      Animated.parallel([
+        Animated.spring(scale, { toValue: targetScale, friction: 7, tension: 50, useNativeDriver: true }),
+        Animated.spring(translateX, { toValue: 0, friction: 7, tension: 50, useNativeDriver: true }),
+        Animated.spring(translateY, { toValue: 0, friction: 7, tension: 50, useNativeDriver: true }),
+      ]).start();
+    },
+    [scale, translateX, translateY, notifyZoom]
+  );
+
+  const handleTap = useCallback(() => {
+    const now = Date.now();
+    const timeSinceLastTap = now - lastTapTime.current;
+
+    if (timeSinceLastTap < 300) {
+      // Double tap
+      if (singleTapTimer.current) {
+        clearTimeout(singleTapTimer.current);
+        singleTapTimer.current = null;
+      }
+      lastTapTime.current = 0;
+      if (currentScale.current > 1.05) {
+        resetZoom(true);
+      } else {
+        zoomTo(2.5);
+      }
+    } else {
+      // First tap
+      lastTapTime.current = now;
+      singleTapTimer.current = setTimeout(() => {
+        singleTapTimer.current = null;
+        if (currentScale.current <= 1.05) {
+          onDismiss();
+        }
+      }, 300);
+    }
+  }, [resetZoom, zoomTo, onDismiss]);
 
   const panResponder = useMemo(
     () =>
       PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
+        onStartShouldSetPanResponder: () => false,
+        onStartShouldSetPanResponderCapture: () => false,
         onMoveShouldSetPanResponder: (_, gestureState) => {
-          return gestureState.numberActiveTouches === 2 || currentScale.current > 1;
+          if (gestureState.numberActiveTouches >= 2) return true;
+          if (currentScale.current > 1.05) {
+            return Math.abs(gestureState.dx) > 2 || Math.abs(gestureState.dy) > 2;
+          }
+          return false;
+        },
+        onMoveShouldSetPanResponderCapture: (_, gestureState) => {
+          if (gestureState.numberActiveTouches >= 2) return true;
+          if (currentScale.current > 1.05) {
+            return Math.abs(gestureState.dx) > 2 || Math.abs(gestureState.dy) > 2;
+          }
+          return false;
         },
         onPanResponderGrant: (evt) => {
+          if (singleTapTimer.current) {
+            clearTimeout(singleTapTimer.current);
+            singleTapTimer.current = null;
+          }
           const touches = evt.nativeEvent.touches;
-          if (touches.length === 2) {
+          if (touches.length >= 2) {
             isPinching.current = true;
-            initialDist.current = Math.hypot(
+            pinchStartDist.current = Math.hypot(
               touches[0].pageX - touches[1].pageX,
               touches[0].pageY - touches[1].pageY
             );
-            initialScale.current = currentScale.current;
+            startScale.current = currentScale.current;
           } else {
             isPinching.current = false;
+            startTranslateX.current = currentTranslateX.current;
+            startTranslateY.current = currentTranslateY.current;
           }
         },
         onPanResponderMove: (evt, gestureState) => {
           const touches = evt.nativeEvent.touches;
-          if (touches.length === 2) {
-            isPinching.current = true;
+          if (touches.length >= 2) {
             const dist = Math.hypot(
               touches[0].pageX - touches[1].pageX,
               touches[0].pageY - touches[1].pageY
             );
-            if (initialDist.current > 0) {
-              const nextScale = Math.max(1, Math.min(4, initialScale.current * (dist / initialDist.current)));
-              scale.setValue(nextScale);
-              onZoomChange?.(nextScale > 1.05);
+            if (!isPinching.current || pinchStartDist.current === 0) {
+              isPinching.current = true;
+              pinchStartDist.current = dist;
+              startScale.current = currentScale.current;
             }
-          } else if (touches.length === 1 && currentScale.current > 1 && !isPinching.current) {
-            const maxTx = (width * (currentScale.current - 1)) / 2;
-            const maxTy = (height * (currentScale.current - 1)) / 2;
-            const nextX = Math.max(-maxTx, Math.min(maxTx, currentTranslateX.current + gestureState.dx));
-            const nextY = Math.max(-maxTy, Math.min(maxTy, currentTranslateY.current + gestureState.dy));
-            translateX.setValue(nextX);
-            translateY.setValue(nextY);
+            if (pinchStartDist.current > 0) {
+              const newScale = Math.max(1, Math.min(4, startScale.current * (dist / pinchStartDist.current)));
+              currentScale.current = newScale;
+              scale.setValue(newScale);
+              notifyZoom(newScale > 1.05);
+
+              const clamped = clampTranslation(currentTranslateX.current, currentTranslateY.current, newScale);
+              currentTranslateX.current = clamped.x;
+              currentTranslateY.current = clamped.y;
+              translateX.setValue(clamped.x);
+              translateY.setValue(clamped.y);
+            }
+          } else if (touches.length === 1 && currentScale.current > 1.05 && !isPinching.current) {
+            const targetX = startTranslateX.current + gestureState.dx;
+            const targetY = startTranslateY.current + gestureState.dy;
+            const clamped = clampTranslation(targetX, targetY, currentScale.current);
+            translateX.setValue(clamped.x);
+            translateY.setValue(clamped.y);
           }
         },
         onPanResponderRelease: (_, gestureState) => {
+          const wasPinching = isPinching.current;
           isPinching.current = false;
-          if (currentScale.current <= 1.05) {
-            resetZoom();
-            const now = Date.now();
-            if (now - lastTap.current < 300) {
-              Animated.parallel([
-                Animated.spring(scale, { toValue: 2.5, useNativeDriver: true }),
-              ]).start(() => {
-                currentScale.current = 2.5;
-                onZoomChange?.(true);
-              });
-              lastTap.current = 0;
+          pinchStartDist.current = 0;
+
+          if (wasPinching) {
+            if (currentScale.current <= 1.08) {
+              resetZoom(true);
             } else {
-              lastTap.current = now;
-              if (Math.abs(gestureState.dx) < 6 && Math.abs(gestureState.dy) < 6) {
-                setTimeout(() => {
-                  if (Date.now() - lastTap.current >= 280 && lastTap.current !== 0) {
-                    onDismiss();
-                  }
-                }, 300);
-              }
-            }
-          } else {
-            const now = Date.now();
-            if (now - lastTap.current < 300) {
-              resetZoom();
-              lastTap.current = 0;
-            } else {
-              lastTap.current = now;
-              const maxTx = (width * (currentScale.current - 1)) / 2;
-              const maxTy = (height * (currentScale.current - 1)) / 2;
+              const clamped = clampTranslation(currentTranslateX.current, currentTranslateY.current, currentScale.current);
+              currentTranslateX.current = clamped.x;
+              currentTranslateY.current = clamped.y;
               Animated.parallel([
-                Animated.spring(translateX, {
-                  toValue: Math.max(-maxTx, Math.min(maxTx, currentTranslateX.current + gestureState.dx)),
-                  useNativeDriver: true,
-                }),
-                Animated.spring(translateY, {
-                  toValue: Math.max(-maxTy, Math.min(maxTy, currentTranslateY.current + gestureState.dy)),
-                  useNativeDriver: true,
-                }),
+                Animated.spring(translateX, { toValue: clamped.x, friction: 7, tension: 50, useNativeDriver: true }),
+                Animated.spring(translateY, { toValue: clamped.y, friction: 7, tension: 50, useNativeDriver: true }),
               ]).start();
             }
+            return;
+          }
+
+          if (currentScale.current > 1.05) {
+            const targetX = startTranslateX.current + gestureState.dx;
+            const targetY = startTranslateY.current + gestureState.dy;
+            const clamped = clampTranslation(targetX, targetY, currentScale.current);
+            currentTranslateX.current = clamped.x;
+            currentTranslateY.current = clamped.y;
+
+            Animated.parallel([
+              Animated.spring(translateX, { toValue: clamped.x, friction: 8, tension: 60, useNativeDriver: true }),
+              Animated.spring(translateY, { toValue: clamped.y, friction: 8, tension: 60, useNativeDriver: true }),
+            ]).start();
+          } else {
+            resetZoom(true);
+          }
+        },
+        onPanResponderTerminate: () => {
+          isPinching.current = false;
+          pinchStartDist.current = 0;
+          if (currentScale.current <= 1.05) {
+            resetZoom(false);
           }
         },
       }),
-    [width, height, scale, translateX, translateY, resetZoom, onDismiss, onZoomChange]
+    [width, height, scale, translateX, translateY, resetZoom, notifyZoom]
   );
 
   return (
-    <View
+    <Pressable
       style={{ width, height, justifyContent: "center", alignItems: "center", overflow: "hidden" }}
+      onPress={handleTap}
       {...panResponder.panHandlers}
     >
       <Animated.Image
@@ -193,7 +283,7 @@ function ZoomableImage({ uri, width, height, onDismiss, onZoomChange }: Zoomable
         }}
         resizeMode="contain"
       />
-    </View>
+    </Pressable>
   );
 }
 
@@ -1679,6 +1769,12 @@ export default function ProductDetailScreen() {
             pagingEnabled
             scrollEnabled={!isViewerZoomed}
             showsHorizontalScrollIndicator={false}
+            onMomentumScrollEnd={(e) => {
+              const offset = e.nativeEvent.contentOffset.x;
+              const idx = Math.round(offset / windowWidth);
+              setViewerIdx(idx);
+              setIsViewerZoomed(false);
+            }}
             onLayout={() =>
               viewerScrollRef.current?.scrollTo({ x: viewerIdx * windowWidth, animated: false })
             }
