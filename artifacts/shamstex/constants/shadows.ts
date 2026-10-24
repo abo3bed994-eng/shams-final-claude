@@ -1,4 +1,4 @@
-import { ViewStyle } from "react-native";
+import { Platform, ViewStyle } from "react-native";
 
 export function cardShadow(
   isDark: boolean,
@@ -10,6 +10,6 @@ export function cardShadow(
     shadowOffset: { width: 0, height: strong ? 8 : 5 },
     shadowOpacity: isDark ? (strong ? 0.5 : 0.38) : (strong ? 0.22 : 0.14),
     shadowRadius: strong ? 16 : 10,
-    elevation: strong ? 8 : 4,
+    elevation: Platform.OS === "android" ? (strong ? 3 : 2) : (strong ? 8 : 4),
   };
 }

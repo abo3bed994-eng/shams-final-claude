@@ -54,6 +54,7 @@ function ZoomableImage({ uri, width, height, onDismiss, onZoomChange }: Zoomable
   const startScale = useRef(1);
   const pinchStartDist = useRef(0);
   const isPinching = useRef(false);
+  const gestureStartTimestamp = useRef(0);
 
   const lastTapTime = useRef(0);
   const singleTapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -125,7 +126,7 @@ function ZoomableImage({ uri, width, height, onDismiss, onZoomChange }: Zoomable
     const timeSinceLastTap = now - lastTapTime.current;
 
     if (timeSinceLastTap < 300) {
-      // Double tap
+      // Double tap -> Toggle zoom
       if (singleTapTimer.current) {
         clearTimeout(singleTapTimer.current);
         singleTapTimer.current = null;
@@ -151,23 +152,24 @@ function ZoomableImage({ uri, width, height, onDismiss, onZoomChange }: Zoomable
   const panResponder = useMemo(
     () =>
       PanResponder.create({
-        onStartShouldSetPanResponder: () => false,
-        onStartShouldSetPanResponderCapture: () => false,
+        onStartShouldSetPanResponder: () => true,
+        onStartShouldSetPanResponderCapture: () => currentScale.current > 1.05,
         onMoveShouldSetPanResponder: (_, gestureState) => {
           if (gestureState.numberActiveTouches >= 2) return true;
           if (currentScale.current > 1.05) {
-            return Math.abs(gestureState.dx) > 2 || Math.abs(gestureState.dy) > 2;
+            return Math.abs(gestureState.dx) > 1 || Math.abs(gestureState.dy) > 1;
           }
           return false;
         },
         onMoveShouldSetPanResponderCapture: (_, gestureState) => {
           if (gestureState.numberActiveTouches >= 2) return true;
           if (currentScale.current > 1.05) {
-            return Math.abs(gestureState.dx) > 2 || Math.abs(gestureState.dy) > 2;
+            return Math.abs(gestureState.dx) > 1 || Math.abs(gestureState.dy) > 1;
           }
           return false;
         },
         onPanResponderGrant: (evt) => {
+          gestureStartTimestamp.current = Date.now();
           if (singleTapTimer.current) {
             clearTimeout(singleTapTimer.current);
             singleTapTimer.current = null;
@@ -211,6 +213,7 @@ function ZoomableImage({ uri, width, height, onDismiss, onZoomChange }: Zoomable
               translateY.setValue(clamped.y);
             }
           } else if (touches.length === 1 && currentScale.current > 1.05 && !isPinching.current) {
+            // Smooth single-finger panning while zoomed in
             const targetX = startTranslateX.current + gestureState.dx;
             const targetY = startTranslateY.current + gestureState.dy;
             const clamped = clampTranslation(targetX, targetY, currentScale.current);
@@ -222,6 +225,17 @@ function ZoomableImage({ uri, width, height, onDismiss, onZoomChange }: Zoomable
           const wasPinching = isPinching.current;
           isPinching.current = false;
           pinchStartDist.current = 0;
+
+          // Check if this gesture was a tap (minimal movement & quick duration)
+          const isTap =
+            Math.abs(gestureState.dx) < 6 &&
+            Math.abs(gestureState.dy) < 6 &&
+            Date.now() - gestureStartTimestamp.current < 280;
+
+          if (isTap && !wasPinching) {
+            handleTap();
+            return;
+          }
 
           if (wasPinching) {
             if (currentScale.current <= 1.08) {
@@ -239,6 +253,7 @@ function ZoomableImage({ uri, width, height, onDismiss, onZoomChange }: Zoomable
           }
 
           if (currentScale.current > 1.05) {
+            // Keep dragged position clamped within image bounds
             const targetX = startTranslateX.current + gestureState.dx;
             const targetY = startTranslateY.current + gestureState.dy;
             const clamped = clampTranslation(targetX, targetY, currentScale.current);
@@ -261,13 +276,12 @@ function ZoomableImage({ uri, width, height, onDismiss, onZoomChange }: Zoomable
           }
         },
       }),
-    [width, height, scale, translateX, translateY, resetZoom, notifyZoom]
+    [width, height, scale, translateX, translateY, resetZoom, notifyZoom, handleTap]
   );
 
   return (
-    <Pressable
+    <View
       style={{ width, height, justifyContent: "center", alignItems: "center", overflow: "hidden" }}
-      onPress={handleTap}
       {...panResponder.panHandlers}
     >
       <Animated.Image
@@ -283,7 +297,7 @@ function ZoomableImage({ uri, width, height, onDismiss, onZoomChange }: Zoomable
         }}
         resizeMode="contain"
       />
-    </Pressable>
+    </View>
   );
 }
 

@@ -166,7 +166,7 @@ function RootLayoutNav() {
     <View style={{ flex: 1 }}>
       <EditCountdownBar />
       <FlexibleUpdateModal />
-      <Stack screenOptions={{ headerShown: false }} initialRouteName={user ? "(tabs)" : "auth/login"}>
+      <Stack screenOptions={{ headerShown: false }} initialRouteName="(tabs)">
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="auth/login" options={{ headerShown: false }} />
         <Stack.Screen name="product/[id]" options={{ headerShown: false }} />

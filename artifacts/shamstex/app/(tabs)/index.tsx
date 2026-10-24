@@ -133,6 +133,10 @@ export default function HomeScreen() {
     setTimeout(() => { navGuard.current = false; }, 800);
   }, []);
 
+  const handleProductPress = useCallback((productId: string) => {
+    safePush(`/product/${productId}`);
+  }, [safePush]);
+
   const { isNotifReadForUser } = useApp();
   const myNotifications = useMemo(
     () => filterNotificationsForUser(notifications, user),
@@ -448,7 +452,7 @@ export default function HomeScreen() {
               <ProductCard
                 key={product.id}
                 product={product}
-                onPress={() => router.push(`/product/${product.id}`)}
+                onPress={() => handleProductPress(product.id)}
               />
             ))
           )}

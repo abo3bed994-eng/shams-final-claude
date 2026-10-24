@@ -62,6 +62,8 @@ export default function LoginScreen() {
   const [pinPurpose, setPinPurpose] = useState<"newUser" | "existingNoPin" | "reset">("newUser");
   const [resendCountdown, setResendCountdown] = useState(0);
   const confirmRef = useRef<PhoneAuthConfirmation | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const forgotPinModeRef = useRef(false);
   const otpCompletedRef = useRef(false);
   const submittingRef = useRef(false);
@@ -123,9 +125,23 @@ export default function LoginScreen() {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         return;
       }
-      // Owner phones bypass PIN entirely
+      // Owner phones: 2FA completed (Password was already entered, now OTP verified)
       if (isOwnerPhone(verifiedPhone) && existing) {
-        await finishLogin(existing.name, existing.role as any, { ...existing, phone: verifiedPhone });
+        if (!existing.pin) {
+          // If owner has no password set yet -> set it now
+          setPin("");
+          setConfirmPin("");
+          setPinPurpose("existingNoPin");
+          setStep("setPin");
+        } else if (forgotPinModeRef.current) {
+          forgotPinModeRef.current = false;
+          setPin("");
+          setConfirmPin("");
+          setPinPurpose("reset");
+          setStep("setPin");
+        } else {
+          await finishLogin(existing.name, existing.role as any, { ...existing, phone: verifiedPhone });
+        }
       } else if (forgotPinModeRef.current && existing) {
         // Forgot-PIN flow: OTP verified → set new PIN
         forgotPinModeRef.current = false;
@@ -183,8 +199,18 @@ export default function LoginScreen() {
     submittingRef.current = true;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setError("");
-    // Owner phones bypass PIN — go straight to OTP
+    // Owner phone routing: Password FIRST, then OTP (Double Verification)!
     if (isOwnerPhone(e164Phone)) {
+      const existing = await lookupCustomer(e164Phone);
+      setPin("");
+      setConfirmPin("");
+      if (existing?.pin) {
+        // Step 1: Owner enters password
+        setStep("enterPin");
+        submittingRef.current = false;
+        return;
+      }
+      // If owner has no password yet -> OTP first, then set password
       forgotPinModeRef.current = false;
       try {
         await sendOtp();
@@ -389,9 +415,17 @@ export default function LoginScreen() {
   };
 
   const handleVerifyPin = async () => {
-    if (pin.length !== 4) {
-      setError("الرقم السري يجب أن يكون 4 أرقام");
-      return;
+    const isOwner = isOwnerPhone(e164Phone);
+    if (isOwner) {
+      if (pin.trim().length < 4) {
+        setError("يرجى إدخال كلمة المرور (4 خانات على الأقل)");
+        return;
+      }
+    } else {
+      if (pin.length !== 4) {
+        setError("الرقم السري يجب أن يكون 4 أرقام");
+        return;
+      }
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setLoading(true);
@@ -413,13 +447,22 @@ export default function LoginScreen() {
         } catch {}
       }
       if (!ok) {
-        setError("الرقم السري غير صحيح");
+        setError(isOwner ? "كلمة المرور غير صحيحة" : "الرقم السري غير صحيح");
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         return;
       }
       const existing = findCustomerByPhone(e164Phone);
       if (!existing) {
         setError("الحساب غير موجود");
+        return;
+      }
+
+      // If owner: PASSWORD VERIFIED! Now send OTP for Step 2 (Double verification / 2FA)
+      if (isOwner) {
+        setOtp("");
+        setError("");
+        forgotPinModeRef.current = false;
+        await sendOtp();
         return;
       }
       // Authoritative ban recheck: a user could be banned between phone-submit
@@ -463,12 +506,20 @@ export default function LoginScreen() {
   };
 
   const handleSetPinSubmit = async () => {
-    if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
-      setError("الرقم السري يجب أن يكون 4 أرقام");
-      return;
+    const isOwner = isOwnerPhone(e164Phone);
+    if (isOwner) {
+      if (pin.trim().length < 4) {
+        setError("كلمة المرور يجب أن تتكون من 4 خانات على الأقل");
+        return;
+      }
+    } else {
+      if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
+        setError("الرقم السري يجب أن يكون 4 أرقام");
+        return;
+      }
     }
     if (pin !== confirmPin) {
-      setError("الرقمان السريان غير متطابقين");
+      setError(isOwner ? "كلمتا المرور غير متطابقتين" : "الرقمان السريان غير متطابقين");
       return;
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -866,26 +917,36 @@ export default function LoginScreen() {
                 <Icon name="lock" size={28} color={colors.gold} />
               </View>
               <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
-                الرقم السري
+                {isOwnerPhone(e164Phone) ? "كلمة مرور الإدارة" : "الرقم السري"}
               </Text>
               <Text style={[styles.cardSubtitle, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
-                أدخل الرقم السري المكوّن من 4 أرقام
+                {isOwnerPhone(e164Phone)
+                  ? "أدخل كلمة المرور الخاصة بالمدير للمتابعة إلى كود OTP"
+                  : "أدخل الرقم السري المكوّن من 4 أرقام"}
               </Text>
               <View style={[styles.inputWrapper, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
                 <AppTextInput
-                  style={[styles.inputPin, { color: colors.foreground }]}
-                  placeholder="• • • •"
+                  style={[isOwnerPhone(e164Phone) ? styles.inputPassword : styles.inputPin, { color: colors.foreground }]}
+                  placeholder={isOwnerPhone(e164Phone) ? "أدخل كلمة المرور" : "• • • •"}
                   placeholderTextColor={colors.mutedForeground}
                   value={pin}
-                  onChangeText={(v) => { setPin(v.replace(/\D/g, "").slice(0, 4)); setError(""); }}
-                  keyboardType="numeric"
-                  textAlign="center"
-                  maxLength={4}
-                  secureTextEntry
+                  onChangeText={(v) => {
+                    setPin(isOwnerPhone(e164Phone) ? v : v.replace(/\D/g, "").slice(0, 4));
+                    setError("");
+                  }}
+                  keyboardType={isOwnerPhone(e164Phone) ? "default" : "numeric"}
+                  textAlign={isOwnerPhone(e164Phone) ? "right" : "center"}
+                  maxLength={isOwnerPhone(e164Phone) ? 50 : 4}
+                  secureTextEntry={!showPassword}
                   autoFocus
                   onSubmitEditing={handleVerifyPin}
                 />
+                {isOwnerPhone(e164Phone) && (
+                  <Pressable onPress={() => setShowPassword(!showPassword)} hitSlop={8}>
+                    <Icon name={showPassword ? "eye-off" : "eye"} size={20} color={colors.mutedForeground} />
+                  </Pressable>
+                )}
               </View>
               {error ? (
                 <View style={[styles.errorBox, { backgroundColor: "#E74C3C11", borderColor: "#E74C3C44" }]}>
@@ -893,10 +954,16 @@ export default function LoginScreen() {
                   <Text style={{ color: "#E74C3C", fontFamily: "Cairo_500Medium", fontSize: 12, flex: 1, textAlign: "right" }}>{error}</Text>
                 </View>
               ) : null}
-              <GoldButton label="دخول" onPress={handleVerifyPin} loading={loading} disabled={pin.length !== 4} style={{ width: "100%" }} />
+              <GoldButton
+                label={isOwnerPhone(e164Phone) ? "تأكيد ومتابعة للكود" : "دخول"}
+                onPress={handleVerifyPin}
+                loading={loading}
+                disabled={isOwnerPhone(e164Phone) ? pin.trim().length < 4 : pin.length !== 4}
+                style={{ width: "100%" }}
+              />
               <Pressable onPress={handleForgotPin} disabled={loading}>
                 <Text style={{ color: colors.gold, fontFamily: "Cairo_500Medium", fontSize: 13, textAlign: "center" }}>
-                  نسيت الرقم السري؟ إعادة تعيين عبر SMS
+                  {isOwnerPhone(e164Phone) ? "نسيت كلمة المرور؟ إعادة تعيين عبر SMS" : "نسيت الرقم السري؟ إعادة تعيين عبر SMS"}
                 </Text>
               </Pressable>
             </>
@@ -913,40 +980,60 @@ export default function LoginScreen() {
                 <Icon name="shield" size={28} color={colors.gold} />
               </View>
               <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
-                {pinPurpose === "reset" ? "إعادة تعيين الرقم السري" : "تعيين رقم سري"}
+                {isOwnerPhone(e164Phone)
+                  ? (pinPurpose === "reset" ? "إعادة تعيين كلمة مرور الإدارة" : "تعيين كلمة مرور الإدارة")
+                  : (pinPurpose === "reset" ? "إعادة تعيين الرقم السري" : "تعيين رقم سري")}
               </Text>
               <Text style={[styles.cardSubtitle, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
-                أدخل رقم سري جديد من 4 أرقام
+                {isOwnerPhone(e164Phone)
+                  ? "أدخل كلمة مرور للمدير (حروف، أرقام، رموز - 4 خانات على الأقل)"
+                  : "أدخل رقم سري جديد من 4 أرقام"}
               </Text>
               <View style={[styles.inputWrapper, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
                 <AppTextInput
-                  style={[styles.inputPin, { color: colors.foreground }]}
-                  placeholder="رقم سري جديد"
+                  style={[isOwnerPhone(e164Phone) ? styles.inputPassword : styles.inputPin, { color: colors.foreground }]}
+                  placeholder={isOwnerPhone(e164Phone) ? "كلمة المرور الجديدة" : "رقم سري جديد"}
                   placeholderTextColor={colors.mutedForeground}
                   value={pin}
-                  onChangeText={(v) => { setPin(v.replace(/\D/g, "").slice(0, 4)); setError(""); }}
-                  keyboardType="numeric"
-                  textAlign="center"
-                  maxLength={4}
-                  secureTextEntry
+                  onChangeText={(v) => {
+                    setPin(isOwnerPhone(e164Phone) ? v : v.replace(/\D/g, "").slice(0, 4));
+                    setError("");
+                  }}
+                  keyboardType={isOwnerPhone(e164Phone) ? "default" : "numeric"}
+                  textAlign={isOwnerPhone(e164Phone) ? "right" : "center"}
+                  maxLength={isOwnerPhone(e164Phone) ? 50 : 4}
+                  secureTextEntry={!showPassword}
                   autoFocus
                 />
+                {isOwnerPhone(e164Phone) && (
+                  <Pressable onPress={() => setShowPassword(!showPassword)} hitSlop={8}>
+                    <Icon name={showPassword ? "eye-off" : "eye"} size={20} color={colors.mutedForeground} />
+                  </Pressable>
+                )}
               </View>
               <View style={[styles.inputWrapper, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
                 <AppTextInput
-                  style={[styles.inputPin, { color: colors.foreground }]}
-                  placeholder="تأكيد الرقم السري"
+                  style={[isOwnerPhone(e164Phone) ? styles.inputPassword : styles.inputPin, { color: colors.foreground }]}
+                  placeholder={isOwnerPhone(e164Phone) ? "تأكيد كلمة المرور" : "تأكيد الرقم السري"}
                   placeholderTextColor={colors.mutedForeground}
                   value={confirmPin}
-                  onChangeText={(v) => { setConfirmPin(v.replace(/\D/g, "").slice(0, 4)); setError(""); }}
-                  keyboardType="numeric"
-                  textAlign="center"
-                  maxLength={4}
-                  secureTextEntry
+                  onChangeText={(v) => {
+                    setConfirmPin(isOwnerPhone(e164Phone) ? v : v.replace(/\D/g, "").slice(0, 4));
+                    setError("");
+                  }}
+                  keyboardType={isOwnerPhone(e164Phone) ? "default" : "numeric"}
+                  textAlign={isOwnerPhone(e164Phone) ? "right" : "center"}
+                  maxLength={isOwnerPhone(e164Phone) ? 50 : 4}
+                  secureTextEntry={!showConfirmPassword}
                   onSubmitEditing={handleSetPinSubmit}
                 />
+                {isOwnerPhone(e164Phone) && (
+                  <Pressable onPress={() => setShowConfirmPassword(!showConfirmPassword)} hitSlop={8}>
+                    <Icon name={showConfirmPassword ? "eye-off" : "eye"} size={20} color={colors.mutedForeground} />
+                  </Pressable>
+                )}
               </View>
               {error ? (
                 <View style={[styles.errorBox, { backgroundColor: "#E74C3C11", borderColor: "#E74C3C44" }]}>
@@ -954,7 +1041,13 @@ export default function LoginScreen() {
                   <Text style={{ color: "#E74C3C", fontFamily: "Cairo_500Medium", fontSize: 12, flex: 1, textAlign: "right" }}>{error}</Text>
                 </View>
               ) : null}
-              <GoldButton label="حفظ ودخول" onPress={handleSetPinSubmit} loading={loading} disabled={pin.length !== 4 || confirmPin.length !== 4} style={{ width: "100%" }} />
+              <GoldButton
+                label="حفظ ودخول"
+                onPress={handleSetPinSubmit}
+                loading={loading}
+                disabled={isOwnerPhone(e164Phone) ? (pin.trim().length < 4 || confirmPin.trim().length < 4) : (pin.length !== 4 || confirmPin.length !== 4)}
+                style={{ width: "100%" }}
+              />
             </>
           )}
 
@@ -1082,6 +1175,16 @@ const styles = StyleSheet.create({
     height: 44,
     paddingVertical: 0,
     textAlign: "center",
+    textAlignVertical: "center",
+    includeFontPadding: false,
+  },
+  inputPassword: {
+    flex: 1,
+    fontSize: 15,
+    fontFamily: "Cairo_600SemiBold",
+    height: 44,
+    paddingVertical: 0,
+    textAlign: "right",
     textAlignVertical: "center",
     includeFontPadding: false,
   },
