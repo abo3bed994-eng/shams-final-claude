@@ -175,6 +175,7 @@ function RootLayoutNav() {
         <Stack.Screen name="price-menu" options={{ headerShown: false }} />
         <Stack.Screen name="favorites" options={{ headerShown: false }} />
         <Stack.Screen name="profile" options={{ headerShown: false }} />
+        <Stack.Screen name="profile/settings" options={{ headerShown: false }} />
         <Stack.Screen name="notifications" options={{ headerShown: false }} />
         <Stack.Screen name="legal/privacy" options={{ headerShown: false }} />
         <Stack.Screen name="legal/terms" options={{ headerShown: false }} />

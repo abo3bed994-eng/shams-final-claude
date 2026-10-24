@@ -867,12 +867,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             forceLogoutAccountRemoved();
             return;
           }
-          if (me.role !== "customer" && myDoc.role === "customer") {
-            forceLogoutRoleChanged("customer");
-            return;
-          }
-          if (me.role === "employee" && myDoc.role === "merchant") {
-            forceLogoutRoleChanged("merchant");
+          if (me.role !== myDoc.role) {
+            forceLogoutRoleChanged(myDoc.role);
             return;
           }
         }
@@ -1029,14 +1025,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setCart([]);
     setEditingOrderId(null);
 
-    const isPromotedToMerchant =
-      previousUser?.role === "employee" && (newRole === "merchant" || (!newRole && (previousUser as any)?.lastTargetRole === "merchant"));
-    const alertTitle = isPromotedToMerchant ? "تمت ترقيتك إلى تاجر" : "تم تغيير دورك";
-    const alertMessage = isPromotedToMerchant
-      ? "تمت ترقيتك إلى تاجر. يرجى تسجيل الدخول مجدداً للاستفادة من أسعار الجملة."
-      : "تم إعادتك كعميل من قِبل الإدارة. يرجى تسجيل الدخول مجدداً بحساب العميل.";
-
-    Alert.alert(alertTitle, alertMessage, [{ text: "حسناً" }]);
+    Alert.alert(
+      "تغيير الدور",
+      "تم تغيير دورك من قبل الإدارة , الرجاء تسجيل الدخول مرة اخرى",
+      [{ text: "حسناً" }]
+    );
     try {
       const { router } = await import("expo-router");
       router.replace("/auth/login" as any);
@@ -1605,12 +1598,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
     const currentUser = userRef.current;
     if (currentUser && samePhone(currentUser.phone, updatedUser.phone)) {
-      if (currentUser.role !== updatedUser.role && updatedUser.role === "customer") {
-        forceLogoutRoleChanged("customer");
-        return;
-      }
-      if (currentUser.role === "employee" && updatedUser.role === "merchant") {
-        forceLogoutRoleChanged("merchant");
+      if (currentUser.role !== updatedUser.role) {
+        forceLogoutRoleChanged(updatedUser.role);
         return;
       }
       const synced: User = {

@@ -23,7 +23,7 @@ import GoldButton from "@/components/GoldButton";
 export default function ProfileScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { user, setUser, orders, addNotification, updateRegisteredCustomer, deleteRegisteredCustomer, theme, setTheme, language, setLanguage, registeredCustomers, settings } = useApp();
+  const { user, setUser, orders, addNotification, updateRegisteredCustomer, theme, setTheme, language, setLanguage, registeredCustomers, settings } = useApp();
   const { t, isRTL } = useTranslation();
 
   const systemScheme = useColorScheme();
@@ -69,62 +69,6 @@ export default function ProfileScreen() {
   };
 
   
-  const handleDeleteAccount = () => {
-    const title = language === "ar" ? "حذف الحساب" : "Delete Account Permanently";
-    const msg = language === "ar"
-      ? "هل أنت متأكد من رغبتك في حذف حسابك وبياناتك نهائياً؟ هذا الإجراء لا يمكن التراجع عنه."
-      : "Are you sure you want to delete your account and personal data permanently? This action cannot be undone.";
-    const confirmText = language === "ar" ? "نعم، احذف حسابي" : "Delete My Account";
-    const cancelText = language === "ar" ? "إلغاء" : "Cancel";
-
-    if (Platform.OS === "web") {
-      if (window.confirm(`${title}\n\n${msg}`)) {
-        if (user?.phone) {
-          deleteRegisteredCustomer(user.phone);
-        }
-        setUser(null).then(() => router.replace("/auth/login"));
-      }
-      return;
-    }
-
-    Alert.alert(title, msg, [
-      { text: cancelText, style: "cancel" },
-      {
-        text: confirmText,
-        style: "destructive",
-        onPress: async () => {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-          if (user?.phone) {
-            deleteRegisteredCustomer(user.phone);
-          }
-          await setUser(null);
-          router.replace("/auth/login");
-        },
-      },
-    ]);
-  };
-
-  const handleLogout = () => {
-    if (Platform.OS === "web") {
-      const confirmed = window.confirm(t("logoutConfirm"));
-      if (confirmed) {
-        setUser(null).then(() => router.replace("/auth/login"));
-      }
-      return;
-    }
-    Alert.alert(t("logout"), t("logoutConfirm"), [
-      { text: t("cancel"), style: "cancel" },
-      {
-        text: t("exit"),
-        style: "destructive",
-        onPress: async () => {
-          await setUser(null);
-          router.replace("/auth/login");
-        },
-      },
-    ]);
-  };
-
   useEffect(() => {
     if (!user) {
       router.replace("/auth/login");
@@ -162,6 +106,14 @@ export default function ProfileScreen() {
         contentContainerStyle={[styles.content, { paddingBottom: bottomPad + 40 }]}
       >
         <View style={[styles.profileCard, { backgroundColor: colors.card, borderColor: colors.gold + "33", borderRadius: 20 }]}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="إعدادات الحساب"
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/profile/settings" as any); }}
+            style={({ pressed }) => [styles.settingsButton, { backgroundColor: colors.gold + "18", borderColor: colors.gold + "44", opacity: pressed ? 0.65 : 1 }]}
+          >
+            <Icon name="settings" size={20} color={colors.gold} />
+          </Pressable>
           <View style={[styles.avatar, { backgroundColor: colors.gold + "22", borderColor: colors.gold + "44" }]}>
             <Text style={[styles.avatarText, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
               {user.name.charAt(0)}
@@ -416,39 +368,24 @@ export default function ProfileScreen() {
           ))}
         </View>
 
-        <GoldButton
-          label={language === "ar" ? "تسجيل الخروج" : "Sign Out"}
-          onPress={handleLogout}
-          variant="outline"
-          style={{ borderColor: colors.destructive + "88" }}
-        />
-
-        <View style={{ marginTop: 16, marginBottom: 32, alignItems: "center" }}>
-          <Pressable
-            onPress={handleDeleteAccount}
-            style={({ pressed }) => ({
-              paddingVertical: 8,
-              paddingHorizontal: 16,
-              opacity: pressed ? 0.4 : 0.7,
-            })}
-          >
-            <Text
-              style={{
-                fontSize: 13,
-                color: colors.mutedForeground,
-                fontFamily: "Cairo_400Regular",
-              }}
-            >
-              {language === "ar" ? "حذف الحساب" : "Delete Account"}
-            </Text>
-          </Pressable>
-        </View>
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  settingsButton: {
+    position: "absolute",
+    top: 14,
+    right: 14,
+    zIndex: 2,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   container: { flex: 1 },
   content: { padding: 16, gap: 16 },
   profileCard: { alignItems: "center", padding: 24, borderWidth: 1, gap: 10, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 8, elevation: 3 },
