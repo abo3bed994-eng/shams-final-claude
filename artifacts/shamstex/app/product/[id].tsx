@@ -1314,9 +1314,9 @@ export default function ProductDetailScreen() {
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={[
             styles.companionModalBackdrop,
-            keyboardHeight > 0 && {
+            Platform.OS === "ios" && keyboardHeight > 0 && {
               justifyContent: "flex-end",
-              paddingBottom: Math.min(keyboardHeight + 10, windowHeight * 0.45),
+              paddingBottom: keyboardHeight + 10,
             },
           ]}
         >
@@ -1334,25 +1334,45 @@ export default function ProductDetailScreen() {
               {
                 backgroundColor: colors.card,
                 borderColor: colors.border,
-                maxHeight: Math.min(windowHeight * (keyboardHeight > 0 ? 0.55 : 0.88), 640),
+                maxHeight: Math.min(
+                  windowHeight * (Platform.OS === "ios" && keyboardHeight > 0 ? 0.65 : 0.88),
+                  640
+                ),
                 flexShrink: 1,
               },
             ]}
           >
             {/* Header */}
             <View style={styles.companionModalHeader}>
-              <View style={{ flex: 1, gap: 4 }}>
+              <View style={{ flex: 1, gap: 2 }}>
+                <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      styles.companionModalTitle,
+                      { color: colors.foreground, fontFamily: "Cairo_700Bold" },
+                    ]}
+                  >
+                    الخامة المرافقة
+                  </Text>
+                  {companionMaterials.length === 1 && (
+                    <Text
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={{
+                        color: colors.goldLight,
+                        fontFamily: "Cairo_600SemiBold",
+                        fontSize: 13,
+                        flexShrink: 1,
+                        textAlign: "right",
+                      }}
+                    >
+                      : {companionMaterials[0].name}
+                    </Text>
+                  )}
+                </View>
                 <Text
-                  style={[
-                    styles.companionModalTitle,
-                    { color: colors.foreground, fontFamily: "Cairo_700Bold" },
-                  ]}
-                >
-                  {companionMaterials.length === 1
-                    ? `الخامة المرافقة: ${companionMaterials[0].name}`
-                    : "الخامة المرافقة"}
-                </Text>
-                <Text
+                  numberOfLines={1}
                   style={[
                     styles.companionModalSubtitle,
                     { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" },
@@ -1564,7 +1584,7 @@ export default function ProductDetailScreen() {
                   {companionEditor.mode === "per_color" && (
                     <ScrollView
                       ref={perColorScrollRef}
-                      style={{ maxHeight: 220, flexShrink: 1, minHeight: 0 }}
+                      style={{ maxHeight: 240, flexShrink: 1, minHeight: 80 }}
                       contentContainerStyle={{ gap: 4, paddingVertical: 2 }}
                       nestedScrollEnabled={true}
                       keyboardShouldPersistTaps="handled"
@@ -1627,7 +1647,7 @@ export default function ProductDetailScreen() {
                                   onFocus={() => {
                                     setTimeout(() => {
                                       perColorScrollRef.current?.scrollTo({
-                                        y: colorIdx * 56,
+                                        y: Math.max(0, (colorIdx - 1) * 44),
                                         animated: true,
                                       });
                                     }, 100);

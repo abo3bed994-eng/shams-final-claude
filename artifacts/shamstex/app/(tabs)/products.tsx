@@ -22,6 +22,7 @@ import { useTranslation } from "@/lib/i18n";
 import { sortColorsByGlobal } from "@/lib/colorUtils";
 import { discountPercent, displayPriceFor, isOnOffer } from "@/lib/pricing";
 import { cardShadow } from "@/constants/shadows";
+import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/context/AppContext";
 
 const VIEW_MODE_STORAGE_KEY = "@shamstex/products_view_mode";
@@ -329,13 +330,13 @@ export default function ProductsScreen() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState(isRTL ? "الكل" : "All");
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const [viewMode, setViewMode] = useState<"row" | "grid" | "card">("row");
 
   useEffect(() => {
     AsyncStorage.getItem(VIEW_MODE_STORAGE_KEY)
       .then((saved) => {
-        if (saved === "grid" || saved === "list") {
-          setViewMode(saved);
+        if (saved === "grid" || saved === "card" || saved === "row") {
+          setViewMode(saved as any);
         }
       })
       .catch(() => {});
@@ -343,7 +344,7 @@ export default function ProductsScreen() {
 
   const handleToggleViewMode = useCallback(() => {
     setViewMode((prev) => {
-      const next = prev === "grid" ? "list" : "grid";
+      const next = prev === "row" ? "grid" : prev === "grid" ? "card" : "row";
       AsyncStorage.setItem(VIEW_MODE_STORAGE_KEY, next).catch(() => {});
       return next;
     });
@@ -376,6 +377,14 @@ export default function ProductsScreen() {
       if (viewMode === "grid") {
         return (
           <ProductGridCard
+            product={item}
+            onPress={() => handleProductPress(item.id)}
+          />
+        );
+      }
+      if (viewMode === "card") {
+        return (
+          <ProductCard
             product={item}
             onPress={() => handleProductPress(item.id)}
           />
@@ -555,7 +564,7 @@ export default function ProductsScreen() {
                 accessibilityLabel="تغيير طريقة العرض"
               >
                 <Icon
-                  name={viewMode === "grid" ? "list" : "grid"}
+                  name={viewMode === "row" ? "grid" : viewMode === "grid" ? "card" : "list"}
                   size={20}
                   color={colors.gold}
                 />
