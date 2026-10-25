@@ -1311,12 +1311,13 @@ export default function ProductDetailScreen() {
         }}
       >
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          behavior={undefined}
           style={[
             styles.companionModalBackdrop,
-            Platform.OS === "ios" && keyboardHeight > 0 && {
+            keyboardHeight > 0 && {
               justifyContent: "flex-end",
-              paddingBottom: keyboardHeight + 10,
+              paddingBottom: keyboardHeight + 8,
+              paddingTop: 8,
             },
           ]}
         >
@@ -1334,10 +1335,10 @@ export default function ProductDetailScreen() {
               {
                 backgroundColor: colors.card,
                 borderColor: colors.border,
-                maxHeight: Math.min(
-                  windowHeight * (Platform.OS === "ios" && keyboardHeight > 0 ? 0.65 : 0.88),
-                  640
-                ),
+                maxHeight:
+                  keyboardHeight > 0
+                    ? Math.min(windowHeight - keyboardHeight - 20, 520)
+                    : Math.min(windowHeight * 0.88, 640),
                 flexShrink: 1,
               },
             ]}
@@ -1584,7 +1585,11 @@ export default function ProductDetailScreen() {
                   {companionEditor.mode === "per_color" && (
                     <ScrollView
                       ref={perColorScrollRef}
-                      style={{ maxHeight: 240, flexShrink: 1, minHeight: 80 }}
+                      style={{
+                        maxHeight: keyboardHeight > 0 ? 170 : 250,
+                        flexShrink: 1,
+                        minHeight: 60,
+                      }}
                       contentContainerStyle={{ gap: 4, paddingVertical: 2 }}
                       nestedScrollEnabled={true}
                       keyboardShouldPersistTaps="handled"
@@ -1647,10 +1652,10 @@ export default function ProductDetailScreen() {
                                   onFocus={() => {
                                     setTimeout(() => {
                                       perColorScrollRef.current?.scrollTo({
-                                        y: Math.max(0, (colorIdx - 1) * 44),
+                                        y: Math.max(0, colorIdx * 54),
                                         animated: true,
                                       });
-                                    }, 100);
+                                    }, 120);
                                   }}
                                   onChangeText={(value) => {
                                     if (!/^\d*([.]\d*)?$/.test(value)) return;

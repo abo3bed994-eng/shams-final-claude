@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   Animated,
   AppState,
+  FlatList,
   Image,
   Platform,
   Pressable,
@@ -279,7 +280,200 @@ export default function HomeScreen() {
         </Pressable>
       </View>
 
-      <ScrollView
+      <FlatList
+        data={featuredProducts}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={{ paddingHorizontal: 16 }}>
+            <ProductCard
+              product={item}
+              onPress={() => handleProductPress(item.id)}
+            />
+          </View>
+        )}
+        ListHeaderComponent={
+          <View style={{ gap: 20, marginBottom: 14 }}>
+            <View style={[styles.bannerShadow, { backgroundColor: colors.surface }, cardShadow(colors.isDark, "strong")]}>
+              <View style={[styles.bannerCard, { borderColor: colors.gold + "33" }]}>
+                {hasVideo ? (
+                  <VideoView
+                    player={player}
+                    style={StyleSheet.absoluteFill}
+                    contentFit="cover"
+                    nativeControls={false}
+                  />
+                ) : hasImage ? (
+                  <Image
+                    source={{ uri: currentImageUri }}
+                    style={StyleSheet.absoluteFill}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Image
+                    source={require("../../assets/images/hero-fabrics.png")}
+                    style={StyleSheet.absoluteFill}
+                    resizeMode="cover"
+                  />
+                )}
+
+                <LinearGradient
+                  colors={["transparent", "rgba(0,0,0,0.45)", "rgba(0,0,0,0.95)"]}
+                  locations={[0, 0.45, 1]}
+                  style={styles.bannerOverlay}
+                  pointerEvents="none"
+                />
+
+                <View style={styles.bannerNameRow} pointerEvents="none">
+                  <View style={styles.bannerNamePill}>
+                    <View style={styles.bannerNameTop}>
+                      <Text style={styles.bannerGreeting}>{t("welcomeUser")}</Text>
+                      <Text style={[styles.bannerUserName, { color: colors.goldLight }]} numberOfLines={1}>
+                        {user?.name ?? t("guest")}
+                      </Text>
+                    </View>
+                    {!!settings.bannerCaption?.trim() && (
+                      <Text
+                        style={[styles.bannerCaption, { color: "#FFFFFF" }]}
+                        numberOfLines={2}
+                      >
+                        {settings.bannerCaption.trim()}
+                      </Text>
+                    )}
+                  </View>
+                  {isStaff && (
+                    <View style={[styles.bannerRolePill, { backgroundColor: roleLabel.gold ? colors.gold : colors.surface + "CC" }]}>
+                      <Icon name={roleLabel.icon} size={11} color={roleLabel.gold ? "#0A0A0A" : colors.mutedForeground} />
+                      <Text style={[styles.bannerRoleText, { color: roleLabel.gold ? "#0A0A0A" : colors.mutedForeground }]}>
+                        {roleLabel.text}
+                      </Text>
+                    </View>
+                  )}
+                  {user?.role === "admin" && (
+                    <View style={[styles.bannerRolePill, { backgroundColor: "#27AE60", marginInlineStart: 6 }]}>
+                      <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: "#FFFFFF" }} />
+                      <Text style={[styles.bannerRoleText, { color: "#FFFFFF" }]}>
+                        {onlineCount} متصل الآن
+                      </Text>
+                    </View>
+                  )}
+                </View>
+
+                {videos.length > 1 && (
+                  <View style={styles.dotsRow} pointerEvents="none">
+                    {videos.map((_, i) => (
+                      <View
+                        key={i}
+                        style={[
+                          styles.dot,
+                          { backgroundColor: i === videoIdx ? colors.gold : "rgba(255,255,255,0.4)" },
+                        ]}
+                      />
+                    ))}
+                  </View>
+                )}
+
+                {videos.length === 0 && bannerImages.length > 1 && (
+                  <View style={styles.dotsRow} pointerEvents="none">
+                    {bannerImages.map((_, i) => (
+                      <View
+                        key={i}
+                        style={[
+                          styles.dot,
+                          { backgroundColor: i === (imageIdx % bannerImages.length) ? colors.gold : "rgba(255,255,255,0.4)" },
+                        ]}
+                      />
+                    ))}
+                  </View>
+                )}
+              </View>
+            </View>
+
+            {activeOrders.length > 0 && (
+              <Pressable
+                onPress={() => router.push("/(tabs)/orders")}
+                style={[styles.activeOrdersCard, { backgroundColor: colors.card, borderColor: colors.gold + "44", borderRadius: colors.radius }]}
+              >
+                <View style={styles.activeOrdersHeader}>
+                  <View style={styles.activeOrdersRight}>
+                    <Icon name="package" size={18} color={colors.gold} />
+                    <Text style={[styles.activeOrdersTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
+                      {t("currentOrders")}
+                    </Text>
+                  </View>
+                  <View style={[styles.activeOrdersBadge, { backgroundColor: colors.gold }]}>
+                    <Text style={{ color: colors.background, fontFamily: "Cairo_700Bold", fontSize: 12 }}>
+                      {activeOrders.length}
+                    </Text>
+                  </View>
+                </View>
+                {activeOrders.slice(0, 3).map((order) => {
+                  const statusInfo = STATUS_LABEL[order.status] ?? { text: order.status, color: colors.mutedForeground };
+                  return (
+                    <View key={order.id} style={[styles.activeOrderRow, { borderTopColor: colors.border }]}>
+                      <Icon name="chevron-left" size={14} color={colors.mutedForeground} />
+                      <View style={{ flex: 1, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
+                        <Text style={{ color: colors.foreground, fontFamily: "Cairo_500Medium", fontSize: 13 }}>
+                          {t("orderNum")} #{order.id.slice(0, 12)}
+                        </Text>
+                        <View style={[styles.activeOrderStatusPill, { backgroundColor: statusInfo.color + "22" }]}>
+                          <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: statusInfo.color }} />
+                          <Text style={{ color: statusInfo.color, fontFamily: "Cairo_600SemiBold", fontSize: 11 }}>
+                            {statusInfo.text}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  );
+                })}
+                {activeOrders.length > 3 && (
+                  <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "center", paddingTop: 6 }}>
+                    +{activeOrders.length - 3} {t("moreOrders")}
+                  </Text>
+                )}
+              </Pressable>
+            )}
+
+            <View style={[styles.sectionHeader, { paddingHorizontal: 16 }]}>
+              <Pressable onPress={() => router.push("/(tabs)/products")}>
+                <Text style={[styles.seeAll, { color: colors.gold, fontFamily: "Cairo_600SemiBold" }]}>
+                  {t("viewAll")}
+                </Text>
+              </Pressable>
+              <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
+                {t("featuredProducts")}
+              </Text>
+            </View>
+          </View>
+        }
+        ListEmptyComponent={
+          <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular", paddingHorizontal: 16 }]}>
+            {t("noFeatured")}
+          </Text>
+        }
+        ListFooterComponent={
+          <View style={{ paddingHorizontal: 16, paddingTop: 6 }}>
+            <Pressable
+              onPress={navigateToProducts}
+              style={({ pressed }) => [
+                styles.viewAllBottomBtn,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                  opacity: pressed ? 0.8 : 1,
+                },
+              ]}
+            >
+              <Text style={[styles.viewAllBottomText, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
+                {isRTL ? "عرض جميع المنتجات" : "View All Products"}
+              </Text>
+              <Icon
+                name={isRTL ? "arrow-back-outline" : "arrow-forward-outline"}
+                size={18}
+                color={colors.gold}
+              />
+            </Pressable>
+          </View>
+        }
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomPad + 110 }]}
         refreshControl={
@@ -290,195 +484,12 @@ export default function HomeScreen() {
             colors={[colors.gold]}
           />
         }
-      >
-        <View style={[styles.bannerShadow, { backgroundColor: colors.surface }, cardShadow(colors.isDark, "strong")]}>
-        <View style={[styles.bannerCard, { borderColor: colors.gold + "33" }]}>
-          {hasVideo ? (
-            <VideoView
-              player={player}
-              style={StyleSheet.absoluteFill}
-              contentFit="cover"
-              nativeControls={false}
-            />
-          ) : hasImage ? (
-            <Image
-              source={{ uri: currentImageUri }}
-              style={StyleSheet.absoluteFill}
-              resizeMode="cover"
-            />
-          ) : (
-            <Image
-              source={require("../../assets/images/hero-fabrics.png")}
-              style={StyleSheet.absoluteFill}
-              resizeMode="cover"
-            />
-          )}
-
-          <LinearGradient
-            colors={["transparent", "rgba(0,0,0,0.45)", "rgba(0,0,0,0.95)"]}
-            locations={[0, 0.45, 1]}
-            style={styles.bannerOverlay}
-            pointerEvents="none"
-          />
-
-          <View style={styles.bannerNameRow} pointerEvents="none">
-            <View style={styles.bannerNamePill}>
-              <View style={styles.bannerNameTop}>
-                <Text style={styles.bannerGreeting}>{t("welcomeUser")}</Text>
-                <Text style={[styles.bannerUserName, { color: colors.goldLight }]} numberOfLines={1}>
-                  {user?.name ?? t("guest")}
-                </Text>
-              </View>
-              {!!settings.bannerCaption?.trim() && (
-                <Text
-                  style={[styles.bannerCaption, { color: "#FFFFFF" }]}
-                  numberOfLines={2}
-                >
-                  {settings.bannerCaption.trim()}
-                </Text>
-              )}
-            </View>
-            {isStaff && (
-              <View style={[styles.bannerRolePill, { backgroundColor: roleLabel.gold ? colors.gold : colors.surface + "CC" }]}>
-                <Icon name={roleLabel.icon} size={11} color={roleLabel.gold ? "#0A0A0A" : colors.mutedForeground} />
-                <Text style={[styles.bannerRoleText, { color: roleLabel.gold ? "#0A0A0A" : colors.mutedForeground }]}>
-                  {roleLabel.text}
-                </Text>
-              </View>
-            )}
-            {user?.role === "admin" && (
-              <View style={[styles.bannerRolePill, { backgroundColor: "#27AE60", marginInlineStart: 6 }]}>
-                <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: "#FFFFFF" }} />
-                <Text style={[styles.bannerRoleText, { color: "#FFFFFF" }]}>
-                  {onlineCount} متصل الآن
-                </Text>
-              </View>
-            )}
-          </View>
-
-          {videos.length > 1 && (
-            <View style={styles.dotsRow} pointerEvents="none">
-              {videos.map((_, i) => (
-                <View
-                  key={i}
-                  style={[
-                    styles.dot,
-                    { backgroundColor: i === videoIdx ? colors.gold : "rgba(255,255,255,0.4)" },
-                  ]}
-                />
-              ))}
-            </View>
-          )}
-
-          {videos.length === 0 && bannerImages.length > 1 && (
-            <View style={styles.dotsRow} pointerEvents="none">
-              {bannerImages.map((_, i) => (
-                <View
-                  key={i}
-                  style={[
-                    styles.dot,
-                    { backgroundColor: i === (imageIdx % bannerImages.length) ? colors.gold : "rgba(255,255,255,0.4)" },
-                  ]}
-                />
-              ))}
-            </View>
-          )}
-        </View>
-        </View>
-
-        {activeOrders.length > 0 && (
-          <Pressable
-            onPress={() => router.push("/(tabs)/orders")}
-            style={[styles.activeOrdersCard, { backgroundColor: colors.card, borderColor: colors.gold + "44", borderRadius: colors.radius }]}
-          >
-            <View style={styles.activeOrdersHeader}>
-              <View style={styles.activeOrdersRight}>
-                <Icon name="package" size={18} color={colors.gold} />
-                <Text style={[styles.activeOrdersTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
-                  {t("currentOrders")}
-                </Text>
-              </View>
-              <View style={[styles.activeOrdersBadge, { backgroundColor: colors.gold }]}>
-                <Text style={{ color: colors.background, fontFamily: "Cairo_700Bold", fontSize: 12 }}>
-                  {activeOrders.length}
-                </Text>
-              </View>
-            </View>
-            {activeOrders.slice(0, 3).map((order) => {
-              const statusInfo = STATUS_LABEL[order.status] ?? { text: order.status, color: colors.mutedForeground };
-              return (
-                <View key={order.id} style={[styles.activeOrderRow, { borderTopColor: colors.border }]}>
-                  <Icon name="chevron-left" size={14} color={colors.mutedForeground} />
-                  <View style={{ flex: 1, flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
-                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_500Medium", fontSize: 13 }}>
-                      {t("orderNum")} #{order.id.slice(0, 12)}
-                    </Text>
-                    <View style={[styles.activeOrderStatusPill, { backgroundColor: statusInfo.color + "22" }]}>
-                      <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: statusInfo.color }} />
-                      <Text style={{ color: statusInfo.color, fontFamily: "Cairo_600SemiBold", fontSize: 11 }}>
-                        {statusInfo.text}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              );
-            })}
-            {activeOrders.length > 3 && (
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "center", paddingTop: 6 }}>
-                +{activeOrders.length - 3} {t("moreOrders")}
-              </Text>
-            )}
-          </Pressable>
-        )}
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Pressable onPress={() => router.push("/(tabs)/products")}>
-              <Text style={[styles.seeAll, { color: colors.gold, fontFamily: "Cairo_600SemiBold" }]}>
-                {t("viewAll")}
-              </Text>
-            </Pressable>
-            <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
-              {t("featuredProducts")}
-            </Text>
-          </View>
-
-          {featuredProducts.length === 0 ? (
-            <Text style={[styles.emptyText, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
-              {t("noFeatured")}
-            </Text>
-          ) : (
-            featuredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onPress={() => handleProductPress(product.id)}
-              />
-            ))
-          )}
-
-          <Pressable
-            onPress={navigateToProducts}
-            style={({ pressed }) => [
-              styles.viewAllBottomBtn,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-                opacity: pressed ? 0.8 : 1,
-              },
-            ]}
-          >
-            <Text style={[styles.viewAllBottomText, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
-              {isRTL ? "عرض جميع المنتجات" : "View All Products"}
-            </Text>
-            <Icon
-              name={isRTL ? "arrow-back-outline" : "arrow-forward-outline"}
-              size={18}
-              color={colors.gold}
-            />
-          </Pressable>
-        </View>
-      </ScrollView>
+        initialNumToRender={2}
+        maxToRenderPerBatch={2}
+        windowSize={5}
+        removeClippedSubviews={Platform.OS !== "web"}
+        keyboardShouldPersistTaps="handled"
+      />
     </View>
   );
 }
@@ -526,7 +537,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   avatarText: { fontSize: 16 },
-  scrollContent: { paddingTop: 16, gap: 20, paddingBottom: 100 },
+  scrollContent: { paddingTop: 16, paddingBottom: 100 },
   bannerShadow: {
     marginHorizontal: 16,
     borderRadius: 18,
