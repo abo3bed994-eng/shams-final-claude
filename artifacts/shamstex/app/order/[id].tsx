@@ -2036,6 +2036,29 @@ export default function OrderDetailScreen() {
                 </Text>
               </Pressable>
             </View>
+
+            <Pressable
+              onPress={handleCustomerCancelOrder}
+              disabled={respondingApproval}
+              style={({ pressed }) => ({
+                flexDirection: "row-reverse",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 7,
+                paddingVertical: 11,
+                marginTop: 2,
+                borderRadius: colors.radius - 4,
+                borderWidth: 1,
+                borderColor: "#E74C3C",
+                backgroundColor: pressed ? "#E74C3C18" : "transparent",
+                opacity: respondingApproval ? 0.6 : 1,
+              })}
+            >
+              <Icon name="x-circle" size={16} color="#E74C3C" />
+              <Text style={{ color: "#E74C3C", fontFamily: "Cairo_700Bold", fontSize: 13 }}>
+                إلغاء الطلب
+              </Text>
+            </Pressable>
           </View>
         )}
 
