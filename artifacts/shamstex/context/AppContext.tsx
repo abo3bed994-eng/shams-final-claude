@@ -2432,7 +2432,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         FS.saveNotification(notif).catch(() => {});
       }
     },
-    []
+    [settings.payment?.ewalletFeePercent]
   );
 
   const setOrderEditable = useCallback(

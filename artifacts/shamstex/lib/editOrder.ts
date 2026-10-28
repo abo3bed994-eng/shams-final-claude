@@ -38,14 +38,10 @@ export function acceptStaffAvailability(items: CartItem[]): CartItem[] {
         if (companion.stockStatus === "unavailable") return acc;
         const next = { ...companion };
         if (companion.stockStatus === "partial" && companion.availableQuantity != null) {
-          if (companion.orderType === "weight") {
-            next.weight = companion.availableQuantity;
-            next.actualWeight = undefined;
-          } else {
-            next.actualWeight = companion.availableQuantity;
-            next.quantity = Math.max(1, Math.ceil(companion.availableQuantity / bltOf(companion.unit)));
-            next.manualWeight = true;
-          }
+          next.weight = undefined;
+          next.actualWeight = companion.availableQuantity;
+          next.quantity = 1;
+          next.manualWeight = true;
         }
         delete next.stockStatus;
         delete next.availableQuantity;
