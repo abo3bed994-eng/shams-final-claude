@@ -13,6 +13,14 @@ export function cleanEditedItem(it: CartItem): CartItem {
   delete clean.availableQuantity;
   delete clean.customerDecision;
   delete clean.editMaxQty;
+  if (clean.companions?.length) {
+    clean.companions = clean.companions.map((companion) => {
+      const next = { ...companion };
+      delete next.stockStatus;
+      delete next.availableQuantity;
+      return next;
+    });
+  }
   return withRecalculatedCompanions(clean);
 }
 
@@ -25,6 +33,26 @@ export function acceptStaffAvailability(items: CartItem[]): CartItem[] {
   return items.reduce<CartItem[]>((acc, it) => {
     if (it.stockStatus === "unavailable") return acc;
     const clean = cleanEditedItem(it);
+    if (it.companions?.length) {
+      clean.companions = it.companions.reduce<NonNullable<CartItem["companions"]>>((acc, companion) => {
+        if (companion.stockStatus === "unavailable") return acc;
+        const next = { ...companion };
+        if (companion.stockStatus === "partial" && companion.availableQuantity != null) {
+          if (companion.orderType === "weight") {
+            next.weight = companion.availableQuantity;
+            next.actualWeight = undefined;
+          } else {
+            next.actualWeight = companion.availableQuantity;
+            next.quantity = Math.max(1, Math.ceil(companion.availableQuantity / bltOf(companion.unit)));
+            next.manualWeight = true;
+          }
+        }
+        delete next.stockStatus;
+        delete next.availableQuantity;
+        acc.push(next);
+        return acc;
+      }, []);
+    }
     if (it.stockStatus === "partial" && it.availableQuantity != null) {
       if (it.orderType === "weight") {
         clean.weight = it.availableQuantity;

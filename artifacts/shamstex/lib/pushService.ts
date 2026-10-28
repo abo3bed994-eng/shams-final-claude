@@ -408,3 +408,69 @@ export async function notifyAll(
     console.warn("notifyAll error:", err);
   }
 }
+
+export async function notifyAssignedStaff(
+  order: {
+    id: string;
+    assignedToPhone?: string;
+    branchId?: string;
+    fulfillmentType?: string;
+  },
+  title: string,
+  body: string,
+  data?: Record<string, any>
+): Promise<void> {
+  try {
+    let delivered = false;
+    if (order.assignedToPhone) {
+      const normalizedPhone = migrateLocalToE164(order.assignedToPhone);
+      const token =
+        (await FS.getPushTokenByPhone(normalizedPhone)) ||
+        (normalizedPhone !== order.assignedToPhone
+          ? await FS.getPushTokenByPhone(order.assignedToPhone)
+          : null);
+      if (token) {
+        await sendExpoPush([token], title, body, { orderId: order.id, ...data }, "orders_v4");
+        delivered = true;
+      }
+    }
+
+    if (!delivered) {
+      const isShipping = order.fulfillmentType === "shipping";
+      const orderBranchId = order.branchId;
+      const staffTokens = await FS.getStaffPushTokens();
+      const targetTokens: string[] = [];
+
+      for (const st of staffTokens) {
+        if (!st.expoPushToken) continue;
+        if (st.role === "admin") {
+          targetTokens.push(st.expoPushToken);
+        } else if (st.role === "supervisor") {
+          if (st.supervisorScope === "branch") {
+            if (isShipping ? !!st.canHandleShipping : !!orderBranchId && st.branchId === orderBranchId) {
+              targetTokens.push(st.expoPushToken);
+            }
+          } else {
+            targetTokens.push(st.expoPushToken);
+          }
+        } else if (st.role === "employee") {
+          if (isShipping ? !!st.canHandleShipping : !!orderBranchId && st.branchId === orderBranchId) {
+            targetTokens.push(st.expoPushToken);
+          }
+        }
+      }
+
+      if (targetTokens.length > 0) {
+        await sendExpoPush(
+          Array.from(new Set(targetTokens)),
+          title,
+          body,
+          { orderId: order.id, ...data },
+          "orders_v4"
+        );
+      }
+    }
+  } catch (err) {
+    console.warn("notifyAssignedStaff error:", err);
+  }
+}

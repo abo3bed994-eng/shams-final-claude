@@ -3,7 +3,7 @@ import { setSecureItem, getSecureItem, deleteSecureItem } from "@/lib/secureStor
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Platform } from "react-native";
 import { FS } from "@/lib/firebase";
-import { notifyStaffNewOrder, notifyUserByPhone, notifyByRoles, notifyAll } from "@/lib/pushService";
+import { notifyStaffNewOrder, notifyUserByPhone, notifyByRoles, notifyAll, notifyAssignedStaff } from "@/lib/pushService";
 import { canonicalPhone, samePhone, migrateLocalToE164 } from "@/lib/phoneUtils";
 import { isWithinWorkingHours } from "@/lib/workingHours";
 import { EDIT_WINDOW_MS, acceptStaffAvailability, computeItemsTotal } from "@/lib/editOrder";
@@ -104,6 +104,8 @@ export interface CompanionSelection {
   // Set by staff when the measured companion amount differs from the
   // percentage estimate. Recalculation must preserve this measured value.
   manualWeight?: boolean;
+  stockStatus?: "partial" | "unavailable";
+  availableQuantity?: number;
 }
 
 export interface Product {
@@ -228,6 +230,14 @@ export interface Order {
   paymentOverrideHandle?: string;
   paymentOverrideName?: string;
   transferProofImage?: string;
+  pendingCustomerApproval?: boolean;
+  approvalRequestedAt?: string;
+  pendingStaffItems?: CartItem[];
+  pendingStaffTotal?: number;
+  pendingStaffAt?: string;
+  pendingStaffOriginalItems?: CartItem[];
+  pendingStaffOriginalTotal?: number;
+  customerRejectedStaffChanges?: boolean;
   // Fulfillment: how the customer receives the order
   fulfillmentType?: FulfillmentType; // undefined = legacy = "branch"
   branchId?: string;
@@ -514,6 +524,8 @@ interface AppContextType {
   cancelOrder: (orderId: string, opts?: { notifyStaff?: boolean }) => Promise<void>;
   sendOrderMessage: (orderId: string, message: string) => Promise<void>;
   setOrderEditable: (orderId: string, editable: boolean) => Promise<void>;
+  notifyCustomerOrderChanges: (orderId: string) => Promise<void>;
+  respondToOrderApproval: (orderId: string, approved: boolean) => Promise<void>;
   setOrderEditExpiry: (orderId: string, expiresAt: string | null) => Promise<void>;
   beginOrderEdit: (orderId: string) => void;
   setOrderInvoiceImage: (orderId: string, imageUri: string | null) => Promise<void>;
@@ -1991,6 +2003,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       const prevOrder = ordersRef.current.find((o) => o.id === orderId);
       if (!prevOrder) return;
+      if (
+        me?.role !== "admin" &&
+        (status === "ready" || status === "ready_to_ship") &&
+        (prevOrder.pendingCustomerApproval || prevOrder.pendingStaffItems)
+      ) {
+        Alert.alert("بانتظار موافقة العميل", "لا يمكن إكمال الطلب قبل موافقة العميل على تعديلات فريق العمل.");
+        return;
+      }
       // Idempotency: same status, same staff → no-op (prevents double-tap glitches)
       if (
         prevOrder.status === status &&
@@ -2021,11 +2041,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         // Finalize estimated weights: any pieces item that never got an actual
         // weight recorded during preparing has its per-bolt estimate locked in
         // as the actual weight, so the order stops showing "تقديري" once ready.
-        const needsFinalize = prevOrder.items.some(
+        const sourceItems = prevOrder.pendingStaffItems ?? prevOrder.items;
+        const needsFinalize = sourceItems.some(
           (it) => it.orderType === "pieces" && !it.actualWeight
         );
+        if (prevOrder.pendingStaffItems) {
+          patch.items = sourceItems;
+          patch.total = prevOrder.pendingStaffTotal ?? computeItemsTotal(sourceItems);
+          patch.pendingStaffItems = undefined;
+          patch.pendingStaffTotal = undefined;
+          patch.pendingStaffAt = undefined;
+          patch.pendingStaffOriginalItems = undefined;
+          patch.pendingStaffOriginalTotal = undefined;
+          patch.pendingCustomerApproval = false;
+        }
         if (needsFinalize) {
-          const finalizedItems = prevOrder.items.map((it) =>
+          const finalizedItems = sourceItems.map((it) =>
             it.orderType === "pieces" && !it.actualWeight
               ? { ...it, actualWeight: it.quantity * (it.unit === "meter" ? 100 : 20) }
               : it
@@ -2257,6 +2288,148 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           message,
           { type: "order_message", orderId }
         ).catch(() => {});
+      }
+    },
+    []
+  );
+
+  const notifyCustomerOrderChanges = useCallback(
+    async (orderId: string) => {
+      const targetOrder = ordersRef.current.find((o) => o.id === orderId);
+      if (!targetOrder || !targetOrder.pendingStaffItems) throw new Error("لا توجد تعديلات من الفريق لإبلاغ العميل بها.");
+      if (targetOrder.pendingCustomerApproval) return;
+      const updated = ordersRef.current.map((o) => {
+        if (o.id !== orderId) return o;
+        const approvedItems = o.pendingStaffItems ?? o.items;
+        const approvedTotal = o.pendingStaffTotal ?? o.total;
+        const ewalletPct = settings.payment?.ewalletFeePercent ?? 1;
+        const fee = o.paymentMethod === "ewallet" ? Math.ceil(approvedTotal * ewalletPct / 100) : 0;
+        return {
+          ...o,
+          items: approvedItems,
+          total: approvedTotal,
+          paymentFee: fee,
+          totalWithFee: approvedTotal + fee,
+          pendingStaffItems: undefined,
+          pendingStaffTotal: undefined,
+          pendingStaffAt: undefined,
+          pendingStaffOriginalItems: o.items,
+          pendingStaffOriginalTotal: o.total,
+          pendingCustomerApproval: true,
+          approvalRequestedAt: new Date().toISOString(),
+          editable: false,
+          editableExpiresAt: undefined,
+        };
+      });
+      const updatedOrder = updated.find((o) => o.id === orderId);
+      setOrdersState(updated);
+      ordersRef.current = updated;
+      await AsyncStorage.setItem("orders", JSON.stringify(updated));
+      if (updatedOrder) {
+        FS.saveOrder(updatedOrder).catch(() => {});
+        const recipientPhone = resolveRecipientPhone(updatedOrder.userId, updatedOrder.userPhone);
+        const notif: Notification = {
+          id: `notif_approval_${orderId}_${Date.now()}`,
+          title: "تم تحديث تفاصيل طلبك 📋",
+          body: `مرحباً بك! قام فريق العمل بتجهيز ومراجعة الأوزان والكميات المتوفرة لطلبك #${orderId.slice(0, 10)}. نرجو الاطلاع على التعديلات وتأكيد موافقتك لإكمال الطلب.`,
+          createdAt: new Date().toISOString(),
+          read: false,
+          targetUserId: updatedOrder.userId,
+          targetUserPhone: recipientPhone,
+          linkedOrderId: orderId,
+        };
+        const updatedNotifs = [notif, ...notificationsRef.current];
+        setNotifications(updatedNotifs);
+        await AsyncStorage.setItem("notifications", JSON.stringify(updatedNotifs));
+        FS.saveNotification(notif).catch(() => {});
+        if (recipientPhone) {
+          notifyUserByPhone(
+            recipientPhone,
+            notif.title,
+            notif.body,
+            { type: "order_approval_request", orderId }
+          ).catch(() => {});
+        }
+      }
+    },
+    [resolveRecipientPhone, settings.payment?.ewalletFeePercent]
+  );
+
+  const respondToOrderApproval = useCallback(
+    async (orderId: string, approved: boolean) => {
+      const order = ordersRef.current.find((o) => o.id === orderId);
+      const currentUser = userRef.current;
+      if (!order || !currentUser || order.userId !== currentUser.id || !order.pendingCustomerApproval) return;
+
+      const acceptedItems = approved ? acceptStaffAvailability(order.items) : undefined;
+      const acceptedTotal = acceptedItems ? computeItemsTotal(acceptedItems) : undefined;
+      const acceptedFee = acceptedTotal != null && order.paymentMethod === "ewallet"
+        ? Math.ceil(acceptedTotal * (settings.payment?.ewalletFeePercent ?? 1) / 100)
+        : order.paymentFee ?? 0;
+      const updated = ordersRef.current.map((o) =>
+        o.id === orderId
+          ? {
+              ...o,
+              ...(approved && acceptedItems ? {
+                items: acceptedItems,
+                total: acceptedTotal!,
+                paymentFee: acceptedFee,
+                totalWithFee: acceptedTotal! + acceptedFee,
+              } : !approved && o.pendingStaffOriginalItems ? {
+                items: o.pendingStaffOriginalItems,
+                total: o.pendingStaffOriginalTotal ?? o.total,
+                paymentFee: o.paymentMethod === "ewallet"
+                  ? Math.ceil((o.pendingStaffOriginalTotal ?? o.total) * (settings.payment?.ewalletFeePercent ?? 1) / 100)
+                  : o.paymentFee ?? 0,
+                totalWithFee: (o.pendingStaffOriginalTotal ?? o.total) + (o.paymentMethod === "ewallet"
+                  ? Math.ceil((o.pendingStaffOriginalTotal ?? o.total) * (settings.payment?.ewalletFeePercent ?? 1) / 100)
+                  : o.paymentFee ?? 0),
+              } : {}),
+              pendingStaffOriginalItems: undefined,
+              pendingStaffOriginalTotal: undefined,
+              pendingCustomerApproval: false,
+              customerRejectedStaffChanges: !approved,
+              editable: !approved,
+              editableExpiresAt: undefined,
+            }
+          : o
+      );
+      const updatedOrder = updated.find((o) => o.id === orderId);
+      setOrdersState(updated);
+      ordersRef.current = updated;
+      await AsyncStorage.setItem("orders", JSON.stringify(updated));
+      if (updatedOrder) {
+        FS.saveOrder(updatedOrder).catch(() => {});
+
+        const customerName = order.userName || "العميل";
+        const notifTitle = approved
+          ? `✅ وافق العميل على تعديل الطلب #${orderId.slice(0, 10)}`
+          : `⚠️ لم يوافق العميل على التعديل #${orderId.slice(0, 10)}`;
+        const notifBody = approved
+          ? `وافق العميل ${customerName} على الأوزان والكميات المعدلة، والطلب الآن جاهز لإكمال المرحلة التالية.`
+          : `رفض العميل ${customerName} التعديل وتم فتح إمكانية تعديل الطلب له لاختيار البدائل.`;
+
+        notifyAssignedStaff(updatedOrder, notifTitle, notifBody, {
+          type: "order_approval_response",
+          approved,
+          orderId,
+        }).catch(() => {});
+
+        const notif: Notification = {
+          id: `notif_resp_${orderId}_${Date.now()}`,
+          title: notifTitle,
+          body: notifBody,
+          createdAt: new Date().toISOString(),
+          read: false,
+          ...(updatedOrder.assignedTo
+            ? { targetUserId: updatedOrder.assignedTo, targetUserPhone: updatedOrder.assignedToPhone }
+            : { targetRole: "staff" as any }),
+          linkedOrderId: orderId,
+        };
+        const updatedNotifs = [notif, ...notificationsRef.current];
+        setNotifications(updatedNotifs);
+        await AsyncStorage.setItem("notifications", JSON.stringify(updatedNotifs));
+        FS.saveNotification(notif).catch(() => {});
       }
     },
     []
@@ -2583,17 +2756,36 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (o.id !== orderId) return o;
         const ewalletPct = settings.payment?.ewalletFeePercent ?? 1;
         const fee = o.paymentMethod === "ewallet" ? Math.ceil(normalizedTotal * ewalletPct / 100) : 0;
+        const currentRole = userRef.current?.role;
+        const stageStaffEdit = staffEdit && (currentRole === "admin" || currentRole === "supervisor" || currentRole === "employee");
+        if (stageStaffEdit) {
+          return {
+            ...o,
+            pendingStaffItems: normalizedItems,
+            pendingStaffTotal: normalizedTotal,
+            pendingStaffAt: new Date().toISOString(),
+          };
+        }
         return {
           ...o,
           items: normalizedItems,
           total: normalizedTotal,
           paymentFee: fee,
           totalWithFee: normalizedTotal + fee,
+          pendingStaffItems: undefined,
+          pendingStaffTotal: undefined,
+          pendingStaffAt: undefined,
+          pendingStaffOriginalItems: undefined,
+          pendingStaffOriginalTotal: undefined,
+          customerRejectedStaffChanges: false,
           ...(notes !== undefined ? { notes } : {}),
           ...(fulfillment?.fulfillmentType !== undefined ? { fulfillmentType: fulfillment.fulfillmentType } : {}),
           ...(fulfillment?.branchId !== undefined ? { branchId: fulfillment.branchId } : {}),
           ...(fulfillment?.branchName !== undefined ? { branchName: fulfillment.branchName } : {}),
-          ...(staffEdit ? {} : { editable: false, editableExpiresAt: undefined, edited: true, editedAt: new Date().toISOString() }),
+          editable: false,
+          editableExpiresAt: undefined,
+          edited: true,
+          editedAt: new Date().toISOString(),
         };
       });
       const updatedOrder = updated.find((o) => o.id === orderId);
@@ -2610,7 +2802,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           // of surfacing a hard "تعذّر حفظ التعديل" error to the customer.
           console.warn("updateOrderItems: order queued for offline retry:", orderId);
         }
-        if (!staffEdit) {
+        const currentRole = userRef.current?.role;
+        const isStaffEditor = currentRole === "admin" || currentRole === "supervisor" || currentRole === "employee";
+        if (!isStaffEditor) {
           const assignedStaffId = updatedOrder.assignedTo;
           const assignedStaffPhone = updatedOrder.assignedToPhone;
           const staffNotif: Notification = {
@@ -2660,6 +2854,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const due = ordersRef.current.filter(
       (o) =>
         o.editable &&
+        !o.customerRejectedStaffChanges &&
         o.editableExpiresAt &&
         o.status !== "cancelled" &&
         new Date(o.editableExpiresAt).getTime() <= now &&
@@ -3077,6 +3272,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         cancelOrder,
         sendOrderMessage,
         setOrderEditable,
+    notifyCustomerOrderChanges,
+    respondToOrderApproval,
         setOrderEditExpiry,
         beginOrderEdit,
         setOrderInvoiceImage,

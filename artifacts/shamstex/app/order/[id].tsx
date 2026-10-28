@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Alert, Image, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { KeyboardAwareScroll } from "@/components/KeyboardAware";
 import AppTextInput from "@/components/AppTextInput";
 import { useLocalSearchParams, router } from "expo-router";
@@ -153,7 +153,7 @@ export default function OrderDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { orders, user, updateOrderStatus, deleteOrder, sendOrderMessage, setOrderEditable, setOrderEditExpiry, beginOrderEdit, updateOrderItems, returnRequests, addReturnRequest, updateReturnStatus, setEditingOrderId, settings, products, cancelOrder, setOrderTransferProof, setOrderPaymentMethod, setOrderPaymentOverride, setOrderShipping } = useApp();
+  const { orders, user, updateOrderStatus, deleteOrder, sendOrderMessage, setOrderEditable, setOrderEditExpiry, beginOrderEdit, updateOrderItems, returnRequests, addReturnRequest, updateReturnStatus, setEditingOrderId, settings, products, cancelOrder, setOrderTransferProof, setOrderPaymentMethod, setOrderPaymentOverride, setOrderShipping, notifyCustomerOrderChanges, respondToOrderApproval } = useApp();
   const unitOf = (it: { productId: string; unit?: string }) => products.find(p => p.id === it.productId)?.unit ?? it.unit;
   const boltsOf = (weight: number | undefined, it: { productId: string; unit?: string }) => Math.floor((weight ?? 0) / blt(unitOf(it)));
   const [showMsgInput, setShowMsgInput] = useState(false);
@@ -187,6 +187,14 @@ export default function OrderDetailScreen() {
   const [showWaybillPreview, setShowWaybillPreview] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [showPackingSlipModal, setShowPackingSlipModal] = useState(false);
+  const [showBulkWeightsModal, setShowBulkWeightsModal] = useState(false);
+  const [showBulkAvailModal, setShowBulkAvailModal] = useState(false);
+  const [bulkWeightsItems, setBulkWeightsItems] = useState<CartItem[]>([]);
+  const [bulkAvailItems, setBulkAvailItems] = useState<CartItem[]>([]);
+  const [savingBulkWeights, setSavingBulkWeights] = useState(false);
+  const [savingBulkAvail, setSavingBulkAvail] = useState(false);
+  const [notifyingCustomer, setNotifyingCustomer] = useState(false);
+  const [respondingApproval, setRespondingApproval] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
   const [editSectionY, setEditSectionY] = useState<number | null>(null);
   const didScrollToEditRef = useRef(false);
@@ -194,7 +202,7 @@ export default function OrderDetailScreen() {
   const [availInput, setAvailInput] = useState("");
   const [confirmingEdit, setConfirmingEdit] = useState(false);
 
-  const order = orders.find((o) => o.id === id);
+  const storedOrder = orders.find((o) => o.id === id);
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const isStaff = user?.role === "admin" || user?.role === "employee" || user?.role === "supervisor";
@@ -202,8 +210,94 @@ export default function OrderDetailScreen() {
   const canEditOrders = isAdmin || (isStaff && (user?.permissions ?? []).includes("edit_orders"));
   const canDeleteOrders = isAdmin || (isStaff && (user?.permissions ?? []).includes("delete_orders"));
   const isCustomer = user?.role === "customer" || user?.role === "merchant";
+  const order = storedOrder
+    ? {
+        ...storedOrder,
+        items: isStaff && storedOrder.pendingStaffItems ? storedOrder.pendingStaffItems : storedOrder.items,
+        total: isStaff && storedOrder.pendingStaffTotal != null ? storedOrder.pendingStaffTotal : storedOrder.total,
+      }
+    : undefined;
   const isAssignedToMe = order?.assignedTo === user?.id;
   const isLockedByOther = order?.assignedTo && !isAssignedToMe && !isAdmin;
+
+  const openBulkWeights = () => {
+    if (!order) return;
+    setBulkWeightsItems(JSON.parse(JSON.stringify(order.items)));
+    setShowBulkWeightsModal(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const saveBulkWeights = async () => {
+    if (!order) return;
+    setSavingBulkWeights(true);
+    try {
+      const weightTotal = bulkWeightsItems
+        .filter((i) => i.orderType === "weight")
+        .reduce((a, b) => a + b.unitPrice * (b.weight ?? 1), 0);
+      const piecesTotal = bulkWeightsItems
+        .filter((i) => i.orderType === "pieces")
+        .reduce((a, b) => a + (b.actualWeight ?? (b.quantity * blt(unitOf(b)))) * b.unitPrice, 0);
+      const compTotal = bulkWeightsItems.reduce((acc, it) => acc + companionTotal(it), 0);
+      const newTotal = weightTotal + piecesTotal + compTotal;
+
+      await updateOrderItems(order.id, bulkWeightsItems, newTotal, true);
+      setShowBulkWeightsModal(false);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Alert.alert("تم الحفظ", "تم تحديث الأوزان الفعلية بنجاح. تذكّر الضغط على 'إبلاغ العميل بالتعديلات' لإشعاره.");
+    } catch {
+      Alert.alert("خطأ", "تعذّر حفظ الأوزان الفعلية. حاول مرة أخرى.");
+    } finally {
+      setSavingBulkWeights(false);
+    }
+  };
+
+  const openBulkAvail = () => {
+    if (!order) return;
+    setBulkAvailItems(JSON.parse(JSON.stringify(order.items)));
+    setShowBulkAvailModal(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const saveBulkAvailability = async () => {
+    if (!order) return;
+    setSavingBulkAvail(true);
+    try {
+      await updateOrderItems(order.id, bulkAvailItems, order.total, true);
+      setShowBulkAvailModal(false);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Alert.alert("تم الحفظ", "تم تحديث حالة توفر الخامات بنجاح. تذكّر الضغط على 'إبلاغ العميل بالتعديلات' لإشعاره.");
+    } catch {
+      Alert.alert("خطأ", "تعذّر حفظ حالة التوفر. حاول مرة أخرى.");
+    } finally {
+      setSavingBulkAvail(false);
+    }
+  };
+
+  const handleNotifyCustomer = async () => {
+    if (!order) return;
+    Alert.alert(
+      "إبلاغ العميل بالتعديل",
+      "سيتم إرسال إشعار للعميل بالتعديلات التي تمت على الأوزان والكميات المتوفرة. لن يتمكن الموظف من نقل الطلب إلى (جاهز) حتى يوافق العميل. هل تريد المتابعة؟",
+      [
+        { text: "إلغاء", style: "cancel" },
+        {
+          text: "نعم، أبلغ العميل",
+          onPress: async () => {
+            setNotifyingCustomer(true);
+            try {
+              await notifyCustomerOrderChanges(order.id);
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              Alert.alert("تم الإبلاغ", "تم إرسال الإشعار للعميل بنجاح وبانتظار قراره.");
+            } catch {
+              Alert.alert("خطأ", "تعذّر إرسال الإشعار. حاول مرة أخرى.");
+            } finally {
+              setNotifyingCustomer(false);
+            }
+          },
+        },
+      ]
+    );
+  };
 
   const saveCompanionWeight = (itemIndex: number, companionIndex: number, rawValue: string) => {
     if (!order) return;
@@ -227,7 +321,7 @@ export default function OrderDetailScreen() {
   const STATUS_STEPS = getStatusSteps(order?.fulfillmentType);
   const currentStep = isCancelled || isScheduled ? 0 : STATUS_STEPS.findIndex((s) => s.key === order?.status);
 
-  const hasAffectedItems = !!order && order.items.some((it) => it.stockStatus);
+  const hasAffectedItems = !!order && order.items.some((it) => it.stockStatus || (it.companions ?? []).some((c) => c.stockStatus));
 
   useEffect(() => {
     if (didScrollToEditRef.current) return;
@@ -991,52 +1085,7 @@ export default function OrderDetailScreen() {
                   <Text style={{ color: colors.gold + "99", fontFamily: "Cairo_500Medium", fontSize: 11 }}>
                     {item.unitPrice} ج.م/{ulbl(unitOf(item))}
                   </Text>
-                  {isStaff && order.status === "preparing" && !isLockedByOther && (
-                    <Pressable
-                      onPress={() => {
-                        if (order.editable) {
-                          Alert.alert(
-                            "التعديل قيد التنفيذ",
-                            "لا يمكن تعديل المتوفر بينما العميل يعدّل طلبه. أغلق صلاحية التعديل أولًا أو انتظر حتى يؤكّد العميل الطلب."
-                          );
-                          return;
-                        }
-                        setAvailModalIndex(index);
-                        setAvailInput(item.stockStatus === "partial" && item.availableQuantity != null ? String(item.availableQuantity) : "");
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      }}
-                      style={{
-                        alignSelf: "flex-start",
-                        marginTop: 6,
-                        flexDirection: "row-reverse",
-                        alignItems: "center",
-                        gap: 5,
-                        paddingHorizontal: 8,
-                        paddingVertical: 5,
-                        borderRadius: colors.radius - 6,
-                        borderWidth: 1,
-                        borderColor: item.stockStatus === "unavailable" ? "#E74C3C" : item.stockStatus === "partial" ? "#F39C12" : colors.border,
-                        backgroundColor: item.stockStatus === "unavailable" ? "#E74C3C18" : item.stockStatus === "partial" ? "#F39C1218" : colors.surface,
-                      }}
-                    >
-                      <Icon
-                        name={item.stockStatus ? "alert-triangle" : "package"}
-                        size={12}
-                        color={item.stockStatus === "unavailable" ? "#E74C3C" : item.stockStatus === "partial" ? "#F39C12" : colors.mutedForeground}
-                      />
-                      <Text style={{
-                        fontSize: 11,
-                        fontFamily: "Cairo_600SemiBold",
-                        color: item.stockStatus === "unavailable" ? "#E74C3C" : item.stockStatus === "partial" ? "#F39C12" : colors.mutedForeground,
-                      }}>
-                        {item.stockStatus === "unavailable"
-                          ? "غير متوفر"
-                          : item.stockStatus === "partial"
-                            ? `متوفر فقط: ${item.availableQuantity} ${ulbl(unitOf(item))}`
-                            : "تحديد المتوفر"}
-                      </Text>
-                    </Pressable>
-                  )}
+
                 </View>
               </View>
               <View style={[styles.orderItemLeft, { gap: 10 }]}>
@@ -1527,6 +1576,92 @@ export default function OrderDetailScreen() {
           );
         })()}
 
+                {/* أزرار التجهيز المجمعة: الوزن الفعلي، تحديد المتوفر، وإبلاغ العميل */}
+        {isStaff && order.status === "preparing" && !isLockedByOther && (
+          <View style={{ gap: 8 }}>
+            <View style={{ flexDirection: "row-reverse", gap: 8 }}>
+              <Pressable
+                onPress={openBulkWeights}
+                style={({ pressed }) => [{
+                  flex: 1,
+                  flexDirection: "row-reverse",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                  paddingVertical: 12,
+                  backgroundColor: colors.surface,
+                  borderColor: colors.gold,
+                  borderWidth: 1.5,
+                  borderRadius: colors.radius - 4,
+                  opacity: pressed ? 0.7 : 1,
+                }]}
+              >
+                <Icon name="scale" size={16} color={colors.gold} />
+                <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 13 }}>
+                  الوزن الفعلي
+                </Text>
+              </Pressable>
+
+              <Pressable
+                onPress={openBulkAvail}
+                style={({ pressed }) => [{
+                  flex: 1,
+                  flexDirection: "row-reverse",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                  paddingVertical: 12,
+                  backgroundColor: colors.surface,
+                  borderColor: "#F39C12",
+                  borderWidth: 1.5,
+                  borderRadius: colors.radius - 4,
+                  opacity: pressed ? 0.7 : 1,
+                }]}
+              >
+                <Icon name="package" size={16} color="#F39C12" />
+                <Text style={{ color: "#F39C12", fontFamily: "Cairo_700Bold", fontSize: 13 }}>
+                  تحديد المتوفر
+                </Text>
+              </Pressable>
+            </View>
+
+            {/* زر إبلاغ العميل بالتعديلات */}
+            <Pressable
+              onPress={handleNotifyCustomer}
+              disabled={notifyingCustomer || order.pendingCustomerApproval || !order.pendingStaffItems}
+              style={({ pressed }) => [{
+                flexDirection: "row-reverse",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                paddingVertical: 12,
+                backgroundColor: order.pendingCustomerApproval ? "#27AE6018" : "#3498DB18",
+                borderColor: order.pendingCustomerApproval ? "#27AE60" : "#3498DB",
+                borderWidth: 1.5,
+                borderRadius: colors.radius - 4,
+                opacity: (pressed || notifyingCustomer || order.pendingCustomerApproval || !order.pendingStaffItems) ? 0.7 : 1,
+              }]}
+            >
+              <Icon
+                name={order.pendingCustomerApproval ? "check-circle" : "send"}
+                size={16}
+                color={order.pendingCustomerApproval ? "#27AE60" : "#3498DB"}
+              />
+              <Text style={{
+                color: order.pendingCustomerApproval ? "#27AE60" : "#3498DB",
+                fontFamily: "Cairo_700Bold",
+                fontSize: 13,
+              }}>
+                {order.pendingCustomerApproval
+                  ? "تم إبلاغ العميل بالتعديلات (بانتظار موافقته)"
+                  : order.pendingStaffItems
+                    ? "إبلاغ العميل بالتعديلات"
+                    : "لا توجد تعديلات غير مُبلّغ عنها"}
+              </Text>
+            </Pressable>
+          </View>
+        )}
+
         {isStaff && ["scheduled", "pending", "received", "preparing"].includes(order.status) && !isLockedByOther && (
           <Pressable
             onPress={() => {
@@ -1602,6 +1737,23 @@ export default function OrderDetailScreen() {
                       ]);
                       return;
                     }
+                    if ((nextAction.next === "ready" || nextAction.next === "ready_to_ship") && !isAdmin) {
+                      if (order.pendingCustomerApproval || order.pendingStaffItems) {
+                        Alert.alert(
+                          "بانتظار موافقة العميل",
+                          "هناك تعديلات من فريق العمل لم يوافق عليها العميل بعد. أبلغ العميل وانتظر موافقته قبل إكمال الطلب (ويُستثنى المدير العام)."
+                        );
+                        return;
+                      }
+                      if (order.editable) {
+                        Alert.alert(
+                          "الطلب قيد التعديل بواسطة العميل",
+                          "العميل يقوم بتعديل طلبه حالياً. يرجى الانتظار حتى ينتهي العميل من تعديل طلبه."
+                        );
+                        return;
+                      }
+                    }
+
                     const doAdvance = async () => {
                       if (nextAction.next === "ready" || nextAction.next === "ready_to_ship") {
                         const hasPiecesWithoutWeight = order.items.some(
@@ -1770,6 +1922,123 @@ export default function OrderDetailScreen() {
           );
         })()}
 
+                {/* بطاقة طلب موافقة العميل على تعديلات الطاقم (الأوزان والمتوفر) */}
+        {isCustomer && order.pendingCustomerApproval && order.status !== "cancelled" && (
+          <View
+            style={[
+              styles.editableCustomerCard,
+              {
+                backgroundColor: "#27AE6012",
+                borderColor: "#27AE60",
+                borderRadius: colors.radius,
+                borderWidth: 1.5,
+              },
+            ]}
+          >
+            <View style={styles.editableCustomerHeader}>
+              <Icon name="check-circle" size={18} color="#27AE60" />
+              <Text style={{ color: "#27AE60", fontFamily: "Cairo_700Bold", fontSize: 15, textAlign: "right", flex: 1 }}>
+                تحديث من فريق العمل: مراجعة الطلب
+              </Text>
+            </View>
+            <Text style={{ color: colors.foreground, fontFamily: "Cairo_500Medium", fontSize: 13, textAlign: "right", lineHeight: 22 }}>
+              قام فريق العمل بمراجعة الأوزان والكميات المتوفرة لطلبك. يرجى مراجعة تفاصيل الأصناف والأوزان الظاهرة بالأعلى، وتأكيد موافقتك لإكمال تجهيز وتسليم الطلب.
+            </Text>
+
+            <View style={{ flexDirection: "row-reverse", gap: 10, marginTop: 8 }}>
+              <Pressable
+                onPress={() => {
+                  Alert.alert(
+                    "تأكيد الموافقة",
+                    "هل أنت موافق على الأوزان والكميات المعدلة للطلب؟",
+                    [
+                      { text: "تراجع", style: "cancel" },
+                      {
+                        text: "نعم، أوافق",
+                        onPress: async () => {
+                          setRespondingApproval(true);
+                          try {
+                            await respondToOrderApproval(order.id, true);
+                            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                            Alert.alert("شكراً لك", "تم تسجيل موافقتك بنجاح، ويجري الآن استكمال طلبك.");
+                          } catch {
+                            Alert.alert("خطأ", "تعذّر تسجيل الموافقة. حاول مرة أخرى.");
+                          } finally {
+                            setRespondingApproval(false);
+                          }
+                        },
+                      },
+                    ]
+                  );
+                }}
+                disabled={respondingApproval}
+                style={{
+                  flex: 1,
+                  backgroundColor: "#27AE60",
+                  paddingVertical: 12,
+                  borderRadius: colors.radius - 4,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "row-reverse",
+                  gap: 6,
+                  opacity: respondingApproval ? 0.7 : 1,
+                }}
+              >
+                <Icon name="check" size={16} color="#fff" />
+                <Text style={{ color: "#fff", fontFamily: "Cairo_700Bold", fontSize: 13 }}>
+                  موافق على التعديل
+                </Text>
+              </Pressable>
+
+              <Pressable
+                onPress={() => {
+                  Alert.alert(
+                    "عدم الموافقة على التعديل",
+                    "إذا لم تكن موافقاً، ستفتح لك إمكانية تعديل طلبك واختيار كميات أو بدائل أخرى. هل تريد المتابعة؟",
+                    [
+                      { text: "تراجع", style: "cancel" },
+                      {
+                        text: "غير موافق، أريد التعديل",
+                        style: "destructive",
+                        onPress: async () => {
+                          setRespondingApproval(true);
+                          try {
+                            await respondToOrderApproval(order.id, false);
+                            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+                          } catch {
+                            Alert.alert("خطأ", "تعذّر تسجيل عدم الموافقة. حاول مرة أخرى.");
+                          } finally {
+                            setRespondingApproval(false);
+                          }
+                        },
+                      },
+                    ]
+                  );
+                }}
+                disabled={respondingApproval}
+                style={{
+                  flex: 1,
+                  backgroundColor: colors.card,
+                  borderWidth: 1.5,
+                  borderColor: "#E74C3C",
+                  paddingVertical: 12,
+                  borderRadius: colors.radius - 4,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "row-reverse",
+                  gap: 6,
+                  opacity: respondingApproval ? 0.7 : 1,
+                }}
+              >
+                <Icon name="x" size={16} color="#E74C3C" />
+                <Text style={{ color: "#E74C3C", fontFamily: "Cairo_700Bold", fontSize: 13 }}>
+                  غير موافق (تعديل الطلب)
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
+
         {isCustomer && order.editable && order.status !== "cancelled" && (
           <View
             onLayout={(e) => { const y = e.nativeEvent.layout.y; setEditSectionY((prev) => (prev === y ? prev : y)); }}
@@ -1788,7 +2057,7 @@ export default function OrderDetailScreen() {
             </Text>
 
             {order.items.map((item, index) => {
-              if (!item.stockStatus) return null;
+              if (!item.stockStatus && !(item.companions ?? []).some((c) => c.stockStatus)) return null;
               const isUnavailable = item.stockStatus === "unavailable";
               return (
                 <View
@@ -1814,21 +2083,25 @@ export default function OrderDetailScreen() {
                     </View>
                   </View>
 
-                  {isUnavailable ? (
+                  {item.stockStatus && (isUnavailable ? (
                     <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6, backgroundColor: "#E74C3C18", borderRadius: colors.radius - 6, padding: 8 }}>
                       <Icon name="x-circle" size={14} color="#E74C3C" />
-                      <Text style={{ color: "#E74C3C", fontFamily: "Cairo_600SemiBold", fontSize: 12, flex: 1, textAlign: "right" }}>
-                        غير متوفر — سيُحذف عند تأكيد التعديل
-                      </Text>
+                      <Text style={{ color: "#E74C3C", fontFamily: "Cairo_600SemiBold", fontSize: 12, flex: 1, textAlign: "right" }}>غير متوفر — سيُحذف عند تأكيد التعديل</Text>
                     </View>
                   ) : (
                     <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6, backgroundColor: "#F39C1218", borderRadius: colors.radius - 6, padding: 8 }}>
                       <Icon name="alert-triangle" size={14} color="#F39C12" />
-                      <Text style={{ color: "#F39C12", fontFamily: "Cairo_600SemiBold", fontSize: 12, flex: 1, textAlign: "right" }}>
-                        متوفر فقط: {item.availableQuantity} {ulbl(unitOf(item))} — سيتم تعديل الكمية للمتوفر عند التأكيد
+                      <Text style={{ color: "#F39C12", fontFamily: "Cairo_600SemiBold", fontSize: 12, flex: 1, textAlign: "right" }}>متوفر فقط: {item.availableQuantity} {ulbl(unitOf(item))} — سيتم تعديل الكمية للمتوفر عند التأكيد</Text>
+                    </View>
+                  ))}
+                  {(item.companions ?? []).filter((c) => c.stockStatus).map((c, companionIndex) => (
+                    <View key={`comp_stock_${companionIndex}`} style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6, backgroundColor: c.stockStatus === "unavailable" ? "#E74C3C18" : "#F39C1218", borderRadius: colors.radius - 6, padding: 8 }}>
+                      <Icon name={c.stockStatus === "unavailable" ? "x-circle" : "alert-triangle"} size={14} color={c.stockStatus === "unavailable" ? "#E74C3C" : "#F39C12"} />
+                      <Text style={{ color: c.stockStatus === "unavailable" ? "#E74C3C" : "#F39C12", fontFamily: "Cairo_600SemiBold", fontSize: 12, flex: 1, textAlign: "right" }}>
+                        {c.materialName} — {c.colorName}: {c.stockStatus === "unavailable" ? "غير متوفرة وستُحذف عند التأكيد" : `متوفر منها ${c.availableQuantity} ${ulbl(c.unit)}`}
                       </Text>
                     </View>
-                  )}
+                  ))}
                 </View>
               );
             })}
@@ -2305,6 +2578,163 @@ export default function OrderDetailScreen() {
           </View>
         </Modal>
       )}
+
+      {/* نافذة تحديد المتوفر لجميع بنود الطلب والخامات المرافقة */}
+      <Modal visible={showBulkAvailModal} transparent animationType="slide" onRequestClose={() => setShowBulkAvailModal(false)}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
+          <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
+            <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: "88%", paddingTop: 16, paddingHorizontal: 16, paddingBottom: Math.max(bottomPad, 16) }}>
+              <View style={{ flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                <Text style={{ fontFamily: "Cairo_700Bold", fontSize: 16, color: colors.foreground }}>تحديد المتوفر لجميع الخامات</Text>
+                <Pressable onPress={() => setShowBulkAvailModal(false)}><Icon name="x" size={20} color={colors.mutedForeground} /></Pressable>
+              </View>
+              <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingBottom: 16 }}>
+                {bulkAvailItems.flatMap((item, itemIndex) => [
+                  { itemIndex, companionIndex: null as number | null, label: `${item.productName} — ${item.colorName}`, unit: unitOf(item), orderType: item.orderType, maxQty: item.orderType === "weight" ? (item.weight ?? 1) : item.quantity, stockStatus: item.stockStatus, availableQuantity: item.availableQuantity },
+                  ...(item.companions ?? []).map((c, companionIndex) => ({ itemIndex, companionIndex, label: `${c.materialName} — ${c.colorName} (خامة مرافقة)`, unit: c.unit, orderType: c.orderType, maxQty: c.orderType === "weight" ? (c.weight ?? c.actualWeight ?? 1) : c.quantity, stockStatus: c.stockStatus, availableQuantity: c.availableQuantity })),
+                ]).map((entry, rowIndex) => (
+                  <View key={`${entry.itemIndex}_${entry.companionIndex ?? "main"}`} style={{ backgroundColor: colors.surface, borderRadius: colors.radius - 4, padding: 12, gap: 8, borderWidth: 1, borderColor: colors.border }}>
+                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, textAlign: "right" }}>{entry.label}</Text>
+                    <View style={{ flexDirection: "row-reverse", gap: 7 }}>
+                      <Pressable onPress={() => setBulkAvailItems(prev => prev.map((it, i) => {
+                        if (i !== entry.itemIndex) return it;
+                        if (entry.companionIndex === null) { const next = { ...it }; delete next.stockStatus; delete next.availableQuantity; return next; }
+                        return { ...it, companions: (it.companions ?? []).map((c, ci) => { if (ci !== entry.companionIndex) return c; const next = { ...c }; delete next.stockStatus; delete next.availableQuantity; return next; }) };
+                      }))} style={{ flex: 1, paddingVertical: 8, alignItems: "center", borderRadius: 8, backgroundColor: !entry.stockStatus ? "#27AE6022" : colors.card }}><Text style={{ color: !entry.stockStatus ? "#27AE60" : colors.mutedForeground, fontFamily: "Cairo_600SemiBold", fontSize: 11 }}>متوفر بالكامل</Text></Pressable>
+                      <Pressable onPress={() => setBulkAvailItems(prev => prev.map((it, i) => {
+                        if (i !== entry.itemIndex) return it;
+                        const value = entry.availableQuantity ?? Math.max(1, Math.floor(entry.maxQty / 2));
+                        if (entry.companionIndex === null) return { ...it, stockStatus: "partial", availableQuantity: value };
+                        return { ...it, companions: (it.companions ?? []).map((c, ci) => ci === entry.companionIndex ? { ...c, stockStatus: "partial" as const, availableQuantity: value } : c) };
+                      }))} style={{ flex: 1, paddingVertical: 8, alignItems: "center", borderRadius: 8, backgroundColor: entry.stockStatus === "partial" ? "#F39C1222" : colors.card }}><Text style={{ color: "#F39C12", fontFamily: "Cairo_600SemiBold", fontSize: 11 }}>متوفر جزئياً</Text></Pressable>
+                      <Pressable onPress={() => setBulkAvailItems(prev => prev.map((it, i) => {
+                        if (i !== entry.itemIndex) return it;
+                        if (entry.companionIndex === null) return { ...it, stockStatus: "unavailable", availableQuantity: 0 };
+                        return { ...it, companions: (it.companions ?? []).map((c, ci) => ci === entry.companionIndex ? { ...c, stockStatus: "unavailable" as const, availableQuantity: 0 } : c) };
+                      }))} style={{ flex: 1, paddingVertical: 8, alignItems: "center", borderRadius: 8, backgroundColor: entry.stockStatus === "unavailable" ? "#E74C3C22" : colors.card }}><Text style={{ color: "#E74C3C", fontFamily: "Cairo_600SemiBold", fontSize: 11 }}>غير متوفر</Text></Pressable>
+                    </View>
+                    {entry.stockStatus === "partial" && <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}><Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 12 }}>الكمية المتوفرة ({entry.unit === "meter" ? "متر" : "كغ"})</Text><AppTextInput keyboardType="decimal-pad" value={String(entry.availableQuantity ?? "")} onChangeText={value => setBulkAvailItems(prev => prev.map((it, i) => {
+                      if (i !== entry.itemIndex) return it;
+                      const amount = Number(value);
+                      if (entry.companionIndex === null) return { ...it, availableQuantity: Number.isFinite(amount) ? amount : 0 };
+                      return { ...it, companions: (it.companions ?? []).map((c, ci) => ci === entry.companionIndex ? { ...c, availableQuantity: Number.isFinite(amount) ? amount : 0 } : c) };
+                    }))} style={{ flex: 1, color: colors.foreground, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.gold }} /></View>}
+                  </View>
+                ))}
+              </ScrollView>
+              <View style={{ flexDirection: "row-reverse", gap: 10, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 10 }}>
+                <Pressable onPress={saveBulkAvailability} disabled={savingBulkAvail} style={{ flex: 2, backgroundColor: colors.gold, paddingVertical: 13, borderRadius: 10, alignItems: "center", opacity: savingBulkAvail ? 0.7 : 1 }}><Text style={{ color: colors.background, fontFamily: "Cairo_700Bold" }}>{savingBulkAvail ? "جاري الحفظ..." : "حفظ التوفر"}</Text></Pressable>
+                <Pressable onPress={() => setShowBulkAvailModal(false)} style={{ flex: 1, backgroundColor: colors.surface, paddingVertical: 13, borderRadius: 10, alignItems: "center" }}><Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold" }}>إلغاء</Text></Pressable>
+              </View>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      {/* نافذة الوزن الفعلي لجميع بنود الطلب والخامات المرافقة */}
+      <Modal
+        visible={showBulkWeightsModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowBulkWeightsModal(false)}
+      >
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
+          <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
+            <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: "88%", paddingTop: 16, paddingHorizontal: 16, paddingBottom: Math.max(bottomPad, 16) }}>
+              <View style={{ flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
+                  <Icon name="scale" size={20} color={colors.gold} />
+                  <Text style={{ fontFamily: "Cairo_700Bold", fontSize: 16, color: colors.foreground }}>الوزن الفعلي لجميع الخامات</Text>
+                </View>
+                <Pressable onPress={() => setShowBulkWeightsModal(false)} style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.surface, alignItems: "center", justifyContent: "center" }}>
+                  <Icon name="x" size={18} color={colors.mutedForeground} />
+                </Pressable>
+              </View>
+
+              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right", marginBottom: 12 }}>
+                أدخل الكمية والوزن الفعلي لكل صنف وخامة مرافقة. التعديلات لا تظهر للعميل قبل إبلاغه.
+              </Text>
+
+              <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingBottom: 16 }}>
+                {bulkWeightsItems.map((item, itemIndex) => (
+                  <View key={`weight_${itemIndex}`} style={{ backgroundColor: colors.surface, borderRadius: colors.radius - 2, padding: 12, borderWidth: 1, borderColor: colors.border, gap: 10 }}>
+                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, textAlign: "right" }}>
+                      {item.productName} — {item.colorName}
+                    </Text>
+                    <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 10 }}>
+                      <Text style={{ flex: 1, color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold", fontSize: 12, textAlign: "right" }}>
+                        {item.orderType === "weight" ? "الوزن الفعلي" : "العدد"} ({item.orderType === "weight" ? ulbl(unitOf(item)) : "ثوب"})
+                      </Text>
+                      <AppTextInput
+                        style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 15, minWidth: 86, textAlign: "center", borderBottomWidth: 1.5, borderBottomColor: colors.gold, paddingVertical: 3 }}
+                        keyboardType="decimal-pad"
+                        value={String(item.orderType === "weight" ? (item.weight ?? 1) : item.quantity)}
+                        onChangeText={(txt) => {
+                          const value = parseFloat(txt);
+                          setBulkWeightsItems((prev) => prev.map((it, i) => {
+                            if (i !== itemIndex) return it;
+                            if (it.orderType === "weight") return { ...it, weight: isNaN(value) ? 0 : value };
+                            return { ...it, quantity: isNaN(value) ? 0 : value };
+                          }));
+                        }}
+                      />
+                    </View>
+                    {item.orderType === "pieces" && (
+                      <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 10 }}>
+                        <Text style={{ flex: 1, color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold", fontSize: 12, textAlign: "right" }}>الوزن الفعلي ({ulbl(unitOf(item))})</Text>
+                        <AppTextInput
+                          style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 15, minWidth: 86, textAlign: "center", borderBottomWidth: 1.5, borderBottomColor: colors.gold, paddingVertical: 3 }}
+                          keyboardType="decimal-pad"
+                          value={String(item.actualWeight ?? "")}
+                          onChangeText={(txt) => {
+                            const value = parseFloat(txt);
+                            setBulkWeightsItems((prev) => prev.map((it, i) => i === itemIndex ? { ...it, actualWeight: isNaN(value) ? undefined : value } : it));
+                          }}
+                        />
+                      </View>
+                    )}
+
+                    {(item.companions ?? []).map((companion, companionIndex) => (
+                      <View key={`comp_${companionIndex}`} style={{ backgroundColor: colors.card, borderRadius: colors.radius - 6, padding: 10, gap: 8, borderWidth: 1, borderColor: colors.border }}>
+                        <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 12, textAlign: "right" }}>
+                          {companion.materialName || "خامة مرافقة"} — {companion.colorName || ""}
+                        </Text>
+                        <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 10 }}>
+                          <Text style={{ flex: 1, color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 11, textAlign: "right" }}>الكمية / الوزن الفعلي</Text>
+                          <AppTextInput
+                            style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 14, minWidth: 86, textAlign: "center", borderBottomWidth: 1, borderBottomColor: colors.gold, paddingVertical: 3 }}
+                            keyboardType="decimal-pad"
+                            value={String((companion as any).actualWeight ?? (companion as any).weight ?? (companion as any).quantity ?? "")}
+                            onChangeText={(txt) => {
+                              const value = parseFloat(txt);
+                              setBulkWeightsItems((prev) => prev.map((it, i) => {
+                                if (i !== itemIndex) return it;
+                                const companions = (it.companions ?? []).map((c, ci) => ci === companionIndex
+                                  ? { ...c, actualWeight: isNaN(value) ? undefined : value, weight: undefined, manualWeight: true }
+                                  : c);
+                                return { ...it, companions };
+                              }));
+                            }}
+                          />
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                ))}
+              </ScrollView>
+
+              <View style={{ flexDirection: "row-reverse", gap: 10, marginTop: 12, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.border }}>
+                <Pressable onPress={saveBulkWeights} disabled={savingBulkWeights} style={{ flex: 2, backgroundColor: colors.gold, paddingVertical: 13, borderRadius: colors.radius - 4, alignItems: "center", justifyContent: "center", opacity: savingBulkWeights ? 0.7 : 1 }}>
+                  <Text style={{ color: colors.background, fontFamily: "Cairo_700Bold", fontSize: 14 }}>{savingBulkWeights ? "جاري الحفظ..." : "حفظ الأوزان الفعلية"}</Text>
+                </Pressable>
+                <Pressable onPress={() => setShowBulkWeightsModal(false)} style={{ flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, paddingVertical: 13, borderRadius: colors.radius - 4, alignItems: "center", justifyContent: "center" }}>
+                  <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>إلغاء</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
 
       <Modal visible={showPackingSlipModal} transparent animationType="slide" onRequestClose={() => setShowPackingSlipModal(false)}>
         <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.85)" }}>
