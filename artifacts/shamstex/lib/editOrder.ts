@@ -80,6 +80,11 @@ function capOf(it: CartItem): number | undefined {
 // staff-availability metadata. Unlike acceptStaffAvailability this never raises a
 // quantity up to the cap — the customer's own choices in the cart are preserved.
 export function finalizeEditedItem(it: CartItem): CartItem {
+  // Preserve fully-unavailable items and their status so the customer can
+  // review them in the cart rather than silently dropping them on confirmation.
+  if (it.stockStatus === "unavailable") {
+    return withRecalculatedCompanions({ ...it });
+  }
   const cap = capOf(it);
   const clean = cleanEditedItem(it);
   if (it.orderType === "weight") {

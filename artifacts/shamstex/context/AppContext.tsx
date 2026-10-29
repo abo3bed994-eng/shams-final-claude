@@ -2511,11 +2511,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // Carry items into the cart, dropping only the fully-unavailable ones. Partial
     // items keep their stockStatus/availableQuantity so the cart steppers can cap
     // them at the available amount; the customer edits quantities directly.
-    const carried = order.items.reduce<CartItem[]>((acc, it) => {
-      if (it.stockStatus === "unavailable") return acc;
-      acc.push({ ...it });
-      return acc;
-    }, []);
+    const carried = order.items.map((it) => ({ ...it }));
     setCart(carried);
     setEditingOrderId(orderId);
   }, []);

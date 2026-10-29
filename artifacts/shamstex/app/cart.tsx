@@ -122,11 +122,7 @@ export default function CartScreen() {
         // Carry items (matches beginOrderEdit): drop only fully-unavailable items,
         // keep partial items with stockStatus/availableQuantity intact so the cart
         // steppers can cap quantities at the available amount.
-        const reconciled = order.items.reduce<typeof order.items>((acc, it) => {
-          if (it.stockStatus === "unavailable") return acc;
-          acc.push({ ...it });
-          return acc;
-        }, []);
+        const reconciled = order.items.map((it) => ({ ...it }));
         setCart(reconciled);
         if (order.notes) setNotes(order.notes);
         if (order.fulfillmentType) setFulfillmentType(order.fulfillmentType);
@@ -742,7 +738,12 @@ export default function CartScreen() {
                       {item.productName}
                     </Text>
                     <View style={styles.colorInfo}>
-                      <Text style={[styles.colorLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
+                      {item.stockStatus === "unavailable" && (
+                        <Text style={{ color: "#E74C3C", fontFamily: "Cairo_700Bold", fontSize: 11, marginLeft: 6 }}>
+                          غير متوفر
+                        </Text>
+                      )}
+                      <Text style={[styles.colorLabel, { color: item.stockStatus === "unavailable" ? "#E74C3C" : colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                         {item.colorName}
                       </Text>
                       <View
