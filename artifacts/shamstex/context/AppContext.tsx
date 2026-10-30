@@ -2224,7 +2224,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       // in Firestore — the customer cancel rule uses affectedKeys().hasOnly(['status']).
       // A full setDoc via saveOrder would also write `editable: false` which is
       // outside the allowed set and causes a permission-denied error.
-      if (cancelled) await FS.patchOrder(orderId, { status: "cancelled", editable: false });
+      if (cancelled) await FS.patchOrder(orderId, { status: "cancelled", editable: false, pendingCustomerApproval: false });
       // Notify the staff member who received the order (or the staff role at large)
       // that the customer cancelled it — used when a customer empties their order
       // while editing, or when the edit window auto-cancels an all-unavailable order.
@@ -2359,7 +2359,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     async (orderId: string, approved: boolean) => {
       const order = ordersRef.current.find((o) => o.id === orderId);
       const currentUser = userRef.current;
-      if (!order || !currentUser || order.userId !== currentUser.id || !order.pendingCustomerApproval) return;
+      const isOwnerOrAdmin = currentUser?.role === "admin" || currentUser?.role === "supervisor";
+      const isCustomerOwner =
+        currentUser &&
+        (order?.userId === currentUser.id ||
+          (order?.userPhone && currentUser?.phone && order.userPhone === currentUser.phone));
+      if (!order || !currentUser || (!isCustomerOwner && !isOwnerOrAdmin) || !order.pendingCustomerApproval) return;
 
       const acceptedItems = approved ? acceptStaffAvailability(order.items) : undefined;
       const acceptedTotal = acceptedItems ? computeItemsTotal(acceptedItems) : undefined;

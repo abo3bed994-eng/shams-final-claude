@@ -127,7 +127,17 @@ service cloud.firestore {
         && request.resource.data.userPhone == userPhone()
         && request.resource.data.status in ['pending', 'scheduled'];
 
-      // Customer may edit only their own order if it is editable
+            // Customer may respond to staff's availability/weight adjustment approval request:
+      // approving (accepting staff items/total and resetting pendingCustomerApproval)
+      // or rejecting (setting customerRejectedStaffChanges=true, editable=true, pendingCustomerApproval=false)
+      allow update: if isSignedIn()
+        && resource.data.userPhone == userPhone()
+        && resource.data.get('pendingCustomerApproval', false) == true
+        && request.resource.data.userPhone == resource.data.userPhone
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.get('pendingCustomerApproval', false) == false;
+
+// Customer may edit only their own order if it is editable
       allow update: if isSignedIn() && resource.data.userPhone == userPhone()
         && resource.data.get('editable', false) == true
         && request.resource.data.status == resource.data.status;
@@ -156,16 +166,20 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['transferProofImage']);
 
       // Customer may cancel their own order while it is still pending or
-      // scheduled (i.e. before staff has started working on it). Status must
-      // transition to 'cancelled'; editable/editableExpiresAt are also allowed
-      // so the client can safely send { status, editable } in one patch call.
+      // scheduled (i.e. before staff has started working on it), OR when staff
+      // has requested customer approval for availability/weight modifications,
+      // OR while the order is open for customer editing.
       allow update: if isSignedIn()
         && resource.data.userPhone == userPhone()
-        && resource.data.status in ['pending', 'scheduled']
+        && (
+          resource.data.status in ['pending', 'scheduled'] ||
+          resource.data.get('pendingCustomerApproval', false) == true ||
+          resource.data.get('editable', false) == true
+        )
         && request.resource.data.status == 'cancelled'
         && request.resource.data.userPhone == resource.data.userPhone
         && request.resource.data.diff(resource.data).affectedKeys()
-             .hasOnly(['status', 'editable', 'editableExpiresAt']);
+             .hasOnly(['status', 'editable', 'editableExpiresAt', 'pendingCustomerApproval']);
 
       // Staff can update orders (status, assignment, etc.)
       allow update: if isStaff() && (isAdmin() || hasPermission('edit_orders'));

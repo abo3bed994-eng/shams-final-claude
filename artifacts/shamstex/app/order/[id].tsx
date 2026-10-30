@@ -1757,6 +1757,8 @@ export default function OrderDetailScreen() {
                           try {
                             await respondToOrderApproval(order.id, false);
                             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+                            beginOrderEdit(order.id);
+                            router.push("/cart" as any);
                           } catch {
                             Alert.alert("خطأ", "تعذّر تسجيل عدم الموافقة. حاول مرة أخرى.");
                           } finally {
@@ -1814,7 +1816,7 @@ export default function OrderDetailScreen() {
           </View>
         )}
 
-        {isCustomer && order.editable && order.status !== "cancelled" && (
+        {isCustomer && order.editable && !order.pendingCustomerApproval && order.status !== "cancelled" && (
           <View
             onLayout={(e) => { const y = e.nativeEvent.layout.y; setEditSectionY((prev) => (prev === y ? prev : y)); }}
             style={[styles.editableCustomerCard, { backgroundColor: "#F39C1218", borderColor: "#F39C12", borderRadius: colors.radius }]}
