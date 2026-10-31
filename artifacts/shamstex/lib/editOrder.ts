@@ -105,6 +105,26 @@ export function finalizeEditedItem(it: CartItem): CartItem {
     const requestedWeight = clean.actualWeight ?? bolts * perBolt;
     clean.actualWeight = cap != null ? Math.min(requestedWeight, cap) : requestedWeight;
   }
+
+  // Remove unavailable companion materials when the customer confirms the edit.
+  // For partial availability, lock the measured available quantity into the item.
+  if (it.companions?.length) {
+    clean.companions = it.companions.reduce<NonNullable<CartItem["companions"]>>((acc, comp) => {
+      if (comp.stockStatus === "unavailable") return acc;
+      const nextComp = { ...comp };
+      if (comp.stockStatus === "partial" && comp.availableQuantity != null) {
+        nextComp.weight = undefined;
+        nextComp.actualWeight = comp.availableQuantity;
+        nextComp.quantity = 1;
+        nextComp.manualWeight = true;
+      }
+      delete nextComp.stockStatus;
+      delete nextComp.availableQuantity;
+      acc.push(nextComp);
+      return acc;
+    }, []);
+  }
+
   return withRecalculatedCompanions(clean);
 }
 

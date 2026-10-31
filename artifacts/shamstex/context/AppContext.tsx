@@ -2011,6 +2011,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         Alert.alert("بانتظار موافقة العميل", "لا يمكن إكمال الطلب قبل موافقة العميل على تعديلات فريق العمل.");
         return;
       }
+      if (me?.role !== "admin" && (status === "ready" || status === "ready_to_ship")) {
+        const itemsToCheck = prevOrder.pendingStaffItems ?? prevOrder.items;
+        const hasUnavailableItems = itemsToCheck.some((item) =>
+          item.stockStatus != null || (item.companions ?? []).some((companion) => companion.stockStatus != null)
+        );
+        if (hasUnavailableItems) {
+          Alert.alert("تأكيد التوفر مطلوب", "لا يمكن نقل الطلب إلى الجاهز حتى تكون جميع الأصناف والخامات المرافقة متوفرة بالكامل وتُغلق التعديلات المعلقة.");
+          return;
+        }
+      }
       // Idempotency: same status, same staff → no-op (prevents double-tap glitches)
       if (
         prevOrder.status === status &&

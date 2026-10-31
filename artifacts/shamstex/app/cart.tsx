@@ -994,16 +994,26 @@ export default function CartScreen() {
                 {item.companions?.length ? (
                   <View style={[styles.companionList, { backgroundColor: colors.gold + "0D", borderColor: colors.gold + "33" }]}>
                     <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 12, textAlign: "right" }}>الخامات المرافقة</Text>
-                    {item.companions.map((companion, index) => (
-                      <View key={`${companion.materialId}-${index}`} style={styles.companionLine}>
-                        <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 12 }}>
-                          {formatQuantity(companionLineTotal(companion))} ج.م
-                        </Text>
-                        <Text style={{ flex: 1, color: colors.foreground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>
-                          {companion.materialName} — {companion.colorName} · {companion.percentage}% · {formatQuantity(companionAmount(companion))} {companion.unit === "meter" ? "متر" : "كغ"}
-                        </Text>
-                      </View>
-                    ))}
+                    {item.companions.map((companion, index) => {
+                      const isCompUnavailable = companion.stockStatus === "unavailable";
+                      return (
+                        <View
+                          key={`${companion.materialId}-${index}`}
+                          style={[
+                            styles.companionLine,
+                            isCompUnavailable && { backgroundColor: "#E74C3C15", paddingHorizontal: 6, paddingVertical: 3, borderRadius: 6 }
+                          ]}
+                        >
+                          <Text style={{ color: isCompUnavailable ? "#E74C3C" : colors.gold, fontFamily: "Cairo_700Bold", fontSize: 12 }}>
+                            {formatQuantity(companionLineTotal(companion))} ج.م
+                          </Text>
+                          <Text style={{ flex: 1, color: isCompUnavailable ? "#E74C3C" : colors.foreground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>
+                            {companion.materialName} — {companion.colorName} · {companion.percentage}% · {formatQuantity(companionAmount(companion))} {companion.unit === "meter" ? "متر" : "كغ"}
+                            {isCompUnavailable ? " (غير متوفرة)" : ""}
+                          </Text>
+                        </View>
+                      );
+                    })}
                   </View>
                 ) : null}
               </View>

@@ -187,12 +187,7 @@ export default function OrderDetailScreen() {
   const [showWaybillPreview, setShowWaybillPreview] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [showPackingSlipModal, setShowPackingSlipModal] = useState(false);
-  const [showBulkWeightsModal, setShowBulkWeightsModal] = useState(false);
-  const [showBulkAvailModal, setShowBulkAvailModal] = useState(false);
-  const [bulkWeightsItems, setBulkWeightsItems] = useState<CartItem[]>([]);
-  const [bulkAvailItems, setBulkAvailItems] = useState<CartItem[]>([]);
-  const [savingBulkWeights, setSavingBulkWeights] = useState(false);
-  const [savingBulkAvail, setSavingBulkAvail] = useState(false);
+
   const [notifyingCustomer, setNotifyingCustomer] = useState(false);
   const [respondingApproval, setRespondingApproval] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
@@ -220,79 +215,7 @@ export default function OrderDetailScreen() {
   const isAssignedToMe = order?.assignedTo === user?.id;
   const isLockedByOther = order?.assignedTo && !isAssignedToMe && !isAdmin;
 
-  const openBulkWeights = () => {
-    if (!order) return;
-    setBulkWeightsItems(JSON.parse(JSON.stringify(order.items)));
-    setShowBulkWeightsModal(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  };
 
-  const saveBulkWeights = async () => {
-    if (!order) return;
-    setSavingBulkWeights(true);
-    try {
-      const weightTotal = bulkWeightsItems
-        .filter((i) => i.orderType === "weight")
-        .reduce((a, b) => a + b.unitPrice * (b.weight ?? 1), 0);
-      const piecesTotal = bulkWeightsItems
-        .filter((i) => i.orderType === "pieces")
-        .reduce((a, b) => a + (b.actualWeight ?? (b.quantity * blt(unitOf(b)))) * b.unitPrice, 0);
-      const compTotal = bulkWeightsItems.reduce((acc, it) => acc + companionTotal(it), 0);
-      const newTotal = weightTotal + piecesTotal + compTotal;
-
-      await updateOrderItems(order.id, bulkWeightsItems, newTotal, true);
-      setShowBulkWeightsModal(false);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert("تم الحفظ", "تم تحديث الأوزان الفعلية بنجاح. تذكّر الضغط على 'إبلاغ العميل بالتعديلات' لإشعاره.");
-    } catch {
-      Alert.alert("خطأ", "تعذّر حفظ الأوزان الفعلية. حاول مرة أخرى.");
-    } finally {
-      setSavingBulkWeights(false);
-    }
-  };
-
-  const openBulkAvail = () => {
-    if (!order) return;
-    const cloned: CartItem[] = JSON.parse(JSON.stringify(order.items));
-    setBulkAvailItems(cloned);
-    setShowBulkAvailModal(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  };
-
-  const saveBulkAvailability = async () => {
-    if (!order) return;
-    setSavingBulkAvail(true);
-    try {
-      const sanitizedItems = bulkAvailItems.map((item) => {
-        const next = { ...item };
-        if (next.companions?.length) {
-          next.companions = next.companions.map((c) => {
-            const nextC = { ...c };
-            return nextC;
-          });
-        }
-        return next;
-      });
-
-      const weightTotal = sanitizedItems
-        .filter((i) => i.orderType === "weight")
-        .reduce((a, b) => a + b.unitPrice * (b.weight ?? 1), 0);
-      const piecesTotal = sanitizedItems
-        .filter((i) => i.orderType === "pieces")
-        .reduce((a, b) => a + (b.actualWeight ?? (b.quantity * blt(unitOf(b)))) * b.unitPrice, 0);
-      const compTotal = sanitizedItems.reduce((acc, it) => acc + companionTotal(it), 0);
-      const newTotal = weightTotal + piecesTotal + compTotal;
-
-      await updateOrderItems(order.id, sanitizedItems, newTotal, true);
-      setShowBulkAvailModal(false);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert("تم الحفظ", "تم تحديث الأوزان الفعلية وتحديد المتوفر بنجاح. تذكّر الضغط على 'إبلاغ العميل بالتعديلات' لإشعاره.");
-    } catch {
-      Alert.alert("خطأ", "تعذّر حفظ التعديلات. حاول مرة أخرى.");
-    } finally {
-      setSavingBulkAvail(false);
-    }
-  };
 
   const handleNotifyCustomer = async () => {
     if (!order) return;
@@ -1102,6 +1025,26 @@ export default function OrderDetailScreen() {
                     {item.productName} _ {item.colorName}
                   </Text>
 
+                  {isStaff && order.status === "preparing" && !isLockedByOther && (
+                    <Pressable
+                      onPress={() => {
+                        if (order.editable) {
+                          Alert.alert("التعديل قيد التنفيذ", "لا يمكن تعديل المتوفر بينما العميل يعدّل طلبه. أغلق صلاحية التعديل أولًا أو انتظر حتى يؤكّد العميل الطلب.");
+                          return;
+                        }
+                        setAvailModalIndex(index);
+                        setAvailInput(item.stockStatus === "partial" && item.availableQuantity != null ? String(item.availableQuantity) : "");
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }}
+                      style={{ alignSelf: "flex-start", marginTop: 5, flexDirection: "row-reverse", alignItems: "center", gap: 5, paddingHorizontal: 8, paddingVertical: 5, borderRadius: colors.radius - 6, borderWidth: 1, borderColor: item.stockStatus === "unavailable" ? "#E74C3C" : item.stockStatus === "partial" ? "#F39C12" : colors.border, backgroundColor: item.stockStatus === "unavailable" ? "#E74C3C18" : item.stockStatus === "partial" ? "#F39C1218" : colors.surface }}
+                    >
+                      <Icon name={item.stockStatus ? "alert-triangle" : "package"} size={12} color={item.stockStatus === "unavailable" ? "#E74C3C" : item.stockStatus === "partial" ? "#F39C12" : colors.mutedForeground} />
+                      <Text style={{ fontSize: 11, fontFamily: "Cairo_600SemiBold", color: item.stockStatus === "unavailable" ? "#E74C3C" : item.stockStatus === "partial" ? "#F39C12" : colors.mutedForeground }}>
+                        {item.stockStatus === "unavailable" ? "غير متوفر" : item.stockStatus === "partial" ? "متوفر جزئياً" : "تحديد التوفر"}
+                      </Text>
+                    </Pressable>
+                  )}
+
                   {/* السطر الثاني مباشرة: الكمية بخط كبير وواضح */}
                   <View style={{ flexDirection: "row-reverse", alignItems: "baseline", gap: 6, marginTop: 4 }}>
                     <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 20 }}>
@@ -1142,6 +1085,80 @@ export default function OrderDetailScreen() {
                           : `≈ ${item.quantity * blt(unitOf(item)) * item.unitPrice} ج.م`)}
                     </Text>
                   </View>
+
+                  {isStaff && order.status === "preparing" && !isLockedByOther && (
+                    <View style={{ marginTop: 8, gap: 6, alignItems: "flex-end" }}>
+                      {item.orderType === "pieces" && (
+                        <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
+                          <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 11 }}>عدد الأثواب:</Text>
+                          <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 5 }}>
+                            <Pressable
+                              onPress={() => {
+                                const nextQuantity = Math.max(1, item.quantity - 1);
+                                const nextItems = order.items.map((current, currentIndex) => currentIndex !== index
+                                  ? current
+                                  : { ...current, quantity: nextQuantity, actualWeight: nextQuantity * blt(unitOf(current)) });
+                                updateOrderItems(order.id, nextItems, computeItemsTotal(nextItems), true);
+                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                              }}
+                              style={{ width: 26, height: 26, borderRadius: 13, borderWidth: 1, borderColor: colors.border, alignItems: "center", justifyContent: "center" }}
+                            ><Icon name="minus" size={13} color={colors.gold} /></Pressable>
+                            <AppTextInput
+                              keyboardType="number-pad"
+                              value={weightTexts[`q_${index}`] ?? String(item.quantity)}
+                              onChangeText={(text) => {
+                                if (!/^\d*$/.test(text)) return;
+                                setWeightTexts((current) => ({ ...current, [`q_${index}`]: text }));
+                                const nextQuantity = Number.parseInt(text, 10);
+                                if (!Number.isFinite(nextQuantity) || nextQuantity < 1) return;
+                                const nextItems = order.items.map((current, currentIndex) => currentIndex !== index
+                                  ? current
+                                  : { ...current, quantity: nextQuantity, actualWeight: nextQuantity * blt(unitOf(current)) });
+                                updateOrderItems(order.id, nextItems, computeItemsTotal(nextItems), true);
+                              }}
+                              onBlur={() => setWeightTexts((current) => { const next = { ...current }; delete next[`q_${index}`]; return next; })}
+                              style={{ width: 42, paddingVertical: 3, paddingHorizontal: 4, borderWidth: 1, borderColor: colors.border, borderRadius: 7, backgroundColor: colors.input, color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, textAlign: "center" }}
+                            />
+                            <Pressable
+                              onPress={() => {
+                                const nextQuantity = item.quantity + 1;
+                                const nextItems = order.items.map((current, currentIndex) => currentIndex !== index
+                                  ? current
+                                  : { ...current, quantity: nextQuantity, actualWeight: nextQuantity * blt(unitOf(current)) });
+                                updateOrderItems(order.id, nextItems, computeItemsTotal(nextItems), true);
+                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                              }}
+                              style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: colors.gold, alignItems: "center", justifyContent: "center" }}
+                            ><Icon name="plus" size={13} color={colors.background} /></Pressable>
+                          </View>
+                        </View>
+                      )}
+
+                      <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
+                        <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 11 }}>
+                          {item.orderType === "pieces" ? `الوزن الفعلي (${ulbl(unitOf(item))}):` : `الكمية الفعلية (${ulbl(unitOf(item))}):`}
+                        </Text>
+                        <AppTextInput
+                          keyboardType="decimal-pad"
+                          value={weightTexts[`actual_${index}`] ?? String(item.orderType === "weight" ? item.weight ?? 1 : item.actualWeight ?? item.quantity * blt(unitOf(item)))}
+                          onChangeText={(text) => {
+                            if (!/^\d*\.?\d*$/.test(text)) return;
+                            setWeightTexts((current) => ({ ...current, [`actual_${index}`]: text }));
+                            const amount = Number(text);
+                            if (!Number.isFinite(amount) || amount <= 0) return;
+                            const nextItems = order.items.map((current, currentIndex) => currentIndex !== index
+                              ? current
+                              : current.orderType === "weight"
+                                ? { ...current, weight: amount }
+                                : { ...current, actualWeight: amount });
+                            updateOrderItems(order.id, nextItems, computeItemsTotal(nextItems), true);
+                          }}
+                          onBlur={() => setWeightTexts((current) => { const next = { ...current }; delete next[`actual_${index}`]; return next; })}
+                          style={{ width: 86, paddingVertical: 4, paddingHorizontal: 6, borderWidth: 1, borderColor: colors.border, borderRadius: 7, backgroundColor: colors.input, color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, textAlign: "center" }}
+                        />
+                      </View>
+                    </View>
+                  )}
 
                   {companionTotal(item) > 0 && (
                     <View style={{ alignItems: "flex-end", gap: 2, marginTop: 3 }}>
@@ -1353,30 +1370,9 @@ export default function OrderDetailScreen() {
           );
         })()}
 
-                {/* أزرار التجهيز المجمعة: الوزن الفعلي، تحديد المتوفر، وإبلاغ العميل */}
+        {/* زر إبلاغ العميل بالتعديلات أثناء التجهيز */}
         {isStaff && order.status === "preparing" && !isLockedByOther && (
           <View style={{ gap: 8 }}>
-            <Pressable
-              onPress={openBulkAvail}
-              style={({ pressed }) => [{
-                flexDirection: "row-reverse",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                paddingVertical: 13,
-                backgroundColor: colors.surface,
-                borderColor: "#F39C12",
-                borderWidth: 1.5,
-                borderRadius: colors.radius - 4,
-                opacity: pressed ? 0.7 : 1,
-              }]}
-            >
-              <Icon name="package" size={18} color="#F39C12" />
-              <Text style={{ color: "#F39C12", fontFamily: "Cairo_700Bold", fontSize: 14 }}>
-                تحديد المتوفر
-              </Text>
-            </Pressable>
-
             {/* زر إبلاغ العميل بالتعديلات */}
             <Pressable
               onPress={handleNotifyCustomer}
@@ -2356,105 +2352,6 @@ export default function OrderDetailScreen() {
         </Modal>
       )}
 
-      {/* نافذة تحديد المتوفر لجميع بنود الطلب والخامات المرافقة */}
-      <Modal visible={showBulkAvailModal} transparent animationType="slide" onRequestClose={() => setShowBulkAvailModal(false)}>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
-          <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "flex-end" }}>
-            <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: "88%", paddingTop: 16, paddingHorizontal: 16, paddingBottom: Math.max(bottomPad, 16) }}>
-              <View style={{ flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
-                  <Icon name="package" size={20} color="#F39C12" />
-                  <Text style={{ fontFamily: "Cairo_700Bold", fontSize: 16, color: colors.foreground }}>تحديد المتوفر والوزن الفعلي</Text>
-                </View>
-                <Pressable onPress={() => setShowBulkAvailModal(false)}><Icon name="x" size={20} color={colors.mutedForeground} /></Pressable>
-              </View>
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right", marginBottom: 12 }}>
-                اختر حالة التوفر وأدخل الوزن الفعلي لكل صنف وخامة مرافقة. عند فتح البطاقة يكون كامل الطلب متوفراً.
-              </Text>
-              <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingBottom: 16 }}>
-                {bulkAvailItems.flatMap((item, itemIndex) => [
-                  { itemIndex, companionIndex: null as number | null, label: `${item.productName} — ${item.colorName}`, unit: unitOf(item), orderType: item.orderType, stockStatus: item.stockStatus, availableQuantity: item.availableQuantity },
-                  ...(item.companions ?? []).map((c, companionIndex) => ({ itemIndex, companionIndex, label: `${c.materialName} — ${c.colorName} (خامة مرافقة)`, unit: c.unit, orderType: c.orderType, stockStatus: c.stockStatus, availableQuantity: c.availableQuantity })),
-                ]).map((entry) => {
-                  const isCompanion = entry.companionIndex !== null;
-                  const sourceItem = bulkAvailItems[entry.itemIndex];
-                  const companion = isCompanion ? sourceItem.companions?.[entry.companionIndex!] : undefined;
-                  const isUnavailable = entry.stockStatus === "unavailable";
-                  const isPartial = entry.stockStatus === "partial";
-                  const full = !isUnavailable && !isPartial;
-                  const quantityValue = isCompanion
-                    ? (companion?.actualWeight ?? companion?.weight ?? companion?.quantity ?? 0)
-                    : entry.orderType === "weight"
-                      ? (sourceItem.weight ?? 1)
-                      : (sourceItem.actualWeight ?? sourceItem.quantity * blt(unitOf(sourceItem)));
-                  const updateEntry = (updater: (current: any) => any) => setBulkAvailItems((prev) => prev.map((it, i) => {
-                    if (i !== entry.itemIndex) return it;
-                    if (!isCompanion) return updater(it);
-                    return {
-                      ...it,
-                      companions: (it.companions ?? []).map((c, ci) => ci === entry.companionIndex ? updater(c) : c),
-                    };
-                  }));
-                  const setStatus = (status: "full" | "partial" | "unavailable") => updateEntry((current) => {
-                    const next = { ...current };
-                    if (status === "full") {
-                      delete next.stockStatus;
-                      delete next.availableQuantity;
-                    } else {
-                      next.stockStatus = status;
-                      if (status === "unavailable") {
-                        next.availableQuantity = 0;
-                      } else {
-                        next.availableQuantity = current.availableQuantity ?? Math.max(1, Math.floor(quantityValue / 2));
-                      }
-                    }
-                    return next;
-                  });
-                  const setMeasuredQuantity = (rawValue: string) => updateEntry((current) => {
-                    const value = Number(rawValue);
-                    const amount = Number.isFinite(value) ? value : 0;
-                    if (isCompanion) {
-                      return { ...current, actualWeight: amount, weight: undefined, quantity: 1, manualWeight: true, ...(isPartial ? { availableQuantity: amount } : {}) };
-                    }
-                    if (sourceItem.orderType === "weight") {
-                      return { ...current, weight: amount, ...(isPartial ? { availableQuantity: amount } : {}) };
-                    }
-                    return { ...current, actualWeight: amount, ...(isPartial ? { availableQuantity: amount } : {}) };
-                  });
-                  return (
-                    <View key={`${entry.itemIndex}_${entry.companionIndex ?? "main"}`} style={[{ backgroundColor: colors.surface, borderRadius: colors.radius - 4, padding: 12, gap: 8, borderWidth: 1.5, borderColor: isUnavailable ? "#E74C3C" : colors.border }, cardShadow(colors.isDark, "soft")] }>
-                      <Text style={{ color: isUnavailable ? "#E74C3C" : colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, textAlign: "right" }}>{entry.label}</Text>
-                      <View style={{ flexDirection: "row-reverse", gap: 7 }}>
-                        <Pressable onPress={() => setStatus("full")} style={{ flex: 1, paddingVertical: 8, alignItems: "center", borderRadius: 8, backgroundColor: full ? "#27AE6022" : colors.card }}><Text style={{ color: full ? "#27AE60" : colors.mutedForeground, fontFamily: "Cairo_600SemiBold", fontSize: 11 }}>متوفر بالكامل</Text></Pressable>
-                        <Pressable onPress={() => setStatus("partial")} style={{ flex: 1, paddingVertical: 8, alignItems: "center", borderRadius: 8, backgroundColor: isPartial ? "#F39C1222" : colors.card }}><Text style={{ color: "#F39C12", fontFamily: "Cairo_600SemiBold", fontSize: 11 }}>متوفر جزئياً</Text></Pressable>
-                        <Pressable onPress={() => setStatus("unavailable")} style={{ flex: 1, paddingVertical: 8, alignItems: "center", borderRadius: 8, backgroundColor: isUnavailable ? "#E74C3C22" : colors.card }}><Text style={{ color: "#E74C3C", fontFamily: "Cairo_600SemiBold", fontSize: 11 }}>غير متوفر</Text></Pressable>
-                      </View>
-                      {!isUnavailable && (
-                        <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
-                          <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 12, flex: 1, textAlign: "right" }}>
-                            {isPartial ? "الكمية المتوفرة" : "الوزن الفعلي"} ({entry.unit === "meter" ? "متر" : "كغ"})
-                          </Text>
-                          <AppTextInput
-                            keyboardType="decimal-pad"
-                            value={String(isPartial ? (entry.availableQuantity ?? quantityValue) : quantityValue)}
-                            onChangeText={setMeasuredQuantity}
-                            style={{ width: 92, color: colors.foreground, textAlign: "center", fontFamily: "Cairo_700Bold", fontSize: 15, borderBottomWidth: 1.5, borderBottomColor: colors.gold, paddingVertical: 4 }}
-                          />
-                        </View>
-                      )}
-                    </View>
-                  );
-                })}
-              </ScrollView>
-              <View style={{ flexDirection: "row-reverse", gap: 10, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 10 }}>
-                <Pressable onPress={saveBulkAvailability} disabled={savingBulkAvail} style={{ flex: 2, backgroundColor: colors.gold, paddingVertical: 13, borderRadius: 10, alignItems: "center", opacity: savingBulkAvail ? 0.7 : 1 }}><Text style={{ color: colors.background, fontFamily: "Cairo_700Bold" }}>{savingBulkAvail ? "جاري الحفظ..." : "حفظ التعديلات"}</Text></Pressable>
-                <Pressable onPress={() => setShowBulkAvailModal(false)} style={{ flex: 1, backgroundColor: colors.surface, paddingVertical: 13, borderRadius: 10, alignItems: "center" }}><Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold" }}>إلغاء</Text></Pressable>
-              </View>
-            </View>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
-
       <Modal visible={showPackingSlipModal} transparent animationType="slide" onRequestClose={() => setShowPackingSlipModal(false)}>
         <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.85)" }}>
           <View style={{ flex: 1, marginTop: insets.top + 40, backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20, overflow: "hidden" }}>
@@ -2902,7 +2799,7 @@ export default function OrderDetailScreen() {
                           setAvailModalIndex(null);
                           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                           try {
-                            await updateOrderItems(order.id, newItems, order.total, true);
+                            await updateOrderItems(order.id, newItems, computeItemsTotal(newItems), true);
                           } catch {
                             Alert.alert("خطأ", "تعذّر حفظ التغيير. حاول مرة أخرى.");
                           }
@@ -2937,7 +2834,7 @@ export default function OrderDetailScreen() {
                           setAvailModalIndex(null);
                           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                           try {
-                            await updateOrderItems(order.id, newItems, order.total, true);
+                            await updateOrderItems(order.id, newItems, computeItemsTotal(newItems), true);
                           } catch {
                             Alert.alert("خطأ", "تعذّر حفظ التغيير. حاول مرة أخرى.");
                           }
