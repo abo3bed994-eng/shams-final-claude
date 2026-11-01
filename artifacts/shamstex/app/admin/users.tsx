@@ -62,6 +62,7 @@ const PERMISSION_LABELS: Record<EmployeePermission, string> = {
   toggle_price_view: "التبديل بين أسعار التجار/العملاء",
   view_price_menu: "عرض قائمة الأسعار",
   revert_final: "التراجع عن الشحن/التسليم",
+  force_advance_order: "الاستمرار على أي حال (تجاوز موافقة العميل)",
 };
 
 const EMPLOYEE_PERMISSIONS: EmployeePermission[] = [
@@ -84,6 +85,7 @@ const EMPLOYEE_GRANTABLE: EmployeePermission[] = [
   "approve_upgrades",
   "manage_payments",
   "revert_final",
+  "force_advance_order",
 ];
 
 const SUPERVISOR_PERMISSIONS: EmployeePermission[] = [
@@ -106,6 +108,7 @@ const SUPERVISOR_PERMISSIONS: EmployeePermission[] = [
 const SUPERVISOR_GRANTABLE: EmployeePermission[] = [
   ...SUPERVISOR_PERMISSIONS,
   "revert_final",
+  "force_advance_order",
 ];
 
 const DEMO_STAFF: User[] = [

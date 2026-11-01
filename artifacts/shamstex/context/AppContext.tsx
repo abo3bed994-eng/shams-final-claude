@@ -26,7 +26,8 @@ export type EmployeePermission =
   | "manage_payments"
   | "toggle_price_view"
   | "view_price_menu"
-  | "revert_final";
+  | "revert_final"
+  | "force_advance_order";
 
 export interface SavedAddress {
   id: string;
@@ -242,6 +243,8 @@ export interface Order {
   fulfillmentType?: FulfillmentType; // undefined = legacy = "branch"
   branchId?: string;
   branchName?: string;
+  initialItems?: CartItem[];
+  initialTotal?: number;
   // Shipping-specific
   shippingProviderId?: ShippingProviderId;
   shippingProviderName?: string;
@@ -2003,15 +2006,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       const prevOrder = ordersRef.current.find((o) => o.id === orderId);
       if (!prevOrder) return;
+      const canForce = me?.role === "admin" || (me?.permissions ?? []).includes("force_advance_order");
       if (
-        me?.role !== "admin" &&
+        !canForce &&
         (status === "ready" || status === "ready_to_ship") &&
         (prevOrder.pendingCustomerApproval || prevOrder.pendingStaffItems)
       ) {
         Alert.alert("بانتظار موافقة العميل", "لا يمكن إكمال الطلب قبل موافقة العميل على تعديلات فريق العمل.");
         return;
       }
-      if (me?.role !== "admin" && (status === "ready" || status === "ready_to_ship")) {
+      if (!canForce && (status === "ready" || status === "ready_to_ship")) {
         const itemsToCheck = prevOrder.pendingStaffItems ?? prevOrder.items;
         const hasUnavailableItems = itemsToCheck.some((item) =>
           item.stockStatus != null || (item.companions ?? []).some((companion) => companion.stockStatus != null)
@@ -2030,6 +2034,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
 
       const patch: Partial<Order> = { status };
+      if (status === "received" || status === "pending") {
+        patch.pendingCustomerApproval = false;
+      }
       const claimerPhone = userRef.current?.id === assignedToId ? userRef.current?.phone : undefined;
       if (status === "received" && assignedToId) {
         patch.assignedTo = assignedToId;
@@ -2323,8 +2330,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           pendingStaffItems: undefined,
           pendingStaffTotal: undefined,
           pendingStaffAt: undefined,
-          pendingStaffOriginalItems: o.items,
-          pendingStaffOriginalTotal: o.total,
+          pendingStaffOriginalItems: o.pendingStaffOriginalItems ?? o.items,
+          pendingStaffOriginalTotal: o.pendingStaffOriginalTotal ?? o.total,
           pendingCustomerApproval: true,
           approvalRequestedAt: new Date().toISOString(),
           editable: false,
@@ -2336,7 +2343,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       ordersRef.current = updated;
       await AsyncStorage.setItem("orders", JSON.stringify(updated));
       if (updatedOrder) {
-        FS.saveOrder(updatedOrder).catch(() => {});
+        await saveOrderReliable(updatedOrder);
         const recipientPhone = resolveRecipientPhone(updatedOrder.userId, updatedOrder.userPhone);
         const notif: Notification = {
           id: `notif_approval_${orderId}_${Date.now()}`,
@@ -2775,6 +2782,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             pendingStaffItems: normalizedItems,
             pendingStaffTotal: normalizedTotal,
             pendingStaffAt: new Date().toISOString(),
+            pendingCustomerApproval: false,
           };
         }
         return {

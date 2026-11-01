@@ -396,6 +396,8 @@ export default function CartScreen() {
           userPhone: user?.phone ?? "",
           items: [...cart],
           total: totalPrice,
+          initialItems: [...cart],
+          initialTotal: totalPrice,
           status: willSchedule ? "scheduled" : "pending",
           createdAt: new Date().toISOString(),
           notes,

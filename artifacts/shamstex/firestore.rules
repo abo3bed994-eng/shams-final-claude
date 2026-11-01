@@ -43,6 +43,19 @@ service cloud.firestore {
       return isSignedIn() && getRole(userPhone()) == role;
     }
 
+    function isCustomerOrderOwner(orderData) {
+      return isSignedIn() && (
+        (orderData.userId != null && orderData.userId == request.auth.uid) ||
+        (orderData.userPhone != null && userPhone() != null && (
+          orderData.userPhone == userPhone() ||
+          ("+2" + orderData.userPhone) == userPhone() ||
+          orderData.userPhone == ("+2" + userPhone()) ||
+          ("+20" + orderData.userPhone) == userPhone() ||
+          orderData.userPhone == ("+20" + userPhone())
+        ))
+      );
+    }
+
     // Owner phone numbers — auto-recognized as admin even without a Firestore doc.
     // This ensures the owner can always manage settings and orders, even on first login.
     function isOwnerPhone() {
@@ -119,78 +132,71 @@ service cloud.firestore {
     match /orders/{orderId} {
       // Customer can read their own order; staff can read all
       allow read: if isSignedIn() && (
-        resource.data.userPhone == userPhone() || isStaff()
+        isCustomerOrderOwner(resource.data) || isStaff()
       );
 
       // Customer can create their own order
       allow create: if isSignedIn()
-        && request.resource.data.userPhone == userPhone()
-        && request.resource.data.status in ['pending', 'scheduled'];
+        && isCustomerOrderOwner(request.resource.data)
+        && request.resource.data.status in ["pending", "scheduled"];
 
-            // Customer may respond to staff's availability/weight adjustment approval request:
+      // Customer may respond to staff approval request:
       // approving (accepting staff items/total and resetting pendingCustomerApproval)
       // or rejecting (setting customerRejectedStaffChanges=true, editable=true, pendingCustomerApproval=false)
       allow update: if isSignedIn()
-        && resource.data.userPhone == userPhone()
-        && resource.data.get('pendingCustomerApproval', false) == true
-        && request.resource.data.userPhone == resource.data.userPhone
+        && isCustomerOrderOwner(resource.data)
+        && resource.data.get("pendingCustomerApproval", false) == true
         && request.resource.data.status == resource.data.status
-        && request.resource.data.get('pendingCustomerApproval', false) == false;
+        && request.resource.data.get("pendingCustomerApproval", false) == false;
 
-// Customer may edit only their own order if it is editable
-      allow update: if isSignedIn() && resource.data.userPhone == userPhone()
-        && resource.data.get('editable', false) == true
+      // Customer may edit only their own order if it is editable
+      allow update: if isSignedIn()
+        && isCustomerOrderOwner(resource.data)
+        && resource.data.get("editable", false) == true
         && request.resource.data.status == resource.data.status;
 
-      // Customer may update payment-only fields (method, fee, totals derived
-      // from method, transfer-proof image) on their own order while it is still
-      // pending/scheduled — without requiring `editable=true`. Status, items,
-      // assignment, and ownership must NOT change.
+      // Customer may update payment-only fields on their own order
       allow update: if isSignedIn()
-        && resource.data.userPhone == userPhone()
-        && resource.data.status in ['pending', 'scheduled']
+        && isCustomerOrderOwner(resource.data)
+        && resource.data.status in ["pending", "scheduled"]
         && request.resource.data.status == resource.data.status
-        && request.resource.data.userPhone == resource.data.userPhone
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-            'paymentMethod', 'paymentFee', 'totalWithFee', 'transferProofImage'
+            "paymentMethod", "paymentFee", "totalWithFee", "transferProofImage"
           ]);
 
-      // Customer may upload/replace ONLY the transfer-proof image on their own
-      // order at ANY active stage (customers usually pay after staff confirms
-      // the order, so restricting this to pending would block real receipts).
+      // Customer may upload/replace transfer-proof image
       allow update: if isSignedIn()
-        && resource.data.userPhone == userPhone()
-        && resource.data.status in ['pending', 'scheduled', 'received', 'preparing', 'ready', 'ready_to_ship']
+        && isCustomerOrderOwner(resource.data)
+        && resource.data.status in ["pending", "scheduled", "received", "preparing", "ready", "ready_to_ship"]
         && request.resource.data.status == resource.data.status
-        && request.resource.data.userPhone == resource.data.userPhone
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['transferProofImage']);
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["transferProofImage"]);
 
-      // Customer may cancel their own order while it is still pending or
-      // scheduled (i.e. before staff has started working on it), OR when staff
-      // has requested customer approval for availability/weight modifications,
-      // OR while the order is open for customer editing.
+      // Customer may cancel their own order
       allow update: if isSignedIn()
-        && resource.data.userPhone == userPhone()
+        && isCustomerOrderOwner(resource.data)
         && (
-          resource.data.status in ['pending', 'scheduled'] ||
-          resource.data.get('pendingCustomerApproval', false) == true ||
-          resource.data.get('editable', false) == true
+          resource.data.status in ["pending", "scheduled"] ||
+          resource.data.get("pendingCustomerApproval", false) == true ||
+          resource.data.get("editable", false) == true
         )
-        && request.resource.data.status == 'cancelled'
-        && request.resource.data.userPhone == resource.data.userPhone
+        && request.resource.data.status == "cancelled"
         && request.resource.data.diff(resource.data).affectedKeys()
-             .hasOnly(['status', 'editable', 'editableExpiresAt', 'pendingCustomerApproval']);
+             .hasOnly([
+               "status", "editable", "editableExpiresAt", "pendingCustomerApproval",
+               "pendingStaffOriginalItems", "pendingStaffOriginalTotal",
+               "pendingStaffItems", "pendingStaffTotal", "pendingStaffAt",
+               "customerRejectedStaffChanges"
+             ]);
 
       // Staff can update orders (status, assignment, etc.)
-      allow update: if isStaff() && (isAdmin() || hasPermission('edit_orders'));
+      allow update: if isStaff() && (isAdmin() || hasPermission("edit_orders"));
 
-      // Staff with manage_payments may set payment-override fields even
-      // without full edit_orders permission.
+      // Staff with manage_payments may set payment-override fields
       allow update: if isStaff()
-        && (isAdmin() || hasPermission('manage_payments'))
+        && (isAdmin() || hasPermission("manage_payments"))
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-            'paymentOverrideHandle', 'paymentOverrideName', 'paymentMethod',
-            'paymentFee', 'totalWithFee'
+            "paymentOverrideHandle", "paymentOverrideName", "paymentMethod",
+            "paymentFee", "totalWithFee"
           ]);
 
       // Only admin can delete orders
@@ -225,9 +231,11 @@ service cloud.firestore {
       // Direct/private notifications (targeting a specific user) are staff-only.
       allow create: if isStaff()
         || (isSignedIn()
-            && (request.resource.data.get('targetRole', '') in ['staff', 'admin'] || request.resource.data.get('actionType', '') == 'upgrade_request')
-            && !('targetUserId' in request.resource.data)
-            && !('targetUserPhone' in request.resource.data));
+            && (
+              request.resource.data.get('targetRole', '') in ['staff', 'admin'] ||
+              request.resource.data.get('actionType', '') == 'upgrade_request' ||
+              request.resource.data.get('linkedOrderId', '') != ''
+            ));
       allow delete: if isAdmin() || (isSignedIn() && resource.data.userPhone == userPhone());
     }
 

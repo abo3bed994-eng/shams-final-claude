@@ -77,7 +77,10 @@ function colorHtml(colorName: string, colorHex: string, className = "color") {
 }
 
 export function buildPackingSlipHtml(order: Order, products: Product[]): string {
-  const rows = order.items
+  const itemsToPrint = (order.initialItems && order.initialItems.length > 0)
+    ? order.initialItems
+    : (order.pendingStaffOriginalItems ?? order.items);
+  const rows = itemsToPrint
     .map((item, index) => {
       const product = products.find((candidate) => candidate.id === item.productId);
       const companions = (item.companions ?? [])
