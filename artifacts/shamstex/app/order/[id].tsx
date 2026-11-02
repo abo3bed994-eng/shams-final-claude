@@ -201,8 +201,13 @@ export default function OrderDetailScreen() {
     setBulkAvailItems(itemsCopy);
     const texts: Record<string, string> = {};
     itemsCopy.forEach((item, itemIndex) => {
+      const u = unitOf(item);
+      const isWeight = item.orderType === "weight";
       const mainKey = `${itemIndex}_main`;
       texts[mainKey] = item.availableQuantity != null ? String(item.availableQuantity) : "";
+      const weightKey = `${itemIndex}_weight`;
+      const currentW = isWeight ? (item.weight ?? 1) : (item.actualWeight ?? (item.quantity * blt(u)));
+      texts[weightKey] = String(currentW);
       (item.companions ?? []).forEach((c, companionIndex) => {
         const cKey = `${itemIndex}_${companionIndex}`;
         texts[cKey] = c.availableQuantity != null ? String(c.availableQuantity) : "";
@@ -1202,7 +1207,14 @@ export default function OrderDetailScreen() {
                 <View style={[styles.companionList, { backgroundColor: colors.gold + "0D", borderColor: colors.gold + "33" }]}>
                   <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 11, textAlign: "right" }}>الخامات المرافقة</Text>
                   {item.companions.map((companion, companionIndex) => (
-                    <View key={`${companion.materialId}-${companionIndex}`} style={styles.companionLine}>
+                    <View
+                      key={`${companion.materialId}-${companionIndex}`}
+                      style={[
+                        styles.companionLine,
+                        companion.stockStatus === "unavailable" && { backgroundColor: "#E74C3C15", borderColor: "#E74C3C", borderWidth: 1, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+                        companion.stockStatus === "partial" && { backgroundColor: "#F39C1215", borderColor: "#F39C12", borderWidth: 1, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+                      ]}
+                    >
                       <Text style={[styles.companionPrice, { color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 11 }]}>
                         {Math.round(companionLineTotal(companion) * 100) / 100} ج.م
                       </Text>
@@ -1638,36 +1650,7 @@ export default function OrderDetailScreen() {
           </Pressable>
         )}
 
-        {isStaff && order.status === "preparing" && !order.editable && hasAffectedItems && !isLockedByOther && (
-          <Pressable
-            onPress={() => {
-              Alert.alert(
-                "فتح التعديل للعميل",
-                "سيتم إعلام العميل ليعدّل طلبه خلال المهلة المحددة. لن تتمكن من تعديل المتوفر حتى ينهي العميل تعديله أو تُغلق التعديل. هل تريد المتابعة؟",
-                [
-                  { text: "تراجع", style: "cancel" },
-                  {
-                    text: "نعم، افتح التعديل",
-                    onPress: () => {
-                      setOrderEditable(order.id, true);
-                      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                    },
-                  },
-                ]
-              );
-            }}
-            style={[styles.editableBtn, {
-              backgroundColor: "#27AE6018",
-              borderColor: "#27AE60",
-              borderRadius: colors.radius - 4,
-            }]}
-          >
-            <Icon name="edit-3" size={14} color="#27AE60" />
-            <Text style={{ color: "#27AE60", fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>
-              فتح التعديل للعميل
-            </Text>
-          </Pressable>
-        )}
+
 
 
         {/* Fix 2: customer can cancel within 5 minutes from order detail page */}
@@ -2779,7 +2762,7 @@ export default function OrderDetailScreen() {
         onRequestClose={() => setShowBulkAvailModal(false)}
       >
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={{ flex: 1 }}
         >
           <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "center", padding: 16 }}>
@@ -2834,38 +2817,91 @@ export default function OrderDetailScreen() {
 
                       {/* تعديل عدد الأثواب إذا كان الطلب بالأثواب */}
                       {!isWeight && (
-                        <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", backgroundColor: colors.background, padding: 8, borderRadius: 6 }}>
-                          <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>عدد الأثواب:</Text>
-                          <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
-                            <Pressable
-                              onPress={() => {
-                                const nextQ = Math.max(1, item.quantity - 1);
-                                setBulkAvailItems((prev) => prev.map((it, idx) => idx !== itemIndex ? it : {
-                                  ...it,
-                                  quantity: nextQ,
-                                  actualWeight: nextQ * blt(u),
-                                }));
-                              }}
-                              style={{ width: 28, height: 28, borderRadius: 14, borderWidth: 1, borderColor: colors.border, alignItems: "center", justifyContent: "center" }}
-                            >
-                              <Icon name="minus" size={14} color={colors.gold} />
-                            </Pressable>
-                            <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 14, minWidth: 24, textAlign: "center" }}>
-                              {item.quantity}
+                        <View style={{ gap: 8, backgroundColor: colors.background, padding: 8, borderRadius: 6 }}>
+                          <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
+                            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>عدد الأثواب:</Text>
+                            <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
+                              <Pressable
+                                onPress={() => {
+                                  const nextQ = Math.max(1, item.quantity - 1);
+                                  const nextW = Math.round(nextQ * blt(u) * 100) / 100;
+                                  setBulkAvailItems((prev) => prev.map((it, idx) => idx !== itemIndex ? it : {
+                                    ...it,
+                                    quantity: nextQ,
+                                    actualWeight: nextW,
+                                  }));
+                                  setBulkInputTexts((prev) => ({
+                                    ...prev,
+                                    [`${itemIndex}_weight`]: String(nextW),
+                                  }));
+                                }}
+                                style={{ width: 28, height: 28, borderRadius: 14, borderWidth: 1, borderColor: colors.border, alignItems: "center", justifyContent: "center" }}
+                              >
+                                <Icon name="minus" size={14} color={colors.gold} />
+                              </Pressable>
+                              <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 14, minWidth: 24, textAlign: "center" }}>
+                                {item.quantity}
+                              </Text>
+                              <Pressable
+                                onPress={() => {
+                                  const nextQ = item.quantity + 1;
+                                  const nextW = Math.round(nextQ * blt(u) * 100) / 100;
+                                  setBulkAvailItems((prev) => prev.map((it, idx) => idx !== itemIndex ? it : {
+                                    ...it,
+                                    quantity: nextQ,
+                                    actualWeight: nextW,
+                                  }));
+                                  setBulkInputTexts((prev) => ({
+                                    ...prev,
+                                    [`${itemIndex}_weight`]: String(nextW),
+                                  }));
+                                }}
+                                style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: colors.gold, alignItems: "center", justifyContent: "center" }}
+                              >
+                                <Icon name="plus" size={14} color={colors.background} />
+                              </Pressable>
+                            </View>
+                          </View>
+
+                          {/* تعديل الوزن الفعلي للثوب */}
+                          <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 6 }}>
+                            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>
+                              الوزن الفعلي ({ulbl(u)}):
                             </Text>
-                            <Pressable
-                              onPress={() => {
-                                const nextQ = item.quantity + 1;
-                                setBulkAvailItems((prev) => prev.map((it, idx) => idx !== itemIndex ? it : {
-                                  ...it,
-                                  quantity: nextQ,
-                                  actualWeight: nextQ * blt(u),
-                                }));
-                              }}
-                              style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: colors.gold, alignItems: "center", justifyContent: "center" }}
-                            >
-                              <Icon name="plus" size={14} color={colors.background} />
-                            </Pressable>
+                            <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6, width: 130 }}>
+                              <AppTextInput
+                                style={{
+                                  flex: 1,
+                                  backgroundColor: colors.input,
+                                  borderColor: colors.border,
+                                  borderWidth: 1,
+                                  borderRadius: 6,
+                                  paddingVertical: 3,
+                                  paddingHorizontal: 8,
+                                  color: colors.foreground,
+                                  fontFamily: "Cairo_700Bold",
+                                  fontSize: 13,
+                                  textAlign: "center",
+                                }}
+                                keyboardType="decimal-pad"
+                                placeholder={String(item.quantity * blt(u))}
+                                placeholderTextColor={colors.mutedForeground}
+                                value={bulkInputTexts[`${itemIndex}_weight`] ?? (item.actualWeight != null ? String(item.actualWeight) : String(item.quantity * blt(u)))}
+                                onChangeText={(txt) => {
+                                  if (/^\d*\.?\d*$/.test(txt)) {
+                                    setBulkInputTexts((prev) => ({ ...prev, [`${itemIndex}_weight`]: txt }));
+                                    const num = parseFloat(txt);
+                                    setBulkAvailItems((prev) => prev.map((it, idx) => idx !== itemIndex ? it : {
+                                      ...it,
+                                      actualWeight: !isNaN(num) && num > 0 ? num : undefined,
+                                    }));
+                                  }
+                                }}
+                              />
+                              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 11 }}>
+                                {ulbl(u)}
+                              </Text>
+                            </View>
                           </View>
                         </View>
                       )}
