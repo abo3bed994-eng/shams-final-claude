@@ -28,7 +28,6 @@ import CityPicker from "@/components/CityPicker";
 import { isWithinWorkingHours, nextWorkingTime, formatNextOpenTime } from "@/lib/workingHours";
 import { finalizeEditedItem, computeItemsTotal } from "@/lib/editOrder";
 import { companionAmount, companionLineTotal, companionTotal, withRecalculatedCompanions } from "@/lib/companion";
-import type { CompanionSelection } from "@/context/AppContext";
 
 const ALL_PAYMENT_METHODS: { key: PaymentMethod; short: string; desc: string }[] = [
   { key: "cash", short: "كاش", desc: "الدفع عند استلام البضاعة" },
@@ -46,117 +45,26 @@ export default function CartScreen() {
   const [weightTexts, setWeightTexts] = useState<Record<string, string>>({});
 
   // Companion editing in cart
-  const [companionModalItemIdx, setCompanionModalItemIdx] = useState<number | null>(null);
-  const [selectedCompMatId, setSelectedCompMatId] = useState<string>("");
-  const [selectedCompColor, setSelectedCompColor] = useState<{ name: string; hex: string }>({ name: "", hex: "" });
-  const [selectedCompPct, setSelectedCompPct] = useState<number>(10);
-  const [editingCompIdx, setEditingCompIdx] = useState<number | null>(null);
 
   const handleUpdateCompanionPct = (itemIndex: number, compIndex: number, newPct: number) => {
-    setCart((prev) =>
-      prev.map((it, idx) => {
+    setCart(
+      cart.map((it, idx) => {
         if (idx !== itemIndex) return it;
         const comps = (it.companions ?? []).map((c, cIdx) => {
           if (cIdx !== compIndex) return c;
-          return { ...c, percentage: newPct, manualWeight: false };
+          const baseAmount = it.orderType === "weight"
+            ? (it.weight ?? 0)
+            : (it.actualWeight ?? it.quantity * (it.unit === "meter" ? 100 : 20));
+          const maxPct = c.availableQuantity != null && baseAmount > 0
+            ? Math.min(100, (c.availableQuantity / baseAmount) * 100)
+            : 100;
+          return { ...c, percentage: Math.min(newPct, maxPct), manualWeight: false };
         });
         return withRecalculatedCompanions({ ...it, companions: comps });
       })
     );
   };
 
-  const handleDeleteCompanion = (itemIndex: number, compIndex: number) => {
-    Alert.alert(
-      "حذف الخامة المرافقة",
-      "هل أنت متأكد من حذف هذه الخامة المرافقة من هذا الصنف؟",
-      [
-        { text: "إلغاء", style: "cancel" },
-        {
-          text: "حذف",
-          style: "destructive",
-          onPress: () => {
-            setCart((prev) =>
-              prev.map((it, idx) => {
-                if (idx !== itemIndex) return it;
-                const comps = (it.companions ?? []).filter((_, cIdx) => cIdx !== compIndex);
-                return withRecalculatedCompanions({ ...it, companions: comps });
-              })
-            );
-          },
-        },
-      ]
-    );
-  };
-
-  const handleOpenAddCompanion = (itemIndex: number) => {
-    const item = cart[itemIndex];
-    if (!item) return;
-    const prod = products.find((p) => p.id === item.productId);
-    const available = (settings.companionMaterials ?? []).filter(
-      (m) => m.inStock && (prod?.companionMaterialIds?.length ? prod.companionMaterialIds.includes(m.id) : true)
-    );
-    if (available.length === 0) {
-      Alert.alert("غير متاح", "لا توجد خامات مرافقة متاحة لهذا المنتج حالياً.");
-      return;
-    }
-    const firstMat = available[0];
-    const firstColor = (firstMat.colors && firstMat.colors.length > 0)
-      ? firstMat.colors[0]
-      : { name: item.colorName, hex: item.colorHex };
-    setSelectedCompMatId(firstMat.id);
-    setSelectedCompColor({ name: firstColor.name, hex: firstColor.hex });
-    setSelectedCompPct(10);
-    setEditingCompIdx(null);
-    setCompanionModalItemIdx(itemIndex);
-  };
-
-  const handleOpenEditCompanion = (itemIndex: number, compIndex: number) => {
-    const item = cart[itemIndex];
-    const comp = item?.companions?.[compIndex];
-    if (!comp) return;
-    setSelectedCompMatId(comp.materialId);
-    setSelectedCompColor({ name: comp.colorName, hex: comp.colorHex });
-    setSelectedCompPct(comp.percentage);
-    setEditingCompIdx(compIndex);
-    setCompanionModalItemIdx(itemIndex);
-  };
-
-  const handleSaveCompanionFromModal = () => {
-    if (companionModalItemIdx == null) return;
-    const item = cart[companionModalItemIdx];
-    if (!item) return;
-    const mat = (settings.companionMaterials ?? []).find((m) => m.id === selectedCompMatId);
-    if (!mat) return;
-    const isWholesale = user?.role === "merchant" || user?.role === "admin";
-    const unitPrice = isWholesale ? mat.wholesalePrice : mat.retailPrice;
-
-    setCart((prev) =>
-      prev.map((it, idx) => {
-        if (idx !== companionModalItemIdx) return it;
-        const currentComps = [...(it.companions ?? [])];
-        const newComp: CompanionSelection = {
-          materialId: mat.id,
-          materialName: mat.name,
-          colorName: selectedCompColor.name || it.colorName,
-          colorHex: selectedCompColor.hex || it.colorHex,
-          percentage: selectedCompPct,
-          orderType: it.orderType,
-          unit: mat.unit,
-          unitPrice,
-          quantity: 1,
-        };
-        let updatedComps: CompanionSelection[];
-        if (editingCompIdx != null && currentComps[editingCompIdx]) {
-          updatedComps = currentComps.map((c, cIdx) => (cIdx === editingCompIdx ? newComp : c));
-        } else {
-          updatedComps = [...currentComps, newComp];
-        }
-        return withRecalculatedCompanions({ ...it, companions: updatedComps });
-      })
-    );
-    setCompanionModalItemIdx(null);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-  };
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<PaymentMethod | null>(null);
@@ -234,10 +142,12 @@ export default function CartScreen() {
       setEditingOrderId(paramEditId);
       const order = orders.find((o) => o.id === paramEditId);
       if (order) {
-        // Carry items (matches beginOrderEdit): drop only fully-unavailable items,
-        // keep partial items with stockStatus/availableQuantity intact so the cart
-        // steppers can cap quantities at the available amount.
-        const reconciled = order.items.map((it) => ({ ...it }));
+        // Use the team's latest staged availability decisions in the cart, keeping
+        // partial-availability caps and excluding fully unavailable items.
+        const sourceItems = order.pendingStaffItems ?? order.items;
+        const reconciled = sourceItems
+          .filter((it) => it.stockStatus !== "unavailable")
+          .map((it) => ({ ...it }));
         setCart(reconciled);
         if (order.notes) setNotes(order.notes);
         if (order.fulfillmentType) setFulfillmentType(order.fulfillmentType);
@@ -1148,26 +1058,14 @@ export default function CartScreen() {
 
                 {(() => {
                   const prod = products.find((p) => p.id === item.productId);
-                  const hasAvailableComps = (settings.companionMaterials ?? []).some(
-                    (m) => m.inStock && (prod?.companionMaterialIds?.length ? prod.companionMaterialIds.includes(m.id) : true)
-                  );
                   const comps = item.companions ?? [];
-
-                  if (!comps.length && !hasAvailableComps) return null;
+                  if (!comps.length) return null;
 
                   return (
                     <View style={[styles.companionList, { backgroundColor: colors.gold + "0D", borderColor: colors.gold + "33" }]}>
                       <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
                         <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 12, textAlign: "right" }}>الخامات المرافقة</Text>
-                        {hasAvailableComps && (
-                          <Pressable
-                            onPress={() => handleOpenAddCompanion(index)}
-                            style={{ flexDirection: "row-reverse", alignItems: "center", gap: 4, paddingVertical: 2, paddingHorizontal: 6, borderRadius: 4, backgroundColor: colors.gold + "20" }}
-                          >
-                            <Icon name="plus" size={12} color={colors.gold} />
-                            <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 11 }}>إضافة خامة</Text>
-                          </Pressable>
-                        )}
+
                       </View>
 
                       {comps.map((companion, compIndex) => {
@@ -1212,12 +1110,8 @@ export default function CartScreen() {
                               <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
                                 <Pressable
                                   onPress={() => {
-                                    const nextPct = Math.max(0, companion.percentage - 5);
-                                    if (nextPct === 0) {
-                                      handleDeleteCompanion(index, compIndex);
-                                    } else {
-                                      handleUpdateCompanionPct(index, compIndex, nextPct);
-                                    }
+                                    const nextPct = Math.max(5, companion.percentage - 5);
+                                    handleUpdateCompanionPct(index, compIndex, nextPct);
                                   }}
                                   style={{ width: 26, height: 26, borderRadius: 13, borderWidth: 1, borderColor: colors.border, alignItems: "center", justifyContent: "center" }}
                                 >
@@ -1230,7 +1124,13 @@ export default function CartScreen() {
 
                                 <Pressable
                                   onPress={() => {
-                                    const nextPct = Math.min(100, companion.percentage + 5);
+                                    const baseAmount = item.orderType === "weight"
+                                      ? (item.weight ?? 0)
+                                      : (item.actualWeight ?? item.quantity * (item.unit === "meter" ? 100 : 20));
+                                    const maxPct = companion.availableQuantity != null && baseAmount > 0
+                                      ? Math.min(100, (companion.availableQuantity / baseAmount) * 100)
+                                      : 100;
+                                    const nextPct = Math.min(maxPct, companion.percentage + 5);
                                     handleUpdateCompanionPct(index, compIndex, nextPct);
                                   }}
                                   style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: colors.gold, alignItems: "center", justifyContent: "center" }}
@@ -1238,21 +1138,6 @@ export default function CartScreen() {
                                   <Icon name="plus" size={12} color={colors.background} />
                                 </Pressable>
 
-                                <Pressable
-                                  onPress={() => handleOpenEditCompanion(index, compIndex)}
-                                  style={{ padding: 4, marginLeft: 2 }}
-                                  hitSlop={6}
-                                >
-                                  <Icon name="sliders" size={14} color={colors.gold} />
-                                </Pressable>
-
-                                <Pressable
-                                  onPress={() => handleDeleteCompanion(index, compIndex)}
-                                  style={{ padding: 4, marginLeft: 2 }}
-                                  hitSlop={6}
-                                >
-                                  <Icon name="trash-2" size={14} color={colors.destructive} />
-                                </Pressable>
                               </View>
                             </View>
                           </View>
@@ -1711,195 +1596,7 @@ export default function CartScreen() {
         </>
       )}
       {/* Modal تعديل / إضافة خامة مرافقة */}
-      <Modal
-        visible={companionModalItemIdx != null}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setCompanionModalItemIdx(null)}
-      >
-        <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "center", padding: 16 }}>
-          <View style={{ backgroundColor: colors.card, borderRadius: colors.radius, borderWidth: 1, borderColor: colors.border, padding: 18, gap: 14, maxHeight: "90%" }}>
-            <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
-              <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 16, textAlign: "right" }}>
-                {editingCompIdx != null ? "تعديل الخامة المرافقة" : "إضافة خامة مرافقة"}
-              </Text>
-              <Pressable onPress={() => setCompanionModalItemIdx(null)} hitSlop={8}>
-                <Icon name="x" size={20} color={colors.mutedForeground} />
-              </Pressable>
-            </View>
 
-            {companionModalItemIdx != null && cart[companionModalItemIdx] && (() => {
-              const currentItem = cart[companionModalItemIdx];
-              const prod = products.find((p) => p.id === currentItem.productId);
-              const availableMats = (settings.companionMaterials ?? []).filter(
-                (m) => m.inStock && (prod?.companionMaterialIds?.length ? prod.companionMaterialIds.includes(m.id) : true)
-              );
-              const activeMat = availableMats.find((m) => m.id === selectedCompMatId) ?? availableMats[0];
-              const colorOptions = (activeMat?.colors && activeMat.colors.length > 0)
-                ? activeMat.colors
-                : (settings.globalColors && settings.globalColors.length > 0 ? settings.globalColors : [{ name: currentItem.colorName, hex: currentItem.colorHex, quantity: 10 }]);
-
-              return (
-                <ScrollView contentContainerStyle={{ gap: 12 }}>
-                  <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 12, textAlign: "right" }}>
-                    للمنتج: {currentItem.productName} ({currentItem.colorName})
-                  </Text>
-
-                  {/* اختيار نوع الخامة المرافقة */}
-                  <View style={{ gap: 6 }}>
-                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 13, textAlign: "right" }}>
-                      الخامة المرافقة:
-                    </Text>
-                    <View style={{ flexDirection: "row-reverse", flexWrap: "wrap", gap: 8 }}>
-                      {availableMats.map((mat) => {
-                        const isSel = mat.id === (activeMat?.id ?? selectedCompMatId);
-                        return (
-                          <Pressable
-                            key={mat.id}
-                            onPress={() => {
-                              setSelectedCompMatId(mat.id);
-                              if (mat.colors && mat.colors.length > 0) {
-                                setSelectedCompColor({ name: mat.colors[0].name, hex: mat.colors[0].hex });
-                              }
-                            }}
-                            style={{
-                              paddingHorizontal: 12,
-                              paddingVertical: 7,
-                              borderRadius: 6,
-                              borderWidth: 1,
-                              borderColor: isSel ? colors.gold : colors.border,
-                              backgroundColor: isSel ? colors.gold + "20" : colors.surface,
-                            }}
-                          >
-                            <Text style={{ color: isSel ? colors.gold : colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 12 }}>
-                              {mat.name}
-                            </Text>
-                          </Pressable>
-                        );
-                      })}
-                    </View>
-                  </View>
-
-                  {/* اختيار اللون */}
-                  <View style={{ gap: 6 }}>
-                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 13, textAlign: "right" }}>
-                      لون الخامة المرافقة ({selectedCompColor.name}):
-                    </Text>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexDirection: "row-reverse", gap: 8, paddingVertical: 4 }}>
-                      {colorOptions.map((c) => {
-                        const isSel = c.name === selectedCompColor.name;
-                        return (
-                          <Pressable
-                            key={c.name}
-                            onPress={() => setSelectedCompColor({ name: c.name, hex: c.hex })}
-                            style={{
-                              alignItems: "center",
-                              gap: 4,
-                              padding: 6,
-                              borderRadius: 8,
-                              borderWidth: isSel ? 2 : 1,
-                              borderColor: isSel ? colors.gold : colors.border,
-                              backgroundColor: isSel ? colors.gold + "15" : colors.surface,
-                              minWidth: 55,
-                            }}
-                          >
-                            <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: c.hex, borderWidth: 1, borderColor: colors.border }} />
-                            <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 11 }}>
-                              {c.name}
-                            </Text>
-                          </Pressable>
-                        );
-                      })}
-                    </ScrollView>
-                  </View>
-
-                  {/* تحديد النسبة المئوية */}
-                  <View style={{ gap: 8, backgroundColor: colors.background, padding: 10, borderRadius: 8 }}>
-                    <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
-                      <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 13 }}>
-                        النسبة المئوية:
-                      </Text>
-                      <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 10 }}>
-                        <Pressable
-                          onPress={() => setSelectedCompPct((prev) => Math.max(1, prev - 1))}
-                          style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: colors.border, alignItems: "center", justifyContent: "center" }}
-                        >
-                          <Icon name="minus" size={14} color={colors.gold} />
-                        </Pressable>
-                        <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 16, minWidth: 44, textAlign: "center" }}>
-                          {selectedCompPct}%
-                        </Text>
-                        <Pressable
-                          onPress={() => setSelectedCompPct((prev) => Math.min(100, prev + 1))}
-                          style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.gold, alignItems: "center", justifyContent: "center" }}
-                        >
-                          <Icon name="plus" size={14} color={colors.background} />
-                        </Pressable>
-                      </View>
-                    </View>
-
-                    {/* اختصارات سريعة للنسبة */}
-                    <View style={{ flexDirection: "row-reverse", gap: 8, justifyContent: "center", paddingTop: 4 }}>
-                      {[5, 10, 15, 20, 25].map((pct) => (
-                        <Pressable
-                          key={pct}
-                          onPress={() => setSelectedCompPct(pct)}
-                          style={{
-                            paddingVertical: 4,
-                            paddingHorizontal: 10,
-                            borderRadius: 6,
-                            borderWidth: 1,
-                            borderColor: selectedCompPct === pct ? colors.gold : colors.border,
-                            backgroundColor: selectedCompPct === pct ? colors.gold + "20" : colors.surface,
-                          }}
-                        >
-                          <Text style={{ color: selectedCompPct === pct ? colors.gold : colors.mutedForeground, fontFamily: "Cairo_700Bold", fontSize: 11 }}>
-                            {pct}%
-                          </Text>
-                        </Pressable>
-                      ))}
-                    </View>
-                  </View>
-
-                  {/* أزرار الإجراء */}
-                  <View style={{ flexDirection: "row-reverse", gap: 10, marginTop: 6 }}>
-                    <Pressable
-                      onPress={handleSaveCompanionFromModal}
-                      style={{
-                        flex: 1,
-                        backgroundColor: colors.gold,
-                        borderRadius: 8,
-                        paddingVertical: 12,
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text style={{ color: colors.background, fontFamily: "Cairo_700Bold", fontSize: 14 }}>
-                        {editingCompIdx != null ? "تحديث الخامة" : "إضافة إلى الصنف"}
-                      </Text>
-                    </Pressable>
-
-                    <Pressable
-                      onPress={() => setCompanionModalItemIdx(null)}
-                      style={{
-                        paddingHorizontal: 18,
-                        paddingVertical: 12,
-                        borderRadius: 8,
-                        borderWidth: 1,
-                        borderColor: colors.border,
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 14 }}>
-                        إلغاء
-                      </Text>
-                    </Pressable>
-                  </View>
-                </ScrollView>
-              );
-            })()}
-          </View>
-        </View>
-      </Modal>
 
     </View>
   );

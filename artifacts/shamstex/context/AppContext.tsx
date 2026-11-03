@@ -2530,10 +2530,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const beginOrderEdit = useCallback((orderId: string) => {
     const order = ordersRef.current.find((o) => o.id === orderId);
     if (!order) return;
-    // Carry items into the cart, dropping only the fully-unavailable ones. Partial
-    // items keep their stockStatus/availableQuantity so the cart steppers can cap
-    // them at the available amount; the customer edits quantities directly.
-    const carried = order.items.map((it) => ({ ...it }));
+    // Carry the team's most recent availability decisions into the cart. This keeps
+    // edits visible to the customer and preserves the availability caps.
+    const sourceItems = order.pendingStaffItems ?? order.items;
+    const carried = sourceItems
+      .filter((it) => it.stockStatus !== "unavailable")
+      .map((it) => ({ ...it }));
     setCart(carried);
     setEditingOrderId(orderId);
   }, []);

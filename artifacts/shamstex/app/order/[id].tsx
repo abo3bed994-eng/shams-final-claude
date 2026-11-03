@@ -205,6 +205,7 @@ export default function OrderDetailScreen() {
       const isWeight = item.orderType === "weight";
       const mainKey = `${itemIndex}_main`;
       texts[mainKey] = item.availableQuantity != null ? String(item.availableQuantity) : "";
+      if (isWeight) texts[`${itemIndex}_quantity`] = String(item.quantity ?? 1);
       const weightKey = `${itemIndex}_weight`;
       const currentW = isWeight ? (item.weight ?? 1) : (item.actualWeight ?? (item.quantity * blt(u)));
       texts[weightKey] = String(currentW);
@@ -225,28 +226,42 @@ export default function OrderDetailScreen() {
       const hasAnyUnavailable = bulkAvailItems.some(
         (it) => it.stockStatus != null || (it.companions ?? []).some((c) => c.stockStatus != null)
       );
-
       const sanitizedItems = bulkAvailItems.map((it) => {
         const next = { ...it };
-        if (!next.stockStatus) {
-          delete next.stockStatus;
+        const u = unitOf(it);
+        const isWeight = it.orderType === "weight";
+        const perB = blt(u);
+        if (next.stockStatus === "unavailable") {
           delete next.availableQuantity;
+          delete next.editMaxQty;
+        } else {
+          if (next.stockStatus === "partial") {
+            next.availableQuantity = isWeight
+              ? (next.weight ?? 1)
+              : (next.actualWeight ?? (next.quantity * perB));
+          } else {
+            delete next.stockStatus;
+            delete next.availableQuantity;
+          }
+          next.editMaxQty = isWeight
+            ? (next.weight ?? 1)
+            : (next.actualWeight ?? (next.quantity * perB));
         }
         if (next.companions) {
           next.companions = next.companions.map((c) => {
             const nextC = { ...c };
-            if (!nextC.stockStatus) {
-              delete nextC.stockStatus;
+            if (nextC.stockStatus === "unavailable") {
               delete nextC.availableQuantity;
+            } else {
+              if (nextC.stockStatus !== "partial") delete nextC.stockStatus;
+              nextC.availableQuantity = nextC.actualWeight ?? Math.round(companionAmount(nextC) * 100) / 100;
             }
             return nextC;
           });
         }
         return next;
       });
-
       const newTotal = computeItemsTotal(sanitizedItems);
-
       await updateOrderItems(order.id, sanitizedItems, newTotal, true);
       setShowBulkAvailModal(false);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -2815,8 +2830,8 @@ export default function OrderDetailScreen() {
                         </Text>
                       </View>
 
-                      {/* تعديل عدد الأثواب إذا كان الطلب بالأثواب */}
-                      {!isWeight && (
+                      {/* تعديل عدد الأثواب يظهر لكل أنواع الطلب ما عدا غير المتوفر */}
+                      {item.stockStatus !== "unavailable" && (
                         <View style={{ gap: 8, backgroundColor: colors.background, padding: 8, borderRadius: 6 }}>
                           <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
                             <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>عدد الأثواب:</Text>
@@ -2906,6 +2921,41 @@ export default function OrderDetailScreen() {
                         </View>
                       )}
 
+                      {isWeight && item.stockStatus !== "unavailable" && (
+                        <View style={{ gap: 8, backgroundColor: colors.background, padding: 8, borderRadius: 6 }}>
+                          <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
+                            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>عدد الأثواب:</Text>
+                            <AppTextInput
+                              style={{ width: 90, backgroundColor: colors.input, borderColor: colors.border, borderWidth: 1, borderRadius: 6, paddingVertical: 4, paddingHorizontal: 8, color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, textAlign: "center" }}
+                              keyboardType="number-pad"
+                              value={bulkInputTexts[`${itemIndex}_quantity`] ?? String(item.quantity ?? 1)}
+                              onChangeText={(txt) => {
+                                if (/^\d*$/.test(txt)) {
+                                  setBulkInputTexts((prev) => ({ ...prev, [`${itemIndex}_quantity`]: txt }));
+                                  const num = parseInt(txt, 10);
+                                  if (!isNaN(num) && num > 0) setBulkAvailItems((prev) => prev.map((it, idx) => idx !== itemIndex ? it : { ...it, quantity: num }));
+                                }
+                              }}
+                            />
+                          </View>
+                          <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 6 }}>
+                          <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>الوزن المطلوب ({ulbl(u)}):</Text>
+                          <AppTextInput
+                            style={{ width: 120, backgroundColor: colors.input, borderColor: colors.border, borderWidth: 1, borderRadius: 6, paddingVertical: 4, paddingHorizontal: 8, color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 13, textAlign: "center" }}
+                            keyboardType="decimal-pad"
+                            value={bulkInputTexts[`${itemIndex}_weight`] ?? String(item.weight ?? 1)}
+                            onChangeText={(txt) => {
+                              if (/^\d*\.?\d*$/.test(txt)) {
+                                setBulkInputTexts((prev) => ({ ...prev, [`${itemIndex}_weight`]: txt }));
+                                const num = parseFloat(txt);
+                                setBulkAvailItems((prev) => prev.map((it, idx) => idx !== itemIndex ? it : { ...it, weight: !isNaN(num) && num > 0 ? num : undefined }));
+                              }
+                            }}
+                          />
+                          </View>
+                        </View>
+                      )}
+
                       {/* أزرار حالة التوفر */}
                       <View style={{ flexDirection: "row-reverse", gap: 6 }}>
                         <Pressable
@@ -2945,7 +2995,9 @@ export default function OrderDetailScreen() {
                               return {
                                 ...it,
                                 stockStatus: "partial",
-                                availableQuantity: it.availableQuantity ?? orderedQty,
+                                availableQuantity: it.orderType === "weight"
+                                  ? (it.weight ?? orderedQty)
+                                  : (it.actualWeight ?? (it.quantity * blt(u))),
                               };
                             }));
                             if (!bulkInputTexts[mainKey]) {
@@ -2999,44 +3051,6 @@ export default function OrderDetailScreen() {
                           </Text>
                         </Pressable>
                       </View>
-
-                      {/* خانة الكمية المتوفرة عند التوفر الجزئي */}
-                      {item.stockStatus === "partial" && (
-                        <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8, backgroundColor: colors.background, padding: 8, borderRadius: 6 }}>
-                          <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>
-                            الكمية المتوفرة ({ulbl(u)}):
-                          </Text>
-                          <AppTextInput
-                            style={{
-                              flex: 1,
-                              backgroundColor: colors.input,
-                              borderColor: colors.border,
-                              borderWidth: 1,
-                              borderRadius: 6,
-                              paddingVertical: 4,
-                              paddingHorizontal: 8,
-                              color: colors.foreground,
-                              fontFamily: "Cairo_700Bold",
-                              fontSize: 14,
-                              textAlign: "center",
-                            }}
-                            keyboardType="decimal-pad"
-                            placeholder="0.0"
-                            placeholderTextColor={colors.mutedForeground}
-                            value={bulkInputTexts[mainKey] ?? (item.availableQuantity != null ? String(item.availableQuantity) : "")}
-                            onChangeText={(txt) => {
-                              if (/^\d*\.?\d*$/.test(txt)) {
-                                setBulkInputTexts((prev) => ({ ...prev, [mainKey]: txt }));
-                                const num = parseFloat(txt);
-                                setBulkAvailItems((prev) => prev.map((it, idx) => idx !== itemIndex ? it : {
-                                  ...it,
-                                  availableQuantity: !isNaN(num) && num > 0 ? num : undefined,
-                                }));
-                              }
-                            }}
-                          />
-                        </View>
-                      )}
 
                       {/* الخامات المرافقة */}
                       {(item.companions ?? []).length > 0 && (
@@ -3155,6 +3169,33 @@ export default function OrderDetailScreen() {
                                     <Text style={{ color: companion.stockStatus === "unavailable" ? "#E74C3C" : colors.mutedForeground, fontFamily: "Cairo_700Bold", fontSize: 10 }}>غير متوفر</Text>
                                   </Pressable>
                                 </View>
+
+                                {companion.stockStatus !== "unavailable" && (
+                                  <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6, marginTop: 4 }}>
+                                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_500Medium", fontSize: 11 }}>الوزن / المتر:</Text>
+                                    <AppTextInput
+                                      style={{ flex: 1, backgroundColor: colors.input, borderColor: colors.border, borderWidth: 1, borderRadius: 4, paddingVertical: 2, paddingHorizontal: 6, color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 12, textAlign: "center" }}
+                                      keyboardType="decimal-pad"
+                                      value={bulkInputTexts[cKey] ?? String(cOrdered)}
+                                      onChangeText={(txt) => {
+                                        if (/^\d*\.?\d*$/.test(txt)) {
+                                          setBulkInputTexts((prev) => ({ ...prev, [cKey]: txt }));
+                                          const num = parseFloat(txt);
+                                          setBulkAvailItems((prev) => prev.map((it, idx) => {
+                                            if (idx !== itemIndex) return it;
+                                            const nextCompanions = (it.companions ?? []).map((c, cIdx) => cIdx !== companionIndex ? c : {
+                                              ...c,
+                                              actualWeight: !isNaN(num) && num > 0 ? num : undefined,
+                                              manualWeight: true,
+                                            });
+                                            return { ...it, companions: nextCompanions };
+                                          }));
+                                        }
+                                      }}
+                                    />
+                                    <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 10 }}>{cUnit}</Text>
+                                  </View>
+                                )}
 
                                 {companion.stockStatus === "partial" && (
                                   <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6, marginTop: 4 }}>
