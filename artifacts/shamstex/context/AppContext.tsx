@@ -3139,10 +3139,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           ? prev.filter((c) => !(c.productId === productId && c.colorName === colorName))
           : prev.map((c) => {
               if (!(c.productId === productId && c.colorName === colorName)) return c;
-              const cap =
-                c.stockStatus === "partial" && c.availableQuantity != null
-                  ? c.availableQuantity
-                  : c.editMaxQty;
+              const cap = c.stockStatus === "partial" ? c.availableQuantity : undefined;
               return withRecalculatedCompanions({ ...c, weight: cap != null ? Math.min(weight, cap) : weight });
             })
       );
@@ -3156,10 +3153,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         prev.map((c) => {
           if (!(c.productId === productId && c.colorName === colorName)) return c;
           if (actualWeight <= 0) return { ...c, actualWeight: undefined };
-          const cap =
-            c.stockStatus === "partial" && c.availableQuantity != null
-              ? c.availableQuantity
-              : c.editMaxQty;
+          const cap = c.stockStatus === "partial" ? c.availableQuantity : undefined;
            return withRecalculatedCompanions({ ...c, actualWeight: cap != null ? Math.min(actualWeight, cap) : actualWeight });
         })
       );
