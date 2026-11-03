@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Alert, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Image, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { KeyboardAwareScroll } from "@/components/KeyboardAware";
 import AppTextInput from "@/components/AppTextInput";
 import { useLocalSearchParams, router } from "expo-router";
@@ -252,9 +252,13 @@ export default function OrderDetailScreen() {
             delete next.stockStatus;
             delete next.availableQuantity;
           }
-          next.editMaxQty = isWeight
-            ? (next.weight ?? 1)
-            : (next.actualWeight ?? (next.quantity * perB));
+          if (next.stockStatus === "partial") {
+            next.editMaxQty = isWeight
+              ? (next.weight ?? 1)
+              : (next.actualWeight ?? (next.quantity * perB));
+          } else {
+            delete next.editMaxQty;
+          }
         }
         if (next.companions) {
           next.companions = next.companions.map((c) => {
@@ -262,8 +266,12 @@ export default function OrderDetailScreen() {
             if (nextC.stockStatus === "unavailable") {
               delete nextC.availableQuantity;
             } else {
-              if (nextC.stockStatus !== "partial") delete nextC.stockStatus;
-              nextC.availableQuantity = nextC.actualWeight ?? Math.round(companionAmount(nextC) * 100) / 100;
+              if (nextC.stockStatus !== "partial") {
+                delete nextC.stockStatus;
+                delete nextC.availableQuantity;
+              } else {
+                nextC.availableQuantity = nextC.actualWeight ?? Math.round(companionAmount(nextC) * 100) / 100;
+              }
             }
             return nextC;
           });
@@ -1429,7 +1437,7 @@ export default function OrderDetailScreen() {
             >
               <Icon name="package" size={18} color={colors.gold} />
               <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 14 }}>
-                تحديد المتوفر لجميع الخامات
+                الوزن الفعلي وتحديد المتوفر
               </Text>
             </Pressable>
 
@@ -2781,12 +2789,10 @@ export default function OrderDetailScreen() {
         animationType="slide"
         onRequestClose={() => setShowBulkAvailModal(false)}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          style={{ flex: 1 }}
-        >
-          <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "center", padding: 16 }}>
-            <View style={{ backgroundColor: colors.card, borderRadius: colors.radius, borderWidth: 1, borderColor: colors.border, maxHeight: "90%", padding: 18, gap: 12 }}>
+        <View style={{ flex: 1 }}>
+
+          <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "center", padding: 6 }}>
+            <View style={{ flex: 1, width: "100%", backgroundColor: colors.card, borderRadius: colors.radius, borderWidth: 1, borderColor: colors.border, maxHeight: "96%", padding: 12, gap: 10 }}>
               <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
                 <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
                   <Icon name="package" size={20} color={colors.gold} />
@@ -2803,7 +2809,7 @@ export default function OrderDetailScreen() {
                 حدد حالة التوفر والأوزان الفعلية لكل خامة. إذا كانت جميع الخامات متوفرة، يمكنك الانتقال للمرحلة التالية مباشرة دون طلب موافقة العميل.
               </Text>
 
-              <ScrollView style={{ maxHeight: 420 }} contentContainerStyle={{ gap: 12, paddingBottom: 10 }} keyboardShouldPersistTaps="handled">
+              <KeyboardAwareScroll style={{ flex: 1 }} bottomOffset={36} contentContainerStyle={{ gap: 12, paddingBottom: 10 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
                 {bulkAvailItems.map((item, itemIndex) => {
                   const u = unitOf(item);
                   const isWeight = item.orderType === "weight";
@@ -3067,7 +3073,7 @@ export default function OrderDetailScreen() {
                     </View>
                   );
                 })}
-              </ScrollView>
+              </KeyboardAwareScroll>
 
               <View style={{ flexDirection: "row-reverse", gap: 10, marginTop: 4 }}>
                 <Pressable
@@ -3107,7 +3113,7 @@ export default function OrderDetailScreen() {
               </View>
             </View>
           </View>
-        </KeyboardAvoidingView>
+        </View>
       </Modal>
 
     </View>
