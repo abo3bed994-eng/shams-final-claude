@@ -2397,15 +2397,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                 total: acceptedTotal!,
                 paymentFee: acceptedFee,
                 totalWithFee: acceptedTotal! + acceptedFee,
-              } : !approved && o.pendingStaffOriginalItems ? {
-                items: o.pendingStaffOriginalItems,
-                total: o.pendingStaffOriginalTotal ?? o.total,
-                paymentFee: o.paymentMethod === "ewallet"
-                  ? Math.ceil((o.pendingStaffOriginalTotal ?? o.total) * (settings.payment?.ewalletFeePercent ?? 1) / 100)
-                  : o.paymentFee ?? 0,
-                totalWithFee: (o.pendingStaffOriginalTotal ?? o.total) + (o.paymentMethod === "ewallet"
-                  ? Math.ceil((o.pendingStaffOriginalTotal ?? o.total) * (settings.payment?.ewalletFeePercent ?? 1) / 100)
-                  : o.paymentFee ?? 0),
               } : {}),
               pendingStaffOriginalItems: undefined,
               pendingStaffOriginalTotal: undefined,
