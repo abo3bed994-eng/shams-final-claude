@@ -146,7 +146,6 @@ export default function CartScreen() {
         // partial-availability caps and excluding fully unavailable items.
         const sourceItems = order.pendingStaffItems ?? order.items;
         const reconciled = sourceItems
-          .filter((it) => it.stockStatus !== "unavailable")
           .map((it) => ({ ...it }));
         setCart(reconciled);
         if (order.notes) setNotes(order.notes);
