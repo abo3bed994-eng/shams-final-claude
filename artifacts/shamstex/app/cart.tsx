@@ -177,7 +177,7 @@ export default function CartScreen() {
   useEffect(() => {
     if (!editOrderId) return;
     for (const it of cart) {
-      const cap = it.stockStatus === "partial" && it.availableQuantity != null ? it.availableQuantity : it.editMaxQty;
+      const cap = it.stockStatus === "partial" && it.availableQuantity != null ? it.availableQuantity : undefined;
       if (cap == null) continue;
       const perBolt = it.unit === "meter" ? 100 : 20;
       if (it.orderType === "weight") {
@@ -282,20 +282,20 @@ export default function CartScreen() {
 
   const bottomPad = Platform.OS === "web" ? 34 : Math.max(insets.bottom, Platform.OS === "android" ? 24 : 0);
 
-  const totalPieces = cart.reduce((a, b) => a + b.quantity, 0);
+  const totalPieces = cart.filter((item) => item.stockStatus !== "unavailable").reduce((a, b) => a + b.quantity, 0);
   const weightTotal = cart
-    .filter((i) => i.orderType === "weight")
+    .filter((i) => i.orderType === "weight" && i.stockStatus !== "unavailable")
     .reduce((a, b) => a + b.unitPrice * (b.weight ?? 1), 0);
   const piecesEstTotal = cart
-    .filter((i) => i.orderType === "pieces")
+    .filter((i) => i.orderType === "pieces" && i.stockStatus !== "unavailable")
     .reduce((a, b) => {
       const pb = b.unit === "meter" ? 100 : 20;
-      const cap = b.stockStatus === "partial" && b.availableQuantity != null ? b.availableQuantity : b.editMaxQty;
+      const cap = b.stockStatus === "partial" && b.availableQuantity != null ? b.availableQuantity : undefined;
       const raw = b.actualWeight ?? (b.quantity * pb);
       const eff = cap != null ? Math.min(raw, cap) : raw;
       return a + eff * b.unitPrice;
     }, 0);
-  const companionEstTotal = cart.reduce((sum, item) => sum + companionTotal(item), 0);
+  const companionEstTotal = cart.filter((item) => item.stockStatus !== "unavailable").reduce((sum, item) => sum + companionTotal({ companions: item.companions?.filter((companion) => companion.stockStatus !== "unavailable") }), 0);
   const totalPrice = weightTotal + piecesEstTotal + companionEstTotal;
 
   const hasPiecesOrder = cart.some((i) => i.orderType === "pieces");
@@ -396,7 +396,7 @@ export default function CartScreen() {
     for (const item of weightItems) {
       // Items capped by a staff "partial availability" edit may legitimately fall
       // below the normal minimum, so skip the minimum check for them.
-      if (item.editMaxQty != null || item.stockStatus === "partial") continue;
+      if (item.stockStatus === "partial") continue;
       const prod = products.find((p) => p.id === item.productId);
       const minW = prod?.minimumOrderQuantity ?? (prod?.unit === "meter" ? 100 : 20);
       const unitName = prod?.unit === "meter" ? "متر" : "كغ";
@@ -422,7 +422,19 @@ export default function CartScreen() {
         // the staff-availability metadata, recompute the total, and save with
         // staffEdit=false so the order is marked edited, closed for editing, and the
         // staff are notified — no second confirmation step.
-        const finalItems = [...cart].map(finalizeEditedItem);
+        const finalItems = cart
+          .filter((item) => item.stockStatus !== "unavailable")
+          .map((item) => ({
+            ...item,
+            companions: item.companions?.filter((companion) => companion.stockStatus !== "unavailable"),
+          }))
+          .map(finalizeEditedItem);
+        if (finalItems.length === 0) {
+          exitingEditRef.current = false;
+          Alert.alert("لا توجد أصناف متوفرة", "اختر بديلاً للصنف غير المتوفر قبل تأكيد التعديل.");
+          setLoading(false);
+          return;
+        }
         await updateOrderItems(editOrderId, finalItems, computeItemsTotal(finalItems), false, notes, {
           fulfillmentType: fulfillmentType ?? undefined,
           branchId: fulfillmentType === "branch" ? selectedBranchId ?? undefined : undefined,
@@ -781,6 +793,7 @@ export default function CartScreen() {
               >
                 <View style={styles.itemHeader}>
                   <Pressable
+                    disabled={item.stockStatus === "unavailable"}
                     onPress={() => handleDeleteItem(item)}
                     style={({ pressed }) => [
                       styles.deleteBtn,
@@ -825,13 +838,14 @@ export default function CartScreen() {
                   </View>
                 </View>
 
+                <View pointerEvents={item.stockStatus === "unavailable" ? "none" : "auto"} style={item.stockStatus === "unavailable" ? { opacity: 0.62 } : undefined}>
                 {item.orderType === "weight" ? (() => {
                   const prod = products.find((p) => p.id === item.productId);
                   const unitName = prod?.unit === "meter" ? "متر" : "كغ";
                   const perBolt = prod?.unit === "meter" ? 100 : 20;
                   const minW = prod?.minimumOrderQuantity ?? perBolt;
                   const bolts = Math.floor((item.weight ?? 0) / perBolt);
-                  const cap = item.stockStatus === "partial" && item.availableQuantity != null ? item.availableQuantity : item.editMaxQty;
+                  const cap = item.stockStatus === "partial" && item.availableQuantity != null ? item.availableQuantity : undefined;
                   const clampCap = (n: number) => (cap != null ? Math.min(n, cap) : n);
                   const wKey = `${item.productId}_${item.colorName}`;
                   const bKey = `bolt_${item.productId}_${item.colorName}`;
@@ -930,7 +944,7 @@ export default function CartScreen() {
                   const unitName = item.unit === "meter" ? "متر" : "كغ";
                   const perBolt = item.unit === "meter" ? 100 : 20;
                   const isEdit = !!editOrderId;
-                  const cap = item.stockStatus === "partial" && item.availableQuantity != null ? item.availableQuantity : item.editMaxQty;
+                  const cap = item.stockStatus === "partial" && item.availableQuantity != null ? item.availableQuantity : undefined;
                   const maxBolts = cap != null ? Math.max(1, Math.ceil(cap / perBolt)) : null;
                   const clampBolts = (n: number) => (maxBolts != null ? Math.min(Math.max(1, n), maxBolts) : Math.max(1, n));
                   const rawAw = item.actualWeight ?? (item.quantity * perBolt);
@@ -1056,7 +1070,7 @@ export default function CartScreen() {
                   );
                 })()}
 
-                {(() => {
+                {item.stockStatus !== "unavailable" && (() => {
                   const prod = products.find((p) => p.id === item.productId);
                   const comps = item.companions ?? [];
                   if (!comps.length) return null;
@@ -1110,7 +1124,7 @@ export default function CartScreen() {
                               <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
                                 <Pressable
                                   onPress={() => {
-                                    const nextPct = Math.max(5, companion.percentage - 5);
+                                    const nextPct = Math.max(5, companion.percentage - 1);
                                     handleUpdateCompanionPct(index, compIndex, nextPct);
                                   }}
                                   style={{ width: 26, height: 26, borderRadius: 13, borderWidth: 1, borderColor: colors.border, alignItems: "center", justifyContent: "center" }}
@@ -1130,7 +1144,7 @@ export default function CartScreen() {
                                     const maxPct = companion.availableQuantity != null && baseAmount > 0
                                       ? Math.min(100, (companion.availableQuantity / baseAmount) * 100)
                                       : 100;
-                                    const nextPct = Math.min(maxPct, companion.percentage + 5);
+                                    const nextPct = Math.min(maxPct, companion.percentage + 1);
                                     handleUpdateCompanionPct(index, compIndex, nextPct);
                                   }}
                                   style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: colors.gold, alignItems: "center", justifyContent: "center" }}
@@ -1146,6 +1160,7 @@ export default function CartScreen() {
                     </View>
                   );
                 })()}
+                </View>
               </View>
             ))}
 
