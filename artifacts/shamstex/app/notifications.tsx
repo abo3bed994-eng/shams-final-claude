@@ -68,7 +68,8 @@ export default function NotificationsScreen() {
     if (navigatingRef.current) return;
     navigatingRef.current = true;
     if (notif.linkedOrderId) {
-      router.push(`/order/${notif.linkedOrderId}`);
+      const scrollQuery = notif.actionType === "upload_receipt" ? "?scrollTo=payment" : "";
+      router.push(`/order/${notif.linkedOrderId}${scrollQuery}`);
     } else if (notif.linkedReturnId) {
       router.push(`/return/${notif.linkedReturnId}`);
     }

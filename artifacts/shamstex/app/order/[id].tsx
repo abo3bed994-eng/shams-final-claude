@@ -150,7 +150,7 @@ async function pickImage(scopeId: string): Promise<string | null> {
 }
 
 export default function OrderDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, scrollTo } = useLocalSearchParams<{ id: string; scrollTo?: string }>();
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { orders, user, updateOrderStatus, deleteOrder, sendOrderMessage, setOrderEditable, setOrderEditExpiry, beginOrderEdit, updateOrderItems, returnRequests, addReturnRequest, updateReturnStatus, setEditingOrderId, settings, products, cancelOrder, setOrderTransferProof, setOrderPaymentMethod, setOrderPaymentOverride, setOrderShipping, notifyCustomerOrderChanges, respondToOrderApproval } = useApp();
@@ -293,6 +293,8 @@ export default function OrderDetailScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const [editSectionY, setEditSectionY] = useState<number | null>(null);
   const didScrollToEditRef = useRef(false);
+  const [paymentSectionY, setPaymentSectionY] = useState<number | null>(null);
+  const didScrollToPaymentRef = useRef(false);
   const [availModalIndex, setAvailModalIndex] = useState<number | null>(null);
   const [availInput, setAvailInput] = useState("");
   const [confirmingEdit, setConfirmingEdit] = useState(false);
@@ -377,6 +379,17 @@ export default function OrderDetailScreen() {
     }, 350);
     return () => clearTimeout(t);
   }, [order, isCustomer, hasAffectedItems, editSectionY]);
+
+  useEffect(() => {
+    if (didScrollToPaymentRef.current) return;
+    if (!order || scrollTo !== "payment") return;
+    if (paymentSectionY == null) return;
+    didScrollToPaymentRef.current = true;
+    const t = setTimeout(() => {
+      scrollRef.current?.scrollTo({ y: Math.max(0, paymentSectionY - 20), animated: true });
+    }, 400);
+    return () => clearTimeout(t);
+  }, [order, scrollTo, paymentSectionY]);
 
   // Fallback: the edit countdown is normally armed by staff the moment they make
   // the order editable. This only kicks in for legacy editable orders that were
@@ -940,7 +953,14 @@ export default function OrderDetailScreen() {
             </Pressable>
           );
           return (
-            <View style={[styles.paymentMethodCard, { backgroundColor: pmColor + "11", borderColor: pmColor + "33", borderRadius: colors.radius }]}>
+            <View
+              onLayout={(e) => setPaymentSectionY(e.nativeEvent.layout.y)}
+              style={[
+                styles.paymentMethodCard,
+                { backgroundColor: pmColor + "11", borderColor: scrollTo === "payment" ? colors.gold : pmColor + "33", borderRadius: colors.radius },
+                scrollTo === "payment" ? { borderWidth: 2 } : null,
+              ]}
+            >
               <View style={styles.paymentMethodRow}>
                 <View style={[styles.paymentMethodIcon, { backgroundColor: pmColor + "22" }]}>
                   <Icon name={PAYMENT_METHOD_ICONS[pm] ?? "credit-card"} size={18} color={pmColor} />

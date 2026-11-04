@@ -3,7 +3,7 @@ import { setSecureItem, getSecureItem, deleteSecureItem } from "@/lib/secureStor
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Platform } from "react-native";
 import { FS } from "@/lib/firebase";
-import { notifyStaffNewOrder, notifyUserByPhone, notifyByRoles, notifyAll, notifyAssignedStaff } from "@/lib/pushService";
+import { notifyStaffNewOrder, notifyUserByPhone, notifyByRoles, notifyAll, notifyAssignedStaff, notifyOrderRelevantStaff } from "@/lib/pushService";
 import { canonicalPhone, samePhone, migrateLocalToE164 } from "@/lib/phoneUtils";
 import { isWithinWorkingHours } from "@/lib/workingHours";
 import { EDIT_WINDOW_MS, acceptStaffAvailability, computeItemsTotal } from "@/lib/editOrder";
@@ -304,7 +304,7 @@ export interface Notification {
   targetUserId?: string;
   targetUserPhone?: string;
   sourceUserId?: string;
-  actionType?: "upgrade_request";
+  actionType?: "upgrade_request" | "upload_receipt";
   actionUserId?: string;
   linkedOrderId?: string;
   linkedReturnId?: string;
@@ -1082,6 +1082,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // We listen and force-logout if the local secure token no longer matches the remote one.
   useEffect(() => {
     if (!user?.phone) return;
+    // Admins are exempt from single-device forced logout so management across
+    // multiple devices (e.g. phone + shop tablet or dev preview) works seamlessly.
+    if (user.role === "admin") return;
     let cancelled = false;
     let unsub: (() => void) | undefined;
 
@@ -1330,7 +1333,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               FS.getSession(migrateLocalToE164(parsedUser.phone)),
               new Promise<null>((resolve) => setTimeout(() => resolve(null), 3500)),
             ]);
-            if (remoteToken && remoteToken !== secureToken) {
+            if (remoteToken && remoteToken !== secureToken && parsedUser.role !== "admin") {
               await AsyncStorage.removeItem("user");
               await deleteSecureItem("sessionToken");
               setUserState(null);
@@ -2133,15 +2136,32 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         };
         if (!statusLabels[status]) return;
         const recipientPhone = resolveRecipientPhone(updatedOrder.userId, updatedOrder.userPhone);
+        const isTransferPayment =
+          updatedOrder.paymentMethod === "ewallet" ||
+          updatedOrder.paymentMethod === "bank_transfer" ||
+          updatedOrder.paymentMethod === "instapay";
+        const needsTransferProof =
+          (status === "ready" || status === "ready_to_ship") &&
+          isTransferPayment &&
+          !updatedOrder.transferProofImage;
+
+        const notifTitle = needsTransferProof
+          ? "الطلب جاهز — يرجى رفع إيصال التحويل"
+          : statusLabels[status];
+        const notifBody = needsTransferProof
+          ? `طلبك #${orderId.slice(0, 12)} جاهز. الرجاء رفع صورة إيصال التحويل لتأكيد واستلام طلبك.`
+          : `تم تحديث حالة طلبك #${orderId.slice(0, 12)}`;
+
         const custNotif: Notification = {
           id: `notif_status_${orderId}_${status}_${Date.now()}`,
-          title: statusLabels[status],
-          body: `تم تحديث حالة طلبك #${orderId.slice(0, 12)}`,
+          title: notifTitle,
+          body: notifBody,
           createdAt: new Date().toISOString(),
           read: false,
           targetUserId: updatedOrder.userId,
           targetUserPhone: recipientPhone,
           linkedOrderId: orderId,
+          ...(needsTransferProof ? { actionType: "upload_receipt" } : {}),
         };
         FS.saveNotification(custNotif).catch((error) => {
           console.warn("[order-status-notification] Firestore save failed:", error);
@@ -2149,9 +2169,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (recipientPhone) {
           notifyUserByPhone(
             recipientPhone,
-            statusLabels[status],
-            `طلبك #${orderId.slice(0, 12)} — ${statusLabels[status]}`,
-            { type: "order_status", orderId, status }
+            notifTitle,
+            needsTransferProof
+              ? `طلبك #${orderId.slice(0, 12)} جاهز — الرجاء رفع صورة إيصال التحويل`
+              : `طلبك #${orderId.slice(0, 12)} — ${statusLabels[status]}`,
+            {
+              type: "order_status",
+              orderId,
+              status,
+              ...(needsTransferProof ? { scrollTo: "payment" } : {}),
+            }
           ).catch(() => {});
         }
       };
@@ -2600,17 +2627,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           const notif: Notification = {
             id: `notif_proof_${orderId}_${Date.now()}`,
             title: "📸 العميل أرسل إثبات تحويل",
-          body: `العميل ${updatedOrder.userName} أرفق صورة التحويل للطلب #${orderId.slice(0, 12)}`,
+            body: `العميل ${updatedOrder.userName} أرفق صورة التحويل للطلب #${orderId.slice(0, 12)}`,
             createdAt: new Date().toISOString(),
             read: false,
             targetRole: "staff" as any,
             sourceUserId: updatedOrder.userId,
             linkedOrderId: orderId,
+            actionType: "upload_receipt",
           };
           const updatedNotifs = [notif, ...notificationsRef.current];
           setNotifications(updatedNotifs);
           AsyncStorage.setItem("notifications", JSON.stringify(updatedNotifs)).catch(() => {});
           FS.saveNotification(notif).catch(() => {});
+          notifyOrderRelevantStaff(
+            updatedOrder,
+            "📸 العميل أرسل إثبات تحويل",
+            `العميل ${updatedOrder.userName} أرفق صورة التحويل للطلب #${orderId.slice(0, 12)}`,
+            { type: "transfer_proof", orderId, scrollTo: "payment" }
+          ).catch(() => {});
         }
       }
     },
@@ -2835,17 +2869,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           setNotifications(updatedNotifs);
           await AsyncStorage.setItem("notifications", JSON.stringify(updatedNotifs));
           FS.saveNotification(staffNotif).catch(() => {});
-          if (assignedStaffId) {
-            const staffRecord = registeredCustomersRef.current.find((c) => c.id === assignedStaffId);
-            if (staffRecord?.phone) {
-              notifyUserByPhone(
-                staffRecord.phone,
-                "تم تعديل الطلب ✏️",
-                `العميل ${updatedOrder.userName} عدّل طلبه #${orderId.slice(0, 12)} — راجع التعديلات`,
-                { type: "order_edited", orderId }
-              ).catch(() => {});
-            }
-          }
+          notifyOrderRelevantStaff(
+            updatedOrder,
+            "تم تعديل الطلب ✏️",
+            `العميل ${updatedOrder.userName} عدّل طلبه #${orderId.slice(0, 12)} — راجع التعديلات ومتابعة التجهيز`,
+            { type: "order_edited", orderId }
+          ).catch(() => {});
         }
       }
     },

@@ -669,6 +669,13 @@ export default function LoginScreen() {
         const { deleteSecureItem } = await import("@/lib/secureStorage");
         await deleteSecureItem("sessionToken");
       } catch {}
+    } else {
+      // Pre-persist sessionToken before calling setUser so AppContext session listener
+      // immediately sees the matching token and avoids any race condition kick-out.
+      try {
+        const { setSecureItem } = await import("@/lib/secureStorage");
+        await setSecureItem("sessionToken", sessionToken);
+      } catch {}
     }
     if (ownerOverride) {
       // updateRegisteredCustomer overwrites role; registerCustomer would preserve

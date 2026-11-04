@@ -409,7 +409,7 @@ export async function notifyAll(
   }
 }
 
-export async function notifyAssignedStaff(
+export async function notifyOrderRelevantStaff(
   order: {
     id: string;
     assignedToPhone?: string;
@@ -421,7 +421,11 @@ export async function notifyAssignedStaff(
   data?: Record<string, any>
 ): Promise<void> {
   try {
-    let delivered = false;
+    const targetTokens = new Set<string>();
+    const isShipping = order.fulfillmentType === "shipping";
+    const orderBranchId = order.branchId;
+
+    // 1. If assigned to a staff member, always include their token
     if (order.assignedToPhone) {
       const normalizedPhone = migrateLocalToE164(order.assignedToPhone);
       const token =
@@ -430,47 +434,57 @@ export async function notifyAssignedStaff(
           ? await FS.getPushTokenByPhone(order.assignedToPhone)
           : null);
       if (token) {
-        await sendExpoPush([token], title, body, { orderId: order.id, ...data }, "orders_v4");
-        delivered = true;
+        targetTokens.add(token);
       }
     }
 
-    if (!delivered) {
-      const isShipping = order.fulfillmentType === "shipping";
-      const orderBranchId = order.branchId;
+    // 2. Add relevant staff tokens only (admins, relevant supervisors, branch employees if unassigned)
+    try {
       const staffTokens = await FS.getStaffPushTokens();
-      const targetTokens: string[] = [];
-
       for (const st of staffTokens) {
         if (!st.expoPushToken) continue;
         if (st.role === "admin") {
-          targetTokens.push(st.expoPushToken);
+          targetTokens.add(st.expoPushToken);
         } else if (st.role === "supervisor") {
           if (st.supervisorScope === "branch") {
             if (isShipping ? !!st.canHandleShipping : !!orderBranchId && st.branchId === orderBranchId) {
-              targetTokens.push(st.expoPushToken);
+              targetTokens.add(st.expoPushToken);
             }
           } else {
-            targetTokens.push(st.expoPushToken);
+            targetTokens.add(st.expoPushToken);
           }
         } else if (st.role === "employee") {
-          if (isShipping ? !!st.canHandleShipping : !!orderBranchId && st.branchId === orderBranchId) {
-            targetTokens.push(st.expoPushToken);
+          if (!order.assignedToPhone) {
+            if (isShipping ? !!st.canHandleShipping : !!orderBranchId && st.branchId === orderBranchId) {
+              targetTokens.add(st.expoPushToken);
+            }
           }
         }
       }
+    } catch (e) {
+      console.warn("Error filtering staff tokens for order:", e);
+    }
 
-      if (targetTokens.length > 0) {
-        await sendExpoPush(
-          Array.from(new Set(targetTokens)),
-          title,
-          body,
-          { orderId: order.id, ...data },
-          "orders_v4"
-        );
-      }
+    // 3. Guarantee primary manager/owner token is included if present
+    try {
+      const ownerToken =
+        (await FS.getPushTokenByPhone("+201221131138")) ||
+        (await FS.getPushTokenByPhone("01221131138"));
+      if (ownerToken) targetTokens.add(ownerToken);
+    } catch (_) {}
+
+    if (targetTokens.size > 0) {
+      await sendExpoPush(
+        Array.from(targetTokens),
+        title,
+        body,
+        { orderId: order.id, ...data },
+        "orders_v4"
+      );
     }
   } catch (err) {
-    console.warn("notifyAssignedStaff error:", err);
+    console.warn("notifyOrderRelevantStaff error:", err);
   }
 }
+
+export const notifyAssignedStaff = notifyOrderRelevantStaff;

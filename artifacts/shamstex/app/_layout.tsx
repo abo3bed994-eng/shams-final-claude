@@ -105,7 +105,8 @@ function RootLayoutNav() {
           const returnId = data?.returnId || data?.linkedReturnId;
           let path: string | null = null;
           if (orderId) {
-            path = `/order/${orderId}`;
+            const scrollParam = data?.scrollTo ? `?scrollTo=${encodeURIComponent(data.scrollTo)}` : "";
+            path = `/order/${orderId}${scrollParam}`;
           } else if (returnId) {
             path = `/return/${returnId}`;
           }

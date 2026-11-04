@@ -76,7 +76,8 @@ export default function NotificationBanner() {
     navigating.current = true;
     dismiss();
     if (current.linkedOrderId) {
-      router.push(`/order/${current.linkedOrderId}` as any);
+      const scrollQuery = current.actionType === "upload_receipt" ? "?scrollTo=payment" : "";
+      router.push(`/order/${current.linkedOrderId}${scrollQuery}` as any);
     } else if (current.linkedReturnId) {
       router.push(`/return/${current.linkedReturnId}` as any);
     } else {
