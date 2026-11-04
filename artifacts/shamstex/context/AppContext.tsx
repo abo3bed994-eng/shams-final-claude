@@ -1082,21 +1082,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // We listen and force-logout if the local secure token no longer matches the remote one.
   useEffect(() => {
     if (!user?.phone) return;
-    // Admins are exempt from single-device forced logout so management across
-    // multiple devices (e.g. phone + shop tablet or dev preview) works seamlessly.
-    if (user.role === "admin") return;
     let cancelled = false;
     let unsub: (() => void) | undefined;
 
     (async () => {
-      const localToken = await getSecureItem("sessionToken");
-      if (!localToken || cancelled) return;
-
       // Sessions are keyed by the E.164 phone (matches firestore.rules); legacy
       // local-format phones must be migrated to the same key used at login.
       unsub = FS.subscribeSession(migrateLocalToE164(user.phone), async (remoteToken) => {
         if (cancelled || !remoteToken) return;
-        if (remoteToken !== localToken) {
+        const currentLocal =
+          (await getSecureItem("sessionToken")) ||
+          userRef.current?.sessionToken ||
+          (user as any)?.sessionToken;
+        if (!currentLocal) return;
+        if (remoteToken !== currentLocal) {
           if (remoteToken.startsWith("revoked_")) {
             const isMerchant = remoteToken.includes("promoted_merchant");
             forceLogoutRoleChanged(isMerchant ? "merchant" : "customer");
@@ -1333,7 +1332,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               FS.getSession(migrateLocalToE164(parsedUser.phone)),
               new Promise<null>((resolve) => setTimeout(() => resolve(null), 3500)),
             ]);
-            if (remoteToken && remoteToken !== secureToken && parsedUser.role !== "admin") {
+            if (remoteToken && remoteToken !== secureToken) {
               await AsyncStorage.removeItem("user");
               await deleteSecureItem("sessionToken");
               setUserState(null);
