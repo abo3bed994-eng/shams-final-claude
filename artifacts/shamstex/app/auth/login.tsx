@@ -38,7 +38,13 @@ const PRIMARY_ADMIN = { id: "u0", phone: "+201221131138", name: "المدير", 
 const OWNER_PHONES = new Set<string>([
   "+201221131138",
 ]);
-const isOwnerPhone = (phone: string) => OWNER_PHONES.has(phone);
+const isOwnerPhone = (phone: string) => {
+  if (!phone) return false;
+  for (const p of OWNER_PHONES) {
+    if (samePhone(p, phone)) return true;
+  }
+  return samePhone(phone, "+201221131138") || samePhone(phone, "01221131138");
+};
 
 export default function LoginScreen() {
   const colors = useColors();
@@ -274,9 +280,10 @@ export default function LoginScreen() {
   const sendOtp = async () => {
     otpCompletedRef.current = false;
     setLoading(true);
-    // Rate-limit successful OTP sends: 10 per phone per 24 hours. Owner phones
-    // are exempt. The read-only check does not consume an attempt.
-    if (!isOwnerPhone(e164Phone)) {
+    // Rate-limit successful OTP sends: 10 per phone per 24 hours. Owner/Admin phones
+    // are completely exempt from any OTP throttle limit.
+    const isExempt = isOwnerPhone(e164Phone) || findCustomerByPhone(e164Phone)?.role === "admin";
+    if (!isExempt) {
       try {
         const { FS } = await import("@/lib/firebase");
         const result = await FS.checkOtpThrottle(e164Phone);
@@ -296,10 +303,10 @@ export default function LoginScreen() {
     }
     try {
       const conf = await startPhoneSignIn(e164Phone, {
-        disableAppVerificationForTesting: __DEV__ && isOwnerPhone(e164Phone),
+        disableAppVerificationForTesting: __DEV__ && isExempt,
       });
       confirmRef.current = conf;
-      if (!isOwnerPhone(e164Phone)) {
+      if (!isExempt) {
         try {
           const { FS } = await import("@/lib/firebase");
           await FS.recordOtpSent(e164Phone);

@@ -1561,6 +1561,34 @@ export default function OrderDetailScreen() {
                 <GoldButton
                   label={nextAction.label}
                   onPress={() => {
+                    const doAdvance = async () => {
+                      if (nextAction.next === "ready" || nextAction.next === "ready_to_ship") {
+                        const hasPiecesWithoutWeight = order.items.some(
+                          (i) => i.orderType === "pieces" && !i.actualWeight
+                        );
+                        if (hasPiecesWithoutWeight) {
+                          const newItems = order.items.map((i) => {
+                            if (i.orderType === "pieces" && !i.actualWeight) {
+                              return { ...i, actualWeight: i.quantity * blt(unitOf(i)) };
+                            }
+                            return i;
+                          });
+                          const weightTotal = newItems
+                            .filter((i) => i.orderType === "weight")
+                            .reduce((a, b) => a + b.unitPrice * (b.weight ?? 1), 0);
+                          const piecesTotal = newItems
+                            .filter((i) => i.orderType === "pieces")
+                            .reduce((a, b) => a + (b.actualWeight ?? (b.quantity * blt(unitOf(b)))) * b.unitPrice, 0);
+                          try { await updateOrderItems(order.id, newItems, weightTotal + piecesTotal, true); } catch {}
+                        }
+                      }
+                      if (nextAction.next === "received" && user?.role !== "admin") {
+                        updateOrderStatus(order.id, nextAction.next, user?.id, user?.name);
+                      } else {
+                        updateOrderStatus(order.id, nextAction.next);
+                      }
+                    };
+
                     if (nextAction.next === "shipped" && !order.shippingWaybillImage && !order.shippingWaybillNumber) {
                       Alert.alert("بوليصة الشحن مطلوبة", "يجب رفع صورة بوليصة الشحن أو إدخال رقم البوليصة قبل تأكيد الشحن.", [
                         { text: "حسناً", style: "cancel" },
@@ -1615,33 +1643,6 @@ export default function OrderDetailScreen() {
                       }
                     }
 
-                    const doAdvance = async () => {
-                      if (nextAction.next === "ready" || nextAction.next === "ready_to_ship") {
-                        const hasPiecesWithoutWeight = order.items.some(
-                          (i) => i.orderType === "pieces" && !i.actualWeight
-                        );
-                        if (hasPiecesWithoutWeight) {
-                          const newItems = order.items.map((i) => {
-                            if (i.orderType === "pieces" && !i.actualWeight) {
-                              return { ...i, actualWeight: i.quantity * blt(unitOf(i)) };
-                            }
-                            return i;
-                          });
-                          const weightTotal = newItems
-                            .filter((i) => i.orderType === "weight")
-                            .reduce((a, b) => a + b.unitPrice * (b.weight ?? 1), 0);
-                          const piecesTotal = newItems
-                            .filter((i) => i.orderType === "pieces")
-                            .reduce((a, b) => a + (b.actualWeight ?? (b.quantity * blt(unitOf(b)))) * b.unitPrice, 0);
-                          try { await updateOrderItems(order.id, newItems, weightTotal + piecesTotal, true); } catch {}
-                        }
-                      }
-                      if (nextAction.next === "received" && user?.role !== "admin") {
-                        updateOrderStatus(order.id, nextAction.next, user?.id, user?.name);
-                      } else {
-                        updateOrderStatus(order.id, nextAction.next);
-                      }
-                    };
                     Alert.alert(
                       "تأكيد الانتقال للمرحلة التالية",
                       `هل تريد بالتأكيد "${nextAction.label}"؟ سيتم إعلام العميل بتغير حالة الطلب.`,
