@@ -23,7 +23,7 @@ import GoldButton from "@/components/GoldButton";
 export default function ProfileScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { user, setUser, orders, addNotification, updateRegisteredCustomer, theme, setTheme, language, setLanguage, registeredCustomers, settings } = useApp();
+  const { user, setUser, orders, addNotification, updateRegisteredCustomer, theme, setTheme, language, setLanguage, registeredCustomers, settings, editingOrderId } = useApp();
   const { t, isRTL } = useTranslation();
 
   const systemScheme = useColorScheme();
@@ -109,7 +109,17 @@ export default function ProfileScreen() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="إعدادات الحساب"
-            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/profile/settings" as any); }}
+            onPress={() => {
+              if (editingOrderId && (user?.role === "customer" || user?.role === "merchant")) {
+                Alert.alert(
+                  "تعديل الطلب جاري",
+                  "لا يمكنك الدخول إلى الإعدادات أثناء تعديل الطلب. يرجى إتمام التعديل أو إلغاؤه من السلة أولاً."
+                );
+                return;
+              }
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push("/profile/settings" as any);
+            }}
             style={({ pressed }) => [styles.settingsButton, { backgroundColor: colors.gold + "18", borderColor: colors.gold + "44", opacity: pressed ? 0.65 : 1 }]}
           >
             <Icon name="settings" size={20} color={colors.gold} />

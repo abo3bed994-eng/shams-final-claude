@@ -11,7 +11,7 @@ import { filterNotificationsForUser } from "@/lib/notificationFilter";
 export default function NotificationsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { notifications, markNotificationRead, markAllNotificationsRead, user, registeredCustomers, updateRegisteredCustomer, isNotifReadForUser } = useApp();
+  const { notifications, markNotificationRead, markAllNotificationsRead, user, registeredCustomers, updateRegisteredCustomer, isNotifReadForUser, editingOrderId } = useApp();
   const markedRef = useRef(false);
 
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
@@ -68,6 +68,13 @@ export default function NotificationsScreen() {
     if (navigatingRef.current) return;
     navigatingRef.current = true;
     if (notif.linkedOrderId) {
+      if (editingOrderId && (user?.role === "customer" || user?.role === "merchant")) {
+        Alert.alert(
+          "تعديل الطلب جاري",
+          "أنت حالياً في وضع تعديل الطلب. يرجى إتمام تعديل طلبك أو إلغاؤه من السلة أولاً."
+        );
+        return;
+      }
       const scrollQuery = notif.actionType === "upload_receipt" ? "?scrollTo=payment" : "";
       router.push(`/order/${notif.linkedOrderId}${scrollQuery}`);
     } else if (notif.linkedReturnId) {

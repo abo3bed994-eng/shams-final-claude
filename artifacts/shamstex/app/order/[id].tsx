@@ -153,7 +153,7 @@ export default function OrderDetailScreen() {
   const { id, scrollTo } = useLocalSearchParams<{ id: string; scrollTo?: string }>();
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { orders, user, updateOrderStatus, deleteOrder, sendOrderMessage, setOrderEditable, setOrderEditExpiry, beginOrderEdit, updateOrderItems, returnRequests, addReturnRequest, updateReturnStatus, setEditingOrderId, settings, products, cancelOrder, setOrderTransferProof, setOrderPaymentMethod, setOrderPaymentOverride, setOrderShipping, notifyCustomerOrderChanges, respondToOrderApproval } = useApp();
+  const { orders, user, updateOrderStatus, deleteOrder, sendOrderMessage, setOrderEditable, setOrderEditExpiry, beginOrderEdit, updateOrderItems, returnRequests, addReturnRequest, updateReturnStatus, setEditingOrderId, editingOrderId, settings, products, cancelOrder, setOrderTransferProof, setOrderPaymentMethod, setOrderPaymentOverride, setOrderShipping, notifyCustomerOrderChanges, respondToOrderApproval } = useApp();
   const unitOf = (it: { productId: string; unit?: string }) => products.find(p => p.id === it.productId)?.unit ?? it.unit;
   const boltsOf = (weight: number | undefined, it: { productId: string; unit?: string }) => Math.floor((weight ?? 0) / blt(unitOf(it)));
   const [showMsgInput, setShowMsgInput] = useState(false);
@@ -194,6 +194,18 @@ export default function OrderDetailScreen() {
 
   const [notifyingCustomer, setNotifyingCustomer] = useState(false);
   const [respondingApproval, setRespondingApproval] = useState(false);
+  const isNavigatingToCartRef = useRef(false);
+
+  useEffect(() => {
+    const isCustomer = user?.role === "customer" || user?.role === "merchant";
+    if (editingOrderId && isCustomer && !isNavigatingToCartRef.current && !respondingApproval) {
+      Alert.alert(
+        "تعديل الطلب جاري",
+        "لا يمكنك فتح شاشة الطلب أثناء وجود تعديل طلب جاري. يرجى إتمام التعديل أو إلغاؤه من السلة أولاً."
+      );
+      router.replace("/cart" as any);
+    }
+  }, [editingOrderId, user?.role, respondingApproval]);
   const openBulkAvail = () => {
     if (!order) return;
     const source = order.pendingStaffItems ?? order.items;
@@ -1831,10 +1843,11 @@ export default function OrderDetailScreen() {
                     [
                       { text: "تراجع", style: "cancel" },
                       {
-                        text: "غير موافق، أريد التعديل",
+                        text: "تعديل الطلب",
                         style: "destructive",
                         onPress: async () => {
                           setRespondingApproval(true);
+                          isNavigatingToCartRef.current = true;
                           try {
                             await respondToOrderApproval(order.id, false);
                             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
@@ -1992,6 +2005,7 @@ export default function OrderDetailScreen() {
               <Pressable
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                  isNavigatingToCartRef.current = true;
                   beginOrderEdit(order.id);
                   router.push("/cart" as any);
                 }}

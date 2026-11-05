@@ -2,7 +2,7 @@ import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
 import Icon from "@/components/Icon";
 import React, { useMemo } from "react";
-import { Animated, Platform, Pressable, StyleSheet, Text, View, useColorScheme, useWindowDimensions } from "react-native";
+import { Alert, Animated, Platform, Pressable, StyleSheet, Text, View, useColorScheme, useWindowDimensions } from "react-native";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useApp } from "@/context/AppContext";
@@ -99,7 +99,7 @@ function MovingTabBubble({
 
 export default function TabLayout() {
   const colors = useColors();
-  const { theme, orders, user, returnRequests, cart } = useApp();
+  const { theme, orders, user, returnRequests, cart, editingOrderId } = useApp();
   const { t } = useTranslation();
   const systemScheme = useColorScheme();
   const isDark = theme === "system" ? systemScheme !== "light" : theme === "dark";
@@ -214,6 +214,13 @@ export default function TabLayout() {
           const color = focused ? (isDark ? colors.gold : colors.goldLight) : colors.mutedForeground;
           const badge = descriptor.options.tabBarBadge;
           const onPress = () => {
+            if (name === "orders" && editingOrderId && (user?.role === "customer" || user?.role === "merchant")) {
+              Alert.alert(
+                "تعديل الطلب جاري",
+                "أنت حالياً في وضع تعديل الطلب. يرجى إتمام تعديل طلبك أو إلغاؤه من السلة أولاً للعودة لقائمة الطلبات."
+              );
+              return;
+            }
             const event = props.navigation.emit({ type: "tabPress", target: route.key, canPreventDefault: true });
             if (!focused && !event.defaultPrevented) props.navigation.navigate(route.name);
           };

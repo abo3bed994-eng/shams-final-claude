@@ -14,7 +14,7 @@ import { samePhone } from "@/lib/phoneUtils";
 export default function SettingsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { user, setUser, updateRegisteredCustomer, deleteRegisteredCustomer, setCustomerPin, verifyCustomerPin, registeredCustomers, showToast } = useApp();
+  const { user, setUser, updateRegisteredCustomer, deleteRegisteredCustomer, setCustomerPin, verifyCustomerPin, registeredCustomers, showToast, editingOrderId } = useApp();
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const isOwner = Boolean(
@@ -36,6 +36,16 @@ export default function SettingsScreen() {
   const [showPasswordText, setShowPasswordText] = useState(false);
   const [savingPin, setSavingPin] = useState(false);
   const [pinError, setPinError] = useState("");
+
+  React.useEffect(() => {
+    if (editingOrderId && (user?.role === "customer" || user?.role === "merchant")) {
+      Alert.alert(
+        "تعديل الطلب جاري",
+        "لا يمكنك الدخول إلى الإعدادات أثناء تعديل الطلب. يرجى إتمام التعديل أو إلغاؤه من السلة أولاً."
+      );
+      router.back();
+    }
+  }, [editingOrderId, user?.role]);
 
   if (!user) return null;
 
@@ -102,6 +112,13 @@ export default function SettingsScreen() {
   };
 
   const handleLogout = () => {
+    if (editingOrderId && (user?.role === "customer" || user?.role === "merchant")) {
+      Alert.alert(
+        "تعديل الطلب جاري",
+        "لا يمكنك تسجيل الخروج أثناء تعديل الطلب. يرجى إتمام التعديل أو إلغاؤه من السلة أولاً."
+      );
+      return;
+    }
     if (Platform.OS === "web") {
       if (window.confirm("هل أنت متأكد من رغبتك في تسجيل الخروج؟")) {
         router.replace("/auth/login");

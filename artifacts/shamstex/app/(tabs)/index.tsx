@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  Alert,
   Animated,
   AppState,
   FlatList,
@@ -28,7 +29,7 @@ import { filterNotificationsForUser } from "@/lib/notificationFilter";
 export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { user, products, notifications, cart, settings, orders, onlineCount, favorites, canViewPriceMenu } = useApp();
+  const { user, products, notifications, cart, settings, orders, onlineCount, favorites, canViewPriceMenu, editingOrderId } = useApp();
   const { t, isRTL } = useTranslation();
 
   const videos = settings.bannerVideoUris ?? [];
@@ -268,7 +269,16 @@ export default function HomeScreen() {
         </View>
 
         <Pressable
-          onPress={() => router.push("/profile")}
+          onPress={() => {
+            if (editingOrderId && (user?.role === "customer" || user?.role === "merchant")) {
+              Alert.alert(
+                "تعديل الطلب جاري",
+                "لا يمكنك الانتقال إلى الإعدادات أو الملف الشخصي أثناء تعديل الطلب. يرجى إتمام التعديل أو إلغاؤه من السلة أولاً."
+              );
+              return;
+            }
+            router.push("/profile");
+          }}
           style={({ pressed }) => [
             styles.avatarBtn,
             { backgroundColor: colors.gold + "22", borderColor: colors.gold + "44", opacity: pressed ? 0.7 : 1 },
@@ -390,7 +400,16 @@ export default function HomeScreen() {
 
             {activeOrders.length > 0 && (
               <Pressable
-                onPress={() => router.push("/(tabs)/orders")}
+                onPress={() => {
+                  if (editingOrderId && (user?.role === "customer" || user?.role === "merchant")) {
+                    Alert.alert(
+                      "تعديل الطلب جاري",
+                      "أنت حالياً في وضع تعديل الطلب. يرجى إتمام تعديل طلبك أو إلغاؤه من السلة أولاً للعودة للطلبات."
+                    );
+                    return;
+                  }
+                  router.push("/(tabs)/orders");
+                }}
                 style={[styles.activeOrdersCard, { backgroundColor: colors.card, borderColor: colors.gold + "44", borderRadius: colors.radius }]}
               >
                 <View style={styles.activeOrdersHeader}>

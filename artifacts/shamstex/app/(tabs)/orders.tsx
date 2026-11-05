@@ -26,7 +26,7 @@ type FilterType = "all" | "scheduled" | "pending" | "received" | "preparing" | "
 export default function OrdersScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { user, orders, updateOrderStatus, deleteOrder, cancelOrder, cart, returnRequests, updateReturnStatus, deleteReturnRequest } = useApp();
+  const { user, orders, updateOrderStatus, deleteOrder, cancelOrder, cart, returnRequests, updateReturnStatus, deleteReturnRequest, editingOrderId } = useApp();
   const cartCount = cart.length;
   const cartPulse = useCartPulse(cartCount);
   const { t, isRTL } = useTranslation();
@@ -343,7 +343,16 @@ export default function OrdersScreen() {
           isAdmin={canEditStatus}
           canControl={userCanControlThisOrder}
           hasReturn={activeReturnOrderIds.has(order.id)}
-          onPress={() => router.push(`/order/${order.id}`)}
+          onPress={() => {
+            if (editingOrderId && (user?.role === "customer" || user?.role === "merchant")) {
+              Alert.alert(
+                "تعديل الطلب جاري",
+                "أنت حالياً في وضع تعديل الطلب. يرجى إتمام تعديل طلبك أو إلغاؤه من السلة أولاً."
+              );
+              return;
+            }
+            router.push(`/order/${order.id}`);
+          }}
           onStatusChange={
             canEditStatus && order.status !== "cancelled" && userCanControlThisOrder
               ? (status: OrderStatus) => {
