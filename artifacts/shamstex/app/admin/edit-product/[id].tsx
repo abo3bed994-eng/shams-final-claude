@@ -70,10 +70,12 @@ export default function EditProductScreen() {
   }
 
   const pickImage = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert("صلاحية مطلوبة", "يرجى السماح بالوصول إلى معرض الصور");
-      return;
+    if (Platform.OS === "ios") {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert("صلاحية مطلوبة", "يرجى السماح بالوصول إلى معرض الصور");
+        return;
+      }
     }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,

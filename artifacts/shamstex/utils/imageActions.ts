@@ -37,7 +37,7 @@ export async function saveImageToDevice(uri: string, baseName = "shamstex"): Pro
     return;
   }
   try {
-    const perm = await MediaLibrary.requestPermissionsAsync();
+    const perm = await MediaLibrary.requestPermissionsAsync(true);
     if (!perm.granted) {
       Alert.alert("صلاحية مطلوبة", "يرجى السماح بالوصول إلى الصور لحفظها");
       return;

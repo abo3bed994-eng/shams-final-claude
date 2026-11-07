@@ -1,6 +1,6 @@
 import AppTextInput from "@/components/AppTextInput";
 import React, { useCallback, useMemo, useState } from "react";
-import { ActivityIndicator, Alert, Image, Pressable, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, Image, Platform, Pressable, Text, TextInput, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as Haptics from "expo-haptics";
 import DraggableFlatList, { RenderItemParams, ScaleDecorator } from "react-native-draggable-flatlist";
@@ -117,10 +117,12 @@ export default function PriceMenuSettingsScreen() {
   };
 
   const pickBackground = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert("صلاحية مطلوبة", "يرجى السماح بالوصول إلى المعرض");
-      return;
+    if (Platform.OS === "ios") {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert("صلاحية مطلوبة", "يرجى السماح بالوصول إلى المعرض");
+        return;
+      }
     }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
