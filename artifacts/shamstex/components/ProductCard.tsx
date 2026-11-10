@@ -1,5 +1,6 @@
 import React from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "@/components/Icon";
 import { cardShadow } from "@/constants/shadows";
@@ -59,7 +60,13 @@ export default React.memo(function ProductCard({ product, onPress }: ProductCard
           style={({ pressed }) => [styles.cardInner, { opacity: pressed ? 0.9 : 1 }]}
         >
           {product.images.length > 0 ? (
-            <Image source={{ uri: product.images[0] }} style={styles.image} resizeMode="cover" />
+            <Image
+              source={{ uri: product.images[0] }}
+              style={styles.image}
+              contentFit="cover"
+              cachePolicy="memory-disk"
+              transition={150}
+            />
           ) : (
             <View style={styles.placeholderImage}>
               <Icon name="layers" size={40} color={isOutOfStock ? "#C0392B88" : colors.goldDark} />

@@ -1,3 +1,4 @@
+import { Image as ExpoImage } from "expo-image";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
@@ -313,10 +314,12 @@ export default function HomeScreen() {
                     nativeControls={false}
                   />
                 ) : hasImage ? (
-                  <Image
+                  <ExpoImage
                     source={{ uri: currentImageUri }}
                     style={StyleSheet.absoluteFill}
-                    resizeMode="cover"
+                    contentFit="cover"
+                    cachePolicy="memory-disk"
+                    transition={200}
                   />
                 ) : (
                   <Image

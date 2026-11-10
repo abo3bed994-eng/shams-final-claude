@@ -1,9 +1,9 @@
+import { Image } from "expo-image";
 import AppTextInput from "@/components/AppTextInput";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Animated,
   FlatList,
-  Image,
   Platform,
   Pressable,
   ScrollView,
@@ -72,7 +72,13 @@ function ProductRowCard({ product, onPress }: { product: Product; onPress: () =>
         {/* Right side: Image thumbnail */}
         <View style={styles.rowImageWrap}>
           {product.images.length > 0 ? (
-            <Image source={{ uri: product.images[0] }} style={styles.rowImage} resizeMode="cover" />
+            <Image
+              source={{ uri: product.images[0] }}
+              style={styles.rowImage}
+              contentFit="cover"
+              cachePolicy="memory-disk"
+              transition={150}
+            />
           ) : (
             <View style={[styles.rowPlaceholderImage, { backgroundColor: colors.input }]}>
               <Icon name="layers" size={28} color={isOutOfStock ? "#C0392B88" : colors.goldDark} />
@@ -221,7 +227,13 @@ function ProductGridCard({ product, onPress }: { product: Product; onPress: () =
         {/* Top: Image */}
         <View style={styles.gridImageWrap}>
           {product.images.length > 0 ? (
-            <Image source={{ uri: product.images[0] }} style={styles.gridImage} resizeMode="cover" />
+            <Image
+              source={{ uri: product.images[0] }}
+              style={styles.gridImage}
+              contentFit="cover"
+              cachePolicy="memory-disk"
+              transition={150}
+            />
           ) : (
             <View style={[styles.gridPlaceholderImage, { backgroundColor: colors.input }]}>
               <Icon name="layers" size={32} color={isOutOfStock ? "#C0392B88" : colors.goldDark} />

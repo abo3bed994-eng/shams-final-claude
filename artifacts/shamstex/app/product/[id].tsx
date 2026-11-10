@@ -1,3 +1,4 @@
+import { Image as ExpoImage } from "expo-image";
 import AppTextInput from "@/components/AppTextInput";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -1048,10 +1049,12 @@ export default function ProductDetailScreen() {
                     setViewerVisible(true);
                   }}
                 >
-                  <Image
+                  <ExpoImage
                     source={{ uri }}
                     style={{ width: imgWidth, height: 220 }}
-                    resizeMode="cover"
+                    contentFit="cover"
+                    cachePolicy="memory-disk"
+                    transition={150}
                   />
                 </Pressable>
               ))}
