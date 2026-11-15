@@ -512,6 +512,7 @@ interface AppContextType {
   setProducts: (products: Product[]) => Promise<void>;
   addProductOne: (product: Product) => Promise<void>;
   updateProductOne: (product: Product) => Promise<void>;
+  updateProductsBatch: (products: Product[]) => Promise<void>;
   deleteProductOne: (productId: string) => Promise<void>;
   cart: CartItem[];
   setCart: (items: CartItem[]) => void;
@@ -1765,6 +1766,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return next;
     });
     await FS.saveProduct(product);
+  }, []);
+
+  const updateProductsBatch = useCallback(async (updatedProducts: Product[]) => {
+    if (!updatedProducts || updatedProducts.length === 0) return;
+    const updateMap = new Map(updatedProducts.map((p) => [p.id, p]));
+    setProductsState((prev) => {
+      const next = prev.map((p) => updateMap.get(p.id) ?? p);
+      AsyncStorage.setItem("products", JSON.stringify(next)).catch(() => {});
+      return next;
+    });
+    await FS.saveProductsBatch(updatedProducts);
   }, []);
 
   const deleteProductOne = useCallback(async (productId: string) => {
@@ -3291,6 +3303,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setProducts,
         addProductOne,
         updateProductOne,
+        updateProductsBatch,
         deleteProductOne,
         cart,
         setCart,

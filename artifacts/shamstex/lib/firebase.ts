@@ -118,6 +118,19 @@ export const FS = {
     await setDoc(doc(db, "products", product.id), stripUndefined(product));
   },
 
+  async saveProductsBatch(products: (object & { id: string })[]) {
+    if (!products || products.length === 0) return;
+    const BATCH_SIZE = 500;
+    for (let i = 0; i < products.length; i += BATCH_SIZE) {
+      const batch = writeBatch(db);
+      const chunk = products.slice(i, i + BATCH_SIZE);
+      for (const p of chunk) {
+        batch.set(doc(db, "products", p.id), stripUndefined(p));
+      }
+      await batch.commit();
+    }
+  },
+
   async deleteProduct(productId: string) {
     await deleteDoc(doc(db, "products", productId));
   },
