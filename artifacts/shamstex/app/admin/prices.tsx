@@ -2,8 +2,10 @@ import AppTextInput from "@/components/AppTextInput";
 import React, { useState, useMemo } from "react";
 import {
   Alert,
+  Modal,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -32,11 +34,12 @@ export default function AdminPricesScreen() {
   useAdminGuard("edit_products");
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { products, updateProductsBatch } = useApp();
+  const { products, updateProductsBatch, settings } = useApp();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
 
+  // Single row edit values
   const [editValues, setEditValues] = useState<{
     name: string;
     retail: string;
@@ -53,17 +56,78 @@ export default function AdminPricesScreen() {
     priceMenuNew: false,
   });
 
+  // Staged batch changes (keyed by product id)
   const [pendingChanges, setPendingChanges] = useState<Record<string, PendingChange>>({});
   const [isSaving, setIsSaving] = useState(false);
+
+  // Bulk Edit Modal State
+  const [bulkModalVisible, setBulkModalVisible] = useState(false);
+  const [bulkCategory, setBulkCategory] = useState<string>("all");
+  const [bulkSubcategory, setBulkSubcategory] = useState<string>("all");
+  const [bulkTarget, setBulkTarget] = useState<"both" | "retail" | "wholesale">("both");
+  const [bulkDirection, setBulkDirection] = useState<"increase" | "decrease">("increase");
+  const [bulkAmount, setBulkAmount] = useState<string>("");
 
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
   const pendingCount = Object.keys(pendingChanges).length;
 
+  // Filtered products for search
   const filteredProducts = useMemo(() => {
     if (!searchQuery.trim()) return products;
     const q = searchQuery.trim().toLowerCase();
     return products.filter((p) => p.name.toLowerCase().includes(q));
   }, [products, searchQuery]);
+
+  // Available categories extracted from products and settings
+  const availableCategories = useMemo(() => {
+    const cats = new Set<string>();
+    products.forEach((p) => {
+      if (p.category && p.category.trim()) cats.add(p.category.trim());
+    });
+    (settings.categories || []).forEach((c) => {
+      if (c && c !== "الكل" && c.trim()) cats.add(c.trim());
+    });
+    return Array.from(cats);
+  }, [products, settings.categories]);
+
+  // Available subcategories for chosen bulkCategory
+  const availableSubcategories = useMemo(() => {
+    const subs = new Set<string>();
+    if (bulkCategory === "all") {
+      products.forEach((p) => {
+        if (p.subcategory && p.subcategory.trim()) subs.add(p.subcategory.trim());
+      });
+      Object.values(settings.subcategories || {}).forEach((arr) => {
+        arr.forEach((s) => {
+          if (s && s.trim()) subs.add(s.trim());
+        });
+      });
+    } else {
+      products.forEach((p) => {
+        if (p.category === bulkCategory && p.subcategory && p.subcategory.trim()) {
+          subs.add(p.subcategory.trim());
+        }
+      });
+      const configured = settings.subcategories?.[bulkCategory] || [];
+      configured.forEach((s) => {
+        if (s && s.trim()) subs.add(s.trim());
+      });
+    }
+    return Array.from(subs);
+  }, [products, bulkCategory, settings.subcategories]);
+
+  // Products matching bulk edit selection
+  const matchingBulkProducts = useMemo(() => {
+    return products.filter((p) => {
+      if (bulkCategory !== "all" && p.category !== bulkCategory) {
+        return false;
+      }
+      if (bulkSubcategory !== "all" && p.subcategory !== bulkSubcategory) {
+        return false;
+      }
+      return true;
+    });
+  }, [products, bulkCategory, bulkSubcategory]);
 
   const startEdit = (product: Product) => {
     const pending = pendingChanges[product.id];
@@ -213,6 +277,68 @@ export default function AdminPricesScreen() {
     }
   };
 
+  // Bulk Edit Execution Handler
+  const applyBulkEdit = () => {
+    const amount = parseFloat(bulkAmount.trim());
+    if (isNaN(amount) || amount <= 0) {
+      Alert.alert("قيمة غير صحيحة", "يرجى كتابة مبلغ تعديل صحيح أكبر من 0 (مثلاً: 3)");
+      return;
+    }
+
+    if (matchingBulkProducts.length === 0) {
+      Alert.alert("تنبيه", "لا توجد خامات مطابقة للفئة أو الفئة الفرعية المختارة.");
+      return;
+    }
+
+    const delta = bulkDirection === "increase" ? amount : -amount;
+    const trend: Product["priceTrend"] = bulkDirection === "increase" ? "up" : "down";
+
+    setPendingChanges((prev) => {
+      const next = { ...prev };
+
+      for (const p of matchingBulkProducts) {
+        const existing = next[p.id];
+        const curRetail = existing?.retailPrice ?? p.retailPrice;
+        const curWholesale = existing?.wholesalePrice ?? p.wholesalePrice;
+        const curOffer = existing !== undefined ? existing.offerPrice : p.offerPrice;
+
+        let newRetail = curRetail;
+        let newWholesale = curWholesale;
+
+        if (bulkTarget === "both" || bulkTarget === "retail") {
+          newRetail = Math.max(1, Math.round((curRetail + delta) * 100) / 100);
+        }
+        if (bulkTarget === "both" || bulkTarget === "wholesale") {
+          newWholesale = Math.max(1, Math.round((curWholesale + delta) * 100) / 100);
+        }
+
+        let newOffer = curOffer;
+        if (newOffer && newOffer >= newRetail) {
+          newOffer = undefined;
+        }
+
+        next[p.id] = {
+          name: existing?.name ?? p.name,
+          retailPrice: newRetail,
+          wholesalePrice: newWholesale,
+          offerPrice: newOffer,
+          priceTrend: trend,
+          priceMenuNew: existing ? existing.priceMenuNew : p.priceMenuNew,
+        };
+      }
+
+      return next;
+    });
+
+    setBulkModalVisible(false);
+    setBulkAmount("");
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    Alert.alert(
+      "تم التطبيق بنجاح",
+      `تم تعديل أسعار ${matchingBulkProducts.length} خامة بـ (${delta > 0 ? "+" : ""}${delta} ج.م) وتعيين سهم (${trend === "up" ? "صاعد ↑" : "هابط ↓"}). اضغط على "حفظ الكل" بالأسفل لاعتمادها نهائياً.`
+    );
+  };
+
   // Preview helper values for editing row
   const editRetailNum = parseFloat(editValues.retail) || 0;
   const editOfferNum = parseFloat(editValues.offer) || 0;
@@ -227,46 +353,82 @@ export default function AdminPricesScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <GoldHeader title="إدارة الأسعار والعروض" onBack={handleBack} />
 
-      {/* Search & Info Bar */}
-      <View style={[styles.searchBarContainer, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
-        <View style={[styles.searchInputWrapper, { backgroundColor: colors.input, borderColor: colors.border }]}>
-          <Icon name="search" size={16} color={colors.mutedForeground} />
-          <AppTextInput
-            style={[styles.searchInput, { color: colors.foreground, fontFamily: "Cairo_500Medium" }]}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholder="بحث عن خامة..."
-            placeholderTextColor={colors.mutedForeground}
-            textAlign="right"
-          />
-          {searchQuery.length > 0 && (
-            <Pressable onPress={() => setSearchQuery("")} hitSlop={8}>
-              <Icon name="x" size={15} color={colors.mutedForeground} />
-            </Pressable>
-          )}
-        </View>
-
-        <View style={styles.statsRow}>
-          <Text style={[styles.statsText, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
-            الإجمالي: {products.length} خامة
-          </Text>
-          {pendingCount > 0 && (
-            <View style={[styles.pendingPill, { backgroundColor: colors.gold + "22", borderColor: colors.gold }]}>
-              <Text style={[styles.pendingPillText, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
-                {pendingCount} بانتظار الحفظ
-              </Text>
-            </View>
-          )}
-        </View>
-      </View>
-
       <KeyboardAwareScroll
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.content,
-          { paddingBottom: bottomPad + (pendingCount > 0 ? 100 : 40) },
+          { paddingBottom: bottomPad + (pendingCount > 0 ? 110 : 40) },
         ]}
       >
+        {/* Search & Bulk Action Controls (Inside ScrollView so it scrolls up to expand screen space) */}
+        <View
+          style={[
+            styles.searchCard,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+              borderRadius: colors.radius,
+            },
+          ]}
+        >
+          <View style={styles.topActionsRow}>
+            {/* Search Input Box */}
+            <View
+              style={[
+                styles.searchInputWrapper,
+                { backgroundColor: colors.input, borderColor: colors.border },
+              ]}
+            >
+              <Icon name="search" size={16} color={colors.mutedForeground} />
+              <AppTextInput
+                style={[styles.searchInput, { color: colors.foreground, fontFamily: "Cairo_500Medium" }]}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                placeholder="بحث عن خامة..."
+                placeholderTextColor={colors.mutedForeground}
+                textAlign="right"
+              />
+              {searchQuery.length > 0 && (
+                <Pressable onPress={() => setSearchQuery("")} hitSlop={8}>
+                  <Icon name="x" size={14} color={colors.mutedForeground} />
+                </Pressable>
+              )}
+            </View>
+
+            {/* Bulk Edit Button */}
+            <Pressable
+              onPress={() => setBulkModalVisible(true)}
+              style={({ pressed }) => [
+                styles.bulkButton,
+                {
+                  backgroundColor: colors.gold + "18",
+                  borderColor: colors.gold,
+                  opacity: pressed ? 0.8 : 1,
+                },
+              ]}
+            >
+              <Icon name="layers" size={15} color={colors.gold} />
+              <Text style={[styles.bulkButtonText, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
+                تعديل جماعي
+              </Text>
+            </Pressable>
+          </View>
+
+          {/* Quick stats and pending badge */}
+          <View style={styles.statsRow}>
+            <Text style={[styles.statsText, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
+              الإجمالي: {products.length} خامة {searchQuery.trim() ? `(المطابق: ${filteredProducts.length})` : ""}
+            </Text>
+            {pendingCount > 0 && (
+              <View style={[styles.pendingPill, { backgroundColor: colors.gold + "22", borderColor: colors.gold }]}>
+                <Text style={[styles.pendingPillText, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
+                  {pendingCount} بانتظار الحفظ
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+
         {/* Table Column Headers */}
         <View style={[styles.headerRow, { borderBottomColor: colors.border }]}>
           <Text style={[styles.colHeader, { color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold", flex: 1 }]}>
@@ -278,9 +440,10 @@ export default function AdminPricesScreen() {
           <Text style={[styles.colHeader, { color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold", flex: 2, textAlign: "right", paddingRight: 6 }]}>
             اسم الخامة
           </Text>
-          <View style={{ width: 24 }} />
+          <View style={{ width: 22 }} />
         </View>
 
+        {/* Products List */}
         {filteredProducts.map((product) => {
           const isEditing = editingId === product.id;
           const pending = pendingChanges[product.id];
@@ -724,33 +887,399 @@ export default function AdminPricesScreen() {
           </View>
         </View>
       )}
+
+      {/* Bulk Price Edit Modal */}
+      <Modal
+        visible={bulkModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setBulkModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View
+            style={[
+              styles.modalCard,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.gold + "55",
+                borderRadius: colors.radius,
+              },
+            ]}
+          >
+            {/* Modal Header */}
+            <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+              <Pressable
+                onPress={() => setBulkModalVisible(false)}
+                hitSlop={10}
+                style={styles.modalCloseBtn}
+              >
+                <Icon name="x" size={18} color={colors.mutedForeground} />
+              </Pressable>
+              <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
+                <Icon name="layers" size={18} color={colors.gold} />
+                <Text style={[styles.modalTitle, { color: colors.gold, fontFamily: "Cairo_700Bold" }]}>
+                  تعديل جماعي للأسعار
+                </Text>
+              </View>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.modalBody}>
+              {/* Step 1: Select Main Category */}
+              <View style={styles.modalSection}>
+                <Text style={[styles.sectionLabel, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
+                  1. الفئة الرئيسية:
+                </Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsScroll}>
+                  <Pressable
+                    onPress={() => {
+                      setBulkCategory("all");
+                      setBulkSubcategory("all");
+                    }}
+                    style={[
+                      styles.chip,
+                      {
+                        backgroundColor: bulkCategory === "all" ? colors.gold : colors.surface,
+                        borderColor: bulkCategory === "all" ? colors.gold : colors.border,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.chipText,
+                        {
+                          color: bulkCategory === "all" ? colors.background : colors.foreground,
+                          fontFamily: "Cairo_700Bold",
+                        },
+                      ]}
+                    >
+                      جميع الفئات
+                    </Text>
+                  </Pressable>
+
+                  {availableCategories.map((cat) => (
+                    <Pressable
+                      key={cat}
+                      onPress={() => {
+                        setBulkCategory(cat);
+                        setBulkSubcategory("all");
+                      }}
+                      style={[
+                        styles.chip,
+                        {
+                          backgroundColor: bulkCategory === cat ? colors.gold : colors.surface,
+                          borderColor: bulkCategory === cat ? colors.gold : colors.border,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.chipText,
+                          {
+                            color: bulkCategory === cat ? colors.background : colors.foreground,
+                            fontFamily: "Cairo_600SemiBold",
+                          },
+                        ]}
+                      >
+                        {cat}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              </View>
+
+              {/* Step 2: Select Subcategory (if available) */}
+              {availableSubcategories.length > 0 && (
+                <View style={styles.modalSection}>
+                  <Text style={[styles.sectionLabel, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
+                    2. الفئة الفرعية:
+                  </Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsScroll}>
+                    <Pressable
+                      onPress={() => setBulkSubcategory("all")}
+                      style={[
+                        styles.chip,
+                        {
+                          backgroundColor: bulkSubcategory === "all" ? colors.gold + "28" : colors.surface,
+                          borderColor: bulkSubcategory === "all" ? colors.gold : colors.border,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.chipText,
+                          {
+                            color: bulkSubcategory === "all" ? colors.gold : colors.foreground,
+                            fontFamily: "Cairo_700Bold",
+                          },
+                        ]}
+                      >
+                        الكل
+                      </Text>
+                    </Pressable>
+
+                    {availableSubcategories.map((sub) => (
+                      <Pressable
+                        key={sub}
+                        onPress={() => setBulkSubcategory(sub)}
+                        style={[
+                          styles.chip,
+                          {
+                            backgroundColor: bulkSubcategory === sub ? colors.gold + "28" : colors.surface,
+                            borderColor: bulkSubcategory === sub ? colors.gold : colors.border,
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.chipText,
+                            {
+                              color: bulkSubcategory === sub ? colors.gold : colors.foreground,
+                              fontFamily: "Cairo_600SemiBold",
+                            },
+                          ]}
+                        >
+                          {sub}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
+
+              {/* Step 3: Select Target Price */}
+              <View style={styles.modalSection}>
+                <Text style={[styles.sectionLabel, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
+                  3. السعر المراد تعديله:
+                </Text>
+                <View style={styles.targetRow}>
+                  {([
+                    { key: "both", label: "التاجر والزبون" },
+                    { key: "retail", label: "سعر الزبون فقط" },
+                    { key: "wholesale", label: "سعر التاجر فقط" },
+                  ] as const).map((t) => (
+                    <Pressable
+                      key={t.key}
+                      onPress={() => setBulkTarget(t.key)}
+                      style={[
+                        styles.targetPill,
+                        {
+                          backgroundColor: bulkTarget === t.key ? colors.gold + "22" : colors.surface,
+                          borderColor: bulkTarget === t.key ? colors.gold : colors.border,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 11.5,
+                          color: bulkTarget === t.key ? colors.gold : colors.foreground,
+                          fontFamily: bulkTarget === t.key ? "Cairo_700Bold" : "Cairo_500Medium",
+                        }}
+                      >
+                        {t.label}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </View>
+
+              {/* Step 4: Direction (Increase / Decrease) & Amount */}
+              <View style={styles.modalSection}>
+                <Text style={[styles.sectionLabel, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
+                  4. نوع وقيمة التعديل:
+                </Text>
+
+                {/* Direction Buttons */}
+                <View style={styles.directionRow}>
+                  <Pressable
+                    onPress={() => setBulkDirection("increase")}
+                    style={[
+                      styles.directionBtn,
+                      {
+                        backgroundColor: bulkDirection === "increase" ? "#27AE6022" : colors.surface,
+                        borderColor: bulkDirection === "increase" ? "#27AE60" : colors.border,
+                      },
+                    ]}
+                  >
+                    <Icon name="chevron-up" size={16} color="#27AE60" />
+                    <Text
+                      style={{
+                        color: bulkDirection === "increase" ? "#27AE60" : colors.foreground,
+                        fontFamily: "Cairo_700Bold",
+                        fontSize: 12,
+                      }}
+                    >
+                      زيادة السعر (+)
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => setBulkDirection("decrease")}
+                    style={[
+                      styles.directionBtn,
+                      {
+                        backgroundColor: bulkDirection === "decrease" ? "#E74C3C22" : colors.surface,
+                        borderColor: bulkDirection === "decrease" ? "#E74C3C" : colors.border,
+                      },
+                    ]}
+                  >
+                    <Icon name="chevron-down" size={16} color="#E74C3C" />
+                    <Text
+                      style={{
+                        color: bulkDirection === "decrease" ? "#E74C3C" : colors.foreground,
+                        fontFamily: "Cairo_700Bold",
+                        fontSize: 12,
+                      }}
+                    >
+                      تخفيض السعر (-)
+                    </Text>
+                  </Pressable>
+                </View>
+
+                {/* Amount Input */}
+                <View style={{ marginTop: 8 }}>
+                  <Text style={[styles.fieldLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>
+                    مبلغ التعديل بالجنيه
+                  </Text>
+                  <AppTextInput
+                    style={[
+                      styles.editInput,
+                      {
+                        color: bulkDirection === "increase" ? "#27AE60" : "#E74C3C",
+                        backgroundColor: colors.input,
+                        borderColor: colors.border,
+                        fontSize: 17,
+                        fontFamily: "Cairo_700Bold",
+                        textAlign: "center",
+                      },
+                    ]}
+                    value={bulkAmount}
+                    onChangeText={(v) => {
+                      if (/^\d*\.?\d*$/.test(v)) setBulkAmount(v);
+                    }}
+                    placeholder="مثال: 3"
+                    placeholderTextColor={colors.mutedForeground}
+                    keyboardType="decimal-pad"
+                  />
+                </View>
+              </View>
+
+              {/* Step 5: Live Summary Box */}
+              <View
+                style={[
+                  styles.summaryBox,
+                  {
+                    backgroundColor: colors.background,
+                    borderColor: colors.gold + "44",
+                  },
+                ]}
+              >
+                <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
+                  <Icon
+                    name={bulkDirection === "increase" ? "chevron-up" : "chevron-down"}
+                    size={16}
+                    color={bulkDirection === "increase" ? "#27AE60" : "#E74C3C"}
+                  />
+                  <Text style={{ fontSize: 12, color: colors.foreground, fontFamily: "Cairo_700Bold" }}>
+                    ملخص التعديل التلقائي:
+                  </Text>
+                </View>
+
+                <Text style={{ fontSize: 11.5, color: colors.foreground, fontFamily: "Cairo_500Medium", textAlign: "right", lineHeight: 18 }}>
+                  • سيتم تعديل أسعار{" "}
+                  <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold" }}>
+                    {matchingBulkProducts.length} خامة
+                  </Text>
+                  {bulkCategory !== "all" ? ` في فئة «${bulkCategory}»` : " في جميع الفئات"}
+                  {bulkSubcategory !== "all" ? ` / «${bulkSubcategory}»` : ""} بـ{" "}
+                  <Text style={{ color: bulkDirection === "increase" ? "#27AE60" : "#E74C3C", fontFamily: "Cairo_700Bold" }}>
+                    {bulkDirection === "increase" ? "+" : "-"}
+                    {bulkAmount.trim() || "0"} ج.م
+                  </Text>
+                  .
+                </Text>
+
+                <Text style={{ fontSize: 11, color: colors.mutedForeground, fontFamily: "Cairo_400Regular", textAlign: "right" }}>
+                  • سيتم تعيين السهم تلقائياً إلى:{" "}
+                  <Text
+                    style={{
+                      color: bulkDirection === "increase" ? "#27AE60" : "#E74C3C",
+                      fontFamily: "Cairo_700Bold",
+                    }}
+                  >
+                    {bulkDirection === "increase" ? "أعلى ↑ (صاعد)" : "أسفل ↓ (هابط)"}
+                  </Text>
+                  .
+                </Text>
+              </View>
+            </ScrollView>
+
+            {/* Modal Actions */}
+            <View style={[styles.modalActions, { borderTopColor: colors.border }]}>
+              <GoldButton
+                label={`تطبيق التعديل (${matchingBulkProducts.length} خامة)`}
+                onPress={applyBulkEdit}
+                size="md"
+                style={{ flex: 1.5 }}
+                disabled={matchingBulkProducts.length === 0}
+              />
+              <GoldButton
+                label="إلغاء"
+                onPress={() => setBulkModalVisible(false)}
+                variant="ghost"
+                size="md"
+                style={{ flex: 1 }}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  searchBarContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
+  content: { padding: 16, gap: 10 },
+
+  // Scrollable search and bulk control card
+  searchCard: {
+    padding: 12,
+    borderWidth: 1,
+    gap: 10,
+    marginBottom: 4,
+  },
+  topActionsRow: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
     gap: 8,
   },
   searchInputWrapper: {
+    flex: 1,
     flexDirection: "row-reverse",
     alignItems: "center",
     paddingHorizontal: 12,
     borderWidth: 1,
     borderRadius: 8,
-    height: 40,
+    height: 42,
     gap: 8,
   },
   searchInput: {
     flex: 1,
-    height: 40,
+    height: 42,
     fontSize: 13,
     paddingVertical: 0,
   },
+  bulkButton: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 6,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    height: 42,
+    borderRadius: 8,
+  },
+  bulkButtonText: { fontSize: 12 },
+
   statsRow: {
     flexDirection: "row-reverse",
     alignItems: "center",
@@ -765,15 +1294,17 @@ const styles = StyleSheet.create({
   },
   pendingPillText: { fontSize: 11 },
 
-  content: { padding: 16, gap: 10 },
+  // Table header
   headerRow: {
     flexDirection: "row-reverse",
     alignItems: "center",
-    paddingBottom: 10,
+    paddingBottom: 8,
     borderBottomWidth: 1,
     paddingHorizontal: 8,
   },
   colHeader: { fontSize: 12, textAlign: "center" },
+
+  // Row items
   priceRow: {
     flexDirection: "row-reverse",
     alignItems: "center",
@@ -916,4 +1447,77 @@ const styles = StyleSheet.create({
   floatingTitle: { fontSize: 13 },
   floatingSubtitle: { fontSize: 10.5 },
   floatingButtons: { flexDirection: "row-reverse", alignItems: "center", gap: 6 },
+
+  // Bulk Edit Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.75)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+  },
+  modalCard: {
+    width: "100%",
+    maxWidth: 480,
+    maxHeight: "85%",
+    borderWidth: 1,
+    overflow: "hidden",
+  },
+  modalHeader: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+  },
+  modalCloseBtn: { padding: 4 },
+  modalTitle: { fontSize: 15 },
+  modalBody: { padding: 16, gap: 14 },
+  modalSection: { gap: 6 },
+  sectionLabel: { fontSize: 12, textAlign: "right" },
+  chipsScroll: { flexDirection: "row-reverse", gap: 6, paddingVertical: 2 },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  chipText: { fontSize: 11.5 },
+
+  targetRow: { flexDirection: "row-reverse", gap: 6 },
+  targetPill: {
+    flex: 1,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingVertical: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  directionRow: { flexDirection: "row-reverse", gap: 8 },
+  directionBtn: {
+    flex: 1,
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingVertical: 10,
+  },
+
+  summaryBox: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+    gap: 6,
+  },
+
+  modalActions: {
+    flexDirection: "row-reverse",
+    gap: 8,
+    padding: 14,
+    borderTopWidth: 1,
+  },
 });
