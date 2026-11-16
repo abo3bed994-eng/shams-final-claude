@@ -18,7 +18,10 @@
       "bundleIdentifier": "com.shamstex.app",
       "icon": "./assets/images/app-icon.png",
       "buildNumber": "1",
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "infoPlist": {
+        "NSPhotoLibraryAddUsageDescription": "يحتاج التطبيق إلى إذن لحفظ صور المنتجات في ألبوم الصور"
+      }
     },
     "android": {
       "package": "com.shamstex.app",
