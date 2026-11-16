@@ -430,7 +430,7 @@ export default function LoginScreen() {
       }
     } else {
       if (pin.length !== 4) {
-        setError("الرقم السري يجب أن يكون 4 أرقام");
+        setError("كلمة المرور يجب أن تكون 4 أرقام");
         return;
       }
     }
@@ -454,7 +454,7 @@ export default function LoginScreen() {
         } catch {}
       }
       if (!ok) {
-        setError(isOwner ? "كلمة المرور غير صحيحة" : "الرقم السري غير صحيح");
+        setError("كلمة المرور غير صحيحة");
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         return;
       }
@@ -521,12 +521,12 @@ export default function LoginScreen() {
       }
     } else {
       if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
-        setError("الرقم السري يجب أن يكون 4 أرقام");
+        setError("كلمة المرور يجب أن تكون 4 أرقام");
         return;
       }
     }
     if (pin !== confirmPin) {
-      setError(isOwner ? "كلمتا المرور غير متطابقتين" : "الرقمان السريان غير متطابقين");
+      setError("كلمتا المرور غير متطابقتين");
       return;
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -550,10 +550,10 @@ export default function LoginScreen() {
       if (existing) {
         await finishLogin(existing.name, (existing.role as any) || "customer", { ...existing, phone: e164Phone });
       } else {
-        setError("تعذّر حفظ الرقم السري، حاول مرة أخرى");
+        setError("تعذّر حفظ كلمة المرور، حاول مرة أخرى");
       }
     } catch (e: any) {
-      setError("تعذّر حفظ الرقم السري");
+      setError("تعذّر حفظ كلمة المرور");
     } finally {
       setLoading(false);
     }
@@ -931,12 +931,12 @@ export default function LoginScreen() {
                 <Icon name="lock" size={28} color={colors.gold} />
               </View>
               <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
-                {isOwnerPhone(e164Phone) ? "كلمة مرور الإدارة" : "الرقم السري"}
+                {isOwnerPhone(e164Phone) ? "أدخل كلمة المرور" : "كلمة المرور"}
               </Text>
               <Text style={[styles.cardSubtitle, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                 {isOwnerPhone(e164Phone)
-                  ? "أدخل كلمة المرور الخاصة بالمدير للمتابعة إلى كود OTP"
-                  : "أدخل الرقم السري المكوّن من 4 أرقام"}
+                  ? "أدخل كلمة المرور للمتابعة إلى كود OTP"
+                  : "أدخل كلمة المرور المكوّنة من 4 أرقام"}
               </Text>
               <View style={[styles.inputWrapper, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
@@ -977,7 +977,7 @@ export default function LoginScreen() {
               />
               <Pressable onPress={handleForgotPin} disabled={loading}>
                 <Text style={{ color: colors.gold, fontFamily: "Cairo_500Medium", fontSize: 13, textAlign: "center" }}>
-                  {isOwnerPhone(e164Phone) ? "نسيت كلمة المرور؟ إعادة تعيين عبر SMS" : "نسيت الرقم السري؟ إعادة تعيين عبر SMS"}
+                  نسيت كلمة المرور؟ إعادة تعيين عبر SMS
                 </Text>
               </Pressable>
             </>
@@ -995,19 +995,19 @@ export default function LoginScreen() {
               </View>
               <Text style={[styles.cardTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
                 {isOwnerPhone(e164Phone)
-                  ? (pinPurpose === "reset" ? "إعادة تعيين كلمة مرور الإدارة" : "تعيين كلمة مرور الإدارة")
-                  : (pinPurpose === "reset" ? "إعادة تعيين الرقم السري" : "تعيين رقم سري")}
+                  ? (pinPurpose === "reset" ? "إعادة تعيين كلمة المرور" : "تعيين كلمة المرور")
+                  : (pinPurpose === "reset" ? "إعادة تعيين كلمة المرور (4 أرقام)" : "إنشاء كلمة مرور من 4 أرقام")}
               </Text>
               <Text style={[styles.cardSubtitle, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
                 {isOwnerPhone(e164Phone)
-                  ? "أدخل كلمة مرور للمدير (حروف، أرقام، رموز - 4 خانات على الأقل)"
-                  : "أدخل رقم سري جديد من 4 أرقام"}
+                  ? "أدخل كلمة مرور (حروف، أرقام، رموز - 4 خانات على الأقل)"
+                  : "أدخل كلمة مرور جديدة من 4 أرقام وتأكيدها"}
               </Text>
               <View style={[styles.inputWrapper, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: colors.radius - 4 }]}>
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
                 <AppTextInput
                   style={[isOwnerPhone(e164Phone) ? styles.inputPassword : styles.inputPin, { color: colors.foreground }]}
-                  placeholder={isOwnerPhone(e164Phone) ? "كلمة المرور الجديدة" : "رقم سري جديد"}
+                  placeholder={isOwnerPhone(e164Phone) ? "كلمة المرور الجديدة" : "كلمة المرور الجديدة (4 أرقام)"}
                   placeholderTextColor={colors.mutedForeground}
                   value={pin}
                   onChangeText={(v) => {
@@ -1030,7 +1030,7 @@ export default function LoginScreen() {
                 <Icon name="lock" size={18} color={colors.mutedForeground} />
                 <AppTextInput
                   style={[isOwnerPhone(e164Phone) ? styles.inputPassword : styles.inputPin, { color: colors.foreground }]}
-                  placeholder={isOwnerPhone(e164Phone) ? "تأكيد كلمة المرور" : "تأكيد الرقم السري"}
+                  placeholder={isOwnerPhone(e164Phone) ? "تأكيد كلمة المرور" : "تأكيد كلمة المرور (4 أرقام)"}
                   placeholderTextColor={colors.mutedForeground}
                   value={confirmPin}
                   onChangeText={(v) => {
