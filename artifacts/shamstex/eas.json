@@ -8,7 +8,7 @@
       "developmentClient": true,
       "distribution": "internal",
       "ios": {
-        "image": "latest"
+        "image": "macos-sequoia-15.6-xcode-16.4"
       },
       "android": {
         "buildType": "apk"
@@ -17,7 +17,7 @@
     "preview": {
       "distribution": "internal",
       "ios": {
-        "image": "latest"
+        "image": "macos-sequoia-15.6-xcode-16.4"
       },
       "android": {
         "buildType": "apk"
@@ -26,7 +26,7 @@
     "production": {
       "autoIncrement": true,
       "ios": {
-        "image": "latest"
+        "image": "macos-sequoia-15.6-xcode-16.4"
       },
       "android": {
         "buildType": "app-bundle"
