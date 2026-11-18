@@ -1154,6 +1154,7 @@ export default function OrderDetailScreen() {
           </Text>
           {order.items.map((item, index) => {
             const isExpanded = !!expandedItemDetails[index];
+            const fmt = (n: number) => Math.round(n * 100) / 100;
             return (
               <View
                 key={index}
@@ -1247,46 +1248,106 @@ export default function OrderDetailScreen() {
 
                     {/* التفاصيل الإضافية التي تظهر فقط عند الضغط على زر عرض التفاصيل */}
                     {isExpanded && (
-                      <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: colors.border, gap: 6 }}>
-                        <View style={{ flexDirection: "row-reverse", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
-                          <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 12 }}>
-                            سعر الوحدة: ({item.unitPrice} ج.م/{ulbl(unitOf(item))})
-                          </Text>
-
-                          {item.orderType === "pieces" && (
-                            item.actualWeight ? (
-                              <Text style={{ color: colors.gold, fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>
-                                الوزن الفعلي: {item.actualWeight} {ulbl(unitOf(item))}
-                              </Text>
-                            ) : (
-                              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11 }}>
-                                ≈ {item.quantity * blt(unitOf(item))} {ulbl(unitOf(item))} (تقديري)
-                              </Text>
-                            )
-                          )}
-
-                          {item.orderType === "weight" && (
-                            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11 }}>
-                              ≈ {boltsOf(item.weight, item)} ثوب (الثوب {blt(unitOf(item))} {ulbl(unitOf(item))})
-                            </Text>
-                          )}
-
-                          <Text style={[styles.orderItemPrice, { color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 13 }]}>
-                            السعر: {item.orderType === "weight"
-                              ? `${item.unitPrice * (item.weight ?? 1)} ج.م`
-                              : (item.actualWeight
-                                ? `${item.actualWeight * item.unitPrice} ج.م`
-                                : `≈ ${item.quantity * blt(unitOf(item)) * item.unitPrice} ج.م`)}
-                          </Text>
-                        </View>
-
-                        {companionTotal(item) > 0 && (
-                          <View style={{ alignItems: "flex-end", gap: 2, marginTop: 2 }}>
-                            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 11 }}>
-                              الخامات المرافقة: {Math.round(companionTotal(item) * 100) / 100} ج.م
+                      <View style={{ marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.border, gap: 8 }}>
+                        {/* 1. تفاصيل الخامة الأساسية */}
+                        <View style={{ backgroundColor: colors.surface, padding: 10, borderRadius: 8, gap: 6 }}>
+                          <View style={{ flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" }}>
+                            <Text style={{ color: colors.foreground, fontFamily: "Cairo_700Bold", fontSize: 12 }}>
+                              الخامة الأساسية:
                             </Text>
                             <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 13 }}>
-                              إجمالي الصنف: {Math.round(((item.orderType === "weight" ? item.unitPrice * (item.weight ?? 1) : (item.actualWeight ?? (item.quantity * blt(unitOf(item)))) * item.unitPrice) + companionTotal(item)) * 100) / 100} ج.م
+                              {item.orderType === "weight"
+                                ? `${fmt(item.unitPrice * (item.weight ?? 1))} ج.م`
+                                : (item.actualWeight
+                                  ? `${fmt(item.actualWeight * item.unitPrice)} ج.م`
+                                  : `≈ ${fmt(item.quantity * blt(unitOf(item)) * item.unitPrice)} ج.م`)}
+                            </Text>
+                          </View>
+
+                          <View style={{ flexDirection: "row-reverse", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+                            <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 11 }}>
+                              سعر الوحدة: {item.unitPrice} ج.م / {ulbl(unitOf(item))}
+                            </Text>
+                            {item.orderType === "pieces" && (
+                              item.actualWeight ? (
+                                <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 11 }}>
+                                  الوزن الفعلي: {item.actualWeight} {ulbl(unitOf(item))} ({item.quantity} ثوب)
+                                </Text>
+                              ) : (
+                                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11 }}>
+                                  الكمية التقديرية: ≈ {item.quantity * blt(unitOf(item))} {ulbl(unitOf(item))} ({item.quantity} ثوب)
+                                </Text>
+                              )
+                            )}
+                            {item.orderType === "weight" && (
+                              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11 }}>
+                                الوزن: {item.weight ?? 1} {ulbl(unitOf(item))} (≈ {boltsOf(item.weight, item)} ثوب)
+                              </Text>
+                            )}
+                          </View>
+                        </View>
+
+                        {/* 2. تفاصيل الخامات المرافقة (إن وُجدت) */}
+                        {item.companions?.length ? (
+                          <View style={[styles.companionList, { backgroundColor: colors.gold + "0D", borderColor: colors.gold + "33", marginTop: 0, padding: 8, gap: 6 }]}>
+                            <View style={{ flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" }}>
+                              <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 11 }}>تفاصيل الخامات المرافقة</Text>
+                              <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 11 }}>
+                                +{fmt(companionTotal(item))} ج.م
+                              </Text>
+                            </View>
+
+                            {item.companions.map((companion, companionIndex) => {
+                              const compAmt = Math.round(companionAmount(companion) * 100) / 100;
+                              const compPrice = Math.round(companionLineTotal(companion) * 100) / 100;
+                              const compUnit = companion.unit === "meter" ? "متر" : "كغ";
+                              return (
+                                <View
+                                  key={`${companion.materialId}-${companionIndex}`}
+                                  style={[
+                                    styles.companionLine,
+                                    companion.stockStatus === "unavailable" && { backgroundColor: "#E74C3C15", borderColor: "#E74C3C", borderWidth: 1, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+                                    companion.stockStatus === "partial" && { backgroundColor: "#F39C1215", borderColor: "#F39C12", borderWidth: 1, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+                                    { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" },
+                                  ]}
+                                >
+                                  <View style={{ flex: 1, minWidth: 0 }}>
+                                    <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 11, textAlign: "right" }}>
+                                      {companion.materialName} — {companion.colorName} ({companion.percentage}%)
+                                    </Text>
+                                    <View style={{ flexDirection: "row-reverse", gap: 8, alignItems: "center" }}>
+                                      <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 10 }}>
+                                        الكمية: {compAmt} {compUnit}
+                                      </Text>
+                                      <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 10 }}>
+                                        ({companion.unitPrice} ج.م/{compUnit})
+                                      </Text>
+                                      {companion.stockStatus === "unavailable" && (
+                                        <Text style={{ color: "#E74C3C", fontFamily: "Cairo_700Bold", fontSize: 10 }}>[غير متوفر]</Text>
+                                      )}
+                                      {companion.stockStatus === "partial" && (
+                                        <Text style={{ color: "#F39C12", fontFamily: "Cairo_700Bold", fontSize: 10 }}>[متوفر جزئياً: {companion.availableQuantity} {compUnit}]</Text>
+                                      )}
+                                    </View>
+                                  </View>
+
+                                  <Text style={[styles.companionPrice, { color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 12 }]}>
+                                    {compPrice} ج.م
+                                  </Text>
+                                </View>
+                              );
+                            })}
+                          </View>
+                        ) : null}
+
+                        {/* 3. إجمالي الصنف الكلي مع الخامات المرافقة */}
+                        {companionTotal(item) > 0 && (
+                          <View style={{ flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", paddingTop: 6, borderTopWidth: 1, borderTopColor: colors.border }}>
+                            <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 12 }}>
+                              إجمالي الصنف مع الخامات المرافقة:
+                            </Text>
+                            <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 14 }}>
+                              {fmt(((item.orderType === "weight" ? item.unitPrice * (item.weight ?? 1) : (item.actualWeight ?? (item.quantity * blt(unitOf(item)))) * item.unitPrice) + companionTotal(item)))} ج.م
                             </Text>
                           </View>
                         )}
@@ -1320,34 +1381,7 @@ export default function OrderDetailScreen() {
                   )}
                 </View>
 
-                {isExpanded && item.companions?.length ? (
-                  <View style={[styles.companionList, { backgroundColor: colors.gold + "0D", borderColor: colors.gold + "33" }]}>
-                    <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 11, textAlign: "right" }}>تفاصيل الخامات المرافقة</Text>
-                    {item.companions.map((companion, companionIndex) => (
-                      <View
-                        key={`${companion.materialId}-${companionIndex}`}
-                        style={[
-                          styles.companionLine,
-                          companion.stockStatus === "unavailable" && { backgroundColor: "#E74C3C15", borderColor: "#E74C3C", borderWidth: 1, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
-                          companion.stockStatus === "partial" && { backgroundColor: "#F39C1215", borderColor: "#F39C12", borderWidth: 1, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
-                        ]}
-                      >
-                        <Text style={[styles.companionPrice, { color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 11 }]}>
-                          {Math.round(companionLineTotal(companion) * 100) / 100} ج.م
-                        </Text>
-                        <Text style={[styles.companionText, { color: colors.foreground, fontFamily: "Cairo_400Regular", fontSize: 11 }]}>
-                          {companion.materialName} — {companion.colorName} · {companion.percentage}% · {Math.round(companionAmount(companion) * 100) / 100} {companion.unit === "meter" ? "متر" : "كغ"}
-                          {companion.stockStatus === "unavailable" && (
-                            <Text style={{ color: "#E74C3C", fontFamily: "Cairo_700Bold" }}>{" "}[غير متوفر]</Text>
-                          )}
-                          {companion.stockStatus === "partial" && (
-                            <Text style={{ color: "#F39C12", fontFamily: "Cairo_700Bold" }}>{" "}[متوفر جزئياً: {companion.availableQuantity} {companion.unit === "meter" ? "متر" : "كغ"}]</Text>
-                          )}
-                        </Text>
-                      </View>
-                    ))}
-                  </View>
-                ) : null}
+
               </View>
             );
           })}

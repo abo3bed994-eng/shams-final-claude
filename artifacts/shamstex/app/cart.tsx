@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   BackHandler,
@@ -46,10 +46,10 @@ export default function CartScreen() {
 
   // Companion editing in cart
 
-  const handleUpdateCompanionPct = (itemIndex: number, compIndex: number, newPct: number) => {
+  const handleUpdateCompanionPct = (productId: string, colorName: string, compIndex: number, newPct: number) => {
     setCart(
-      cart.map((it, idx) => {
-        if (idx !== itemIndex) return it;
+      cart.map((it) => {
+        if (it.productId !== productId || it.colorName !== colorName) return it;
         const comps = (it.companions ?? []).map((c, cIdx) => {
           if (cIdx !== compIndex) return c;
           const baseAmount = it.orderType === "weight"
@@ -298,6 +298,23 @@ export default function CartScreen() {
   const totalPrice = weightTotal + piecesEstTotal + companionEstTotal;
 
   const hasPiecesOrder = cart.some((i) => i.orderType === "pieces");
+
+  // Group items by fabric/product so all colors of the same fabric appear consecutively
+  const sortedCart = useMemo(() => {
+    if (!cart.length) return [];
+    const productOrder = new Map<string, number>();
+    cart.forEach((it) => {
+      if (!productOrder.has(it.productId)) {
+        productOrder.set(it.productId, productOrder.size);
+      }
+    });
+    return [...cart].sort((a, b) => {
+      const orderA = productOrder.get(a.productId) ?? 0;
+      const orderB = productOrder.get(b.productId) ?? 0;
+      if (orderA !== orderB) return orderA - orderB;
+      return a.colorName.localeCompare(b.colorName, "ar");
+    });
+  }, [cart]);
 
   const paymentSettings = settings.payment;
   const ewalletFee = paymentSettings?.ewalletFeePercent ?? 1;
@@ -777,7 +794,7 @@ export default function CartScreen() {
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={[styles.list, { paddingBottom: bottomPad + 220 }]}
           >
-            {cart.map((item, index) => (
+            {sortedCart.map((item, index) => (
               <View
                 key={`${item.productId}-${item.colorName}-${index}`}
                 style={[
@@ -1115,16 +1132,21 @@ export default function CartScreen() {
                             </View>
 
                             <View style={{ flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between" }}>
-                              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 11 }}>
-                                الكمية: {formatQuantity(companionAmount(companion))} {companion.unit === "meter" ? "متر" : "كغ"}
-                              </Text>
+                              <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 8 }}>
+                                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_500Medium", fontSize: 11 }}>
+                                  الكمية: {formatQuantity(companionAmount(companion))} {companion.unit === "meter" ? "متر" : "كغ"}
+                                </Text>
+                                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 10 }}>
+                                  ({companion.unitPrice} ج.م/{companion.unit === "meter" ? "متر" : "كغ"})
+                                </Text>
+                              </View>
 
                               {/* أزرار تعديل النسبة / التعديل / الحذف */}
                               <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 6 }}>
                                 <Pressable
                                   onPress={() => {
                                     const nextPct = Math.max(5, companion.percentage - 1);
-                                    handleUpdateCompanionPct(index, compIndex, nextPct);
+                                    handleUpdateCompanionPct(item.productId, item.colorName, compIndex, nextPct);
                                   }}
                                   style={{ width: 26, height: 26, borderRadius: 13, borderWidth: 1, borderColor: colors.border, alignItems: "center", justifyContent: "center" }}
                                 >
@@ -1144,7 +1166,7 @@ export default function CartScreen() {
                                       ? Math.min(100, (companion.availableQuantity / baseAmount) * 100)
                                       : 100;
                                     const nextPct = Math.min(maxPct, companion.percentage + 1);
-                                    handleUpdateCompanionPct(index, compIndex, nextPct);
+                                    handleUpdateCompanionPct(item.productId, item.colorName, compIndex, nextPct);
                                   }}
                                   style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: colors.gold, alignItems: "center", justifyContent: "center" }}
                                 >
@@ -1156,6 +1178,34 @@ export default function CartScreen() {
                           </View>
                         );
                       })}
+
+                      {/* ملخص إجمالي الصنف مع الخامات المرافقة */}
+                      {(() => {
+                        const baseAmount = item.orderType === "weight"
+                          ? (item.weight ?? 1)
+                          : (editOrderId
+                            ? (item.actualWeight ?? item.quantity * (item.unit === "meter" ? 100 : 20))
+                            : item.quantity * (item.unit === "meter" ? 100 : 20));
+                        const basePrice = baseAmount * item.unitPrice;
+                        const cTotal = companionTotal(item);
+                        if (cTotal <= 0) return null;
+                        return (
+                          <View style={{ marginTop: 6, paddingTop: 8, borderTopWidth: 1, borderTopColor: colors.border, gap: 4 }}>
+                            <View style={{ flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" }}>
+                              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11 }}>الخامة الأساسية:</Text>
+                              <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>{formatQuantity(basePrice)} ج.م</Text>
+                            </View>
+                            <View style={{ flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center" }}>
+                              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 11 }}>الخامات المرافقة:</Text>
+                              <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 12 }}>+{formatQuantity(cTotal)} ج.م</Text>
+                            </View>
+                            <View style={{ flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", marginTop: 2 }}>
+                              <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 12 }}>إجمالي الصنف الكلي:</Text>
+                              <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 14 }}>{formatQuantity(basePrice + cTotal)} ج.م</Text>
+                            </View>
+                          </View>
+                        );
+                      })()}
                     </View>
                   );
                 })()}
