@@ -21,7 +21,13 @@
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "NSPhotoLibraryAddUsageDescription": "يحتاج التطبيق إلى إذن لحفظ صور المنتجات في ألبوم الصور",
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
+      },
+      "entitlements": {
+        "aps-environment": "production"
       }
     },
     "android": {
