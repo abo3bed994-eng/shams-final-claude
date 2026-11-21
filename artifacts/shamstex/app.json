@@ -2,7 +2,7 @@
   "expo": {
     "name": "Shams Tex",
     "slug": "shamstex",
-    "version": "1.1.7",
+    "version": "1.1.8",
     "orientation": "portrait",
     "icon": "./assets/images/app-icon.png",
     "scheme": "shamstex",
@@ -24,6 +24,13 @@
         "ITSAppUsesNonExemptEncryption": false,
         "UIBackgroundModes": [
           "remote-notification"
+        ],
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "app-1-22978900641-ios-6b20b46ea318ff0a8db6e0"
+            ]
+          }
         ]
       },
       "entitlements": {
@@ -45,7 +52,7 @@
         "android.permission.RECORD_AUDIO",
         "android.permission.POST_NOTIFICATIONS"
       ],
-      "versionCode": 21,
+      "versionCode": 22,
       "blockedPermissions": [
         "android.permission.READ_MEDIA_IMAGES",
         "android.permission.READ_MEDIA_VIDEO",
