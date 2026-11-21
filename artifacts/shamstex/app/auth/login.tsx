@@ -320,16 +320,28 @@ export default function LoginScreen() {
       setStep("otp");
     } catch (e: any) {
       const code = e?.code || "";
-      const msg = String(e?.message || e);
-      // Log details to the developer console only (dev builds) — never surface
-      // to user, and never log the phone number.
-      if (__DEV__) console.log("[PhoneAuth ERROR]", { code, msg });
+      const rawMsg = String(e?.message || e || "");
+      const nativeMsg = String(e?.nativeErrorMessage || "");
+      if (__DEV__) console.log("[PhoneAuth ERROR]", { code, rawMsg, nativeMsg, e });
+
       let friendly = "تعذّر إرسال الكود حالياً، حاول مرة أخرى";
-      if (msg.includes("quota")) friendly = "وصلت الحصة اليومية للرسائل، حاول غداً";
-      else if (code.includes("invalid-phone") || msg.includes("invalid-phone")) friendly = "رقم الهاتف غير صحيح";
-      else if (code.includes("too-many-requests") || msg.includes("too-many-requests")) friendly = "محاولات كثيرة، انتظر قليلاً";
-      else if (msg.includes("network") || msg.includes("Network")) friendly = "تعذّر الاتصال بالإنترنت";
-      const diag = code || (msg ? msg.slice(0, 35) : "");
+      if (rawMsg.includes("quota")) friendly = "وصلت الحصة اليومية للرسائل، حاول غداً";
+      else if (code.includes("invalid-phone") || rawMsg.includes("invalid-phone")) friendly = "رقم الهاتف غير صحيح";
+      else if (code.includes("too-many-requests") || rawMsg.includes("too-many-requests")) friendly = "محاولات كثيرة، انتظر قليلاً";
+      else if (rawMsg.includes("network") || rawMsg.includes("Network")) friendly = "تعذّر الاتصال بالإنترنت";
+
+      // Extract underlying error detail to reveal exact cause
+      const strippedMsg = rawMsg.replace(/^\[auth\/[^\]]+\]\s*/i, "").trim();
+      const detailParts: string[] = [];
+      if (nativeMsg) detailParts.push(nativeMsg);
+      if (strippedMsg && !detailParts.includes(strippedMsg)) detailParts.push(strippedMsg);
+      if (e?.userInfo && typeof e.userInfo === "object") {
+        const uDesc = e.userInfo.NSLocalizedDescription || e.userInfo.message;
+        if (uDesc && !detailParts.includes(String(uDesc))) detailParts.push(String(uDesc));
+      }
+      const fullDetail = detailParts.join(" - ") || rawMsg || code || "unknown";
+      const diag = (code && code !== "auth/unknown") ? `${code}: ${fullDetail}` : fullDetail;
+
       setError(diag ? `${friendly} (${diag})` : friendly);
     } finally {
       setLoading(false);
@@ -813,7 +825,7 @@ export default function LoginScreen() {
               {error ? (
                 <View style={[styles.errorBox, { backgroundColor: "#E74C3C11", borderColor: "#E74C3C44" }]}>
                   <Icon name="alert-circle" size={14} color="#E74C3C" />
-                  <Text style={{ color: "#E74C3C", fontFamily: "Cairo_500Medium", fontSize: 12, flex: 1, textAlign: "right" }}>
+                  <Text selectable style={{ color: "#E74C3C", fontFamily: "Cairo_500Medium", fontSize: 12, flex: 1, textAlign: "right" }}>
                     {error}
                   </Text>
                 </View>
