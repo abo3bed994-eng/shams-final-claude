@@ -3,6 +3,8 @@ import {
   Alert,
   Animated,
   FlatList,
+  Keyboard,
+  KeyboardAvoidingView,
   Modal,
   Platform,
   Pressable,
@@ -740,76 +742,101 @@ export default function AdminNotificationsScreen() {
         </View>
       )}
 
-      <Modal visible={tmplModalOpen} transparent animationType="fade" onRequestClose={() => setTmplModalOpen(false)}>
-        <Pressable
-          onPress={() => setTmplModalOpen(false)}
-          style={{ flex: 1, backgroundColor: "#000A", justifyContent: "center", padding: 20 }}
+      <Modal
+        visible={tmplModalOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          Keyboard.dismiss();
+          setTmplModalOpen(false);
+        }}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={{ flex: 1 }}
         >
           <Pressable
-            onPress={(e) => e.stopPropagation()}
-            style={{ backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: colors.radius, padding: 20, gap: 14 }}
+            onPress={() => {
+              Keyboard.dismiss();
+              setTmplModalOpen(false);
+            }}
+            style={{ flex: 1, backgroundColor: "#000A", justifyContent: "center", padding: 20 }}
           >
-            <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 16, textAlign: "right" }}>
-              {tmplEditing ? "تعديل القالب" : "قالب جديد"}
-            </Text>
-            <View style={{ gap: 6 }}>
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>العنوان</Text>
-              <AppTextInput
-                value={tmplTitle}
-                onChangeText={setTmplTitle}
-                placeholder="مثال: عرض خاص"
-                placeholderTextColor={colors.mutedForeground}
-                textAlign="right"
-                style={{
-                  borderWidth: 1, borderColor: colors.border, borderRadius: 8,
-                  paddingHorizontal: 12, paddingVertical: 10, fontSize: 14,
-                  color: colors.foreground, backgroundColor: colors.input, fontFamily: "Cairo_400Regular",
-                }}
-              />
-            </View>
-            <View style={{ gap: 6 }}>
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>النص</Text>
-              <AppTextInput
-                value={tmplBody}
-                onChangeText={setTmplBody}
-                placeholder="نص الإشعار..."
-                placeholderTextColor={colors.mutedForeground}
-                multiline
-                numberOfLines={4}
-                textAlign="right"
-                textAlignVertical="top"
-                style={{
-                  borderWidth: 1, borderColor: colors.border, borderRadius: 8,
-                  paddingHorizontal: 12, paddingVertical: 10, fontSize: 14,
-                  color: colors.foreground, backgroundColor: colors.input, fontFamily: "Cairo_400Regular",
-                  minHeight: 90,
-                }}
-              />
-            </View>
-            <View style={{ flexDirection: "row-reverse", gap: 10, marginTop: 4 }}>
-              <Pressable
-                onPress={saveTemplate}
-                style={({ pressed }) => ({
-                  flex: 1, paddingVertical: 12, borderRadius: 10,
-                  backgroundColor: pressed ? colors.gold + "DD" : colors.gold,
-                  alignItems: "center",
-                })}
-              >
-                <Text style={{ color: colors.background, fontFamily: "Cairo_700Bold", fontSize: 14 }}>حفظ</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => setTmplModalOpen(false)}
-                style={({ pressed }) => ({
-                  flex: 1, paddingVertical: 12, borderRadius: 10,
-                  backgroundColor: pressed ? colors.surface : "transparent",
-                  borderWidth: 1, borderColor: colors.border, alignItems: "center",
-                })}
-              >
-                <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>إلغاء</Text>
-              </Pressable>
-            </View>
+            <Pressable
+              onPress={(e) => {
+                e.stopPropagation();
+                Keyboard.dismiss();
+              }}
+              style={{ backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, borderRadius: colors.radius, padding: 20, gap: 14 }}
+            >
+              <Text style={{ color: colors.gold, fontFamily: "Cairo_700Bold", fontSize: 16, textAlign: "right" }}>
+                {tmplEditing ? "تعديل القالب" : "قالب جديد"}
+              </Text>
+              <View style={{ gap: 6 }}>
+                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>العنوان</Text>
+                <AppTextInput
+                  value={tmplTitle}
+                  onChangeText={setTmplTitle}
+                  placeholder="مثال: عرض خاص"
+                  placeholderTextColor={colors.mutedForeground}
+                  textAlign="right"
+                  style={{
+                    borderWidth: 1, borderColor: colors.border, borderRadius: 8,
+                    paddingHorizontal: 12, paddingVertical: 10, fontSize: 14,
+                    color: colors.foreground, backgroundColor: colors.input, fontFamily: "Cairo_400Regular",
+                  }}
+                />
+              </View>
+              <View style={{ gap: 6 }}>
+                <Text style={{ color: colors.mutedForeground, fontFamily: "Cairo_400Regular", fontSize: 12, textAlign: "right" }}>النص</Text>
+                <AppTextInput
+                  value={tmplBody}
+                  onChangeText={setTmplBody}
+                  placeholder="نص الإشعار..."
+                  placeholderTextColor={colors.mutedForeground}
+                  multiline
+                  numberOfLines={4}
+                  textAlign="right"
+                  textAlignVertical="top"
+                  style={{
+                    borderWidth: 1, borderColor: colors.border, borderRadius: 8,
+                    paddingHorizontal: 12, paddingVertical: 10, fontSize: 14,
+                    color: colors.foreground, backgroundColor: colors.input, fontFamily: "Cairo_400Regular",
+                    minHeight: 90,
+                  }}
+                />
+              </View>
+              <View style={{ flexDirection: "row-reverse", gap: 10, marginTop: 4 }}>
+                <Pressable
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    saveTemplate();
+                  }}
+                  style={({ pressed }) => ({
+                    flex: 1, paddingVertical: 12, borderRadius: 10,
+                    backgroundColor: pressed ? colors.gold + "DD" : colors.gold,
+                    alignItems: "center",
+                  })}
+                >
+                  <Text style={{ color: colors.background, fontFamily: "Cairo_700Bold", fontSize: 14 }}>حفظ</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    setTmplModalOpen(false);
+                  }}
+                  style={({ pressed }) => ({
+                    flex: 1, paddingVertical: 12, borderRadius: 10,
+                    backgroundColor: pressed ? colors.surface : "transparent",
+                    borderWidth: 1, borderColor: colors.border, alignItems: "center",
+                  })}
+                >
+                  <Text style={{ color: colors.foreground, fontFamily: "Cairo_600SemiBold", fontSize: 14 }}>إلغاء</Text>
+                </Pressable>
+              </View>
+            </Pressable>
           </Pressable>
-        </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );
