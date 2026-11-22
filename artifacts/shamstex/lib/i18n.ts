@@ -47,6 +47,8 @@ const translations: Record<string, Record<Language, string>> = {
   new: { ar: "جديد", en: "New" },
 
   cart: { ar: "سلة الطلبات", en: "Shopping Cart" },
+  branches: { ar: "فروعنا", en: "Our Branches" },
+  openLocationInMaps: { ar: "فتح اللوكيشن في الخرائط", en: "Open Location in Maps" },
   editOrder: { ar: "تعديل الطلب", en: "Edit Order" },
   emptyCart: { ar: "السلة فارغة", en: "Cart is Empty" },
   browseProducts: { ar: "تصفح المنتجات وأضف ما تحتاج", en: "Browse products and add what you need" },

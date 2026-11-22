@@ -84,7 +84,7 @@ function MovingTabBubble({
         styles.movingBubble,
         {
           backgroundColor: color,
-            left: tabWidth / 2 - 29,
+          left: tabWidth / 2 - 32,
           transform: [{
             translateX: position.interpolate({
               inputRange: [0, 1, 2, 3, 4],
@@ -157,7 +157,7 @@ export default function TabLayout() {
   const isIOS = Platform.OS === "ios";
   const isWeb = Platform.OS === "web";
   const { width } = useWindowDimensions();
-    const tabNames = ["cart", "products", "index", "orders", "contact"];
+  const tabNames = ["cart", "products", "index", "orders", "contact"];
   const cartCount = cart.length;
 
   const tabBar = (props: any) => {
@@ -167,12 +167,19 @@ export default function TabLayout() {
     const activeSlot = Math.max(0, tabNames.indexOf(activeRouteName));
     const tabWidth = width / tabNames.length;
 
+    // On iOS with home indicator, lower the bar slightly for a sleeker fit while keeping safe-area clear
+    const bottomInset = isIOS
+      ? (props.insets.bottom > 0 ? Math.max(props.insets.bottom - 10, 6) : 0)
+      : props.insets.bottom;
+    const barHeight = isWeb ? 84 : (isIOS ? 56 : 62) + bottomInset;
+    const barPaddingBottom = isWeb ? 16 : (isIOS ? 4 : 8) + bottomInset;
+
     return (
       <View style={[styles.tabBar, {
         backgroundColor: isIOS ? "transparent" : colors.background,
         borderTopColor: colors.border,
-        height: (isWeb ? 84 : 62) + props.insets.bottom,
-        paddingBottom: (isWeb ? 16 : 8) + props.insets.bottom,
+        height: barHeight,
+        paddingBottom: barPaddingBottom,
       }]}>
         {isIOS && (
           <BlurView intensity={90} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFill} />
@@ -201,7 +208,12 @@ export default function TabLayout() {
                       </View>
                     )}
                   </View>
-                  <Text style={[styles.tabLabel, { color: colors.mutedForeground, fontFamily: "Cairo_500Medium" }]}>السلة</Text>
+                  <Text
+                    style={[styles.tabLabel, { color: colors.mutedForeground, fontFamily: "Cairo_600SemiBold" }]}
+                    numberOfLines={1}
+                  >
+                    السلة
+                  </Text>
                 </View>
               </AnimatedTabItem>
             );
@@ -234,18 +246,21 @@ export default function TabLayout() {
               accessibilityState={{ selected: focused }}
             >
               <View>
-                {descriptor.options.tabBarIcon?.({ focused, color: focused ? colors.background : color, size: 20 })}
+                {descriptor.options.tabBarIcon?.({ focused, color: focused ? colors.background : color, size: focused ? 22 : 20 })}
                 {typeof badge === "number" && badge > 0 && (
                   <View style={styles.badge}>
                     <Text style={styles.badgeText}>{badge > 99 ? "99+" : badge}</Text>
                   </View>
                 )}
               </View>
-              <Text style={[
-                styles.tabLabel,
-                focused && styles.activeTabLabel,
-                { color: focused ? colors.background : color, fontFamily: focused ? "Cairo_700Bold" : "Cairo_500Medium" },
-              ]}>
+              <Text
+                style={[
+                  styles.tabLabel,
+                  focused && styles.activeTabLabel,
+                  { color: focused ? colors.background : color, fontFamily: focused ? "Cairo_700Bold" : "Cairo_600SemiBold" },
+                ]}
+                numberOfLines={1}
+              >
                 {descriptor.options.title ?? route.name}
               </Text>
             </AnimatedTabItem>
@@ -264,8 +279,8 @@ export default function TabLayout() {
         headerShown: false,
         tabBarStyle: { position: "absolute" },
         tabBarLabelStyle: {
-          fontFamily: "Cairo_500Medium",
-          fontSize: 11,
+          fontFamily: "Cairo_600SemiBold",
+          fontSize: 12,
         },
       }}
     >
@@ -326,18 +341,19 @@ const styles = StyleSheet.create({
   animatedTabContent: { alignItems: "center", gap: 3 },
   activeTabContent: {
     position: "absolute",
-    top: -7,
-    width: 58,
-    height: 58,
+    top: -8,
+    width: 64,
+    height: 64,
     justifyContent: "center",
+    alignItems: "center",
     gap: 0,
   },
   movingBubble: {
     position: "absolute",
-    top: -7,
-    width: 58,
-    height: 58,
-    borderRadius: 29,
+    top: -8,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 4,
@@ -358,8 +374,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   cartTabBadgeText: { color: "#fff", fontSize: 9, fontFamily: "Cairo_700Bold" },
-  tabLabel: { fontSize: 11, fontFamily: "Cairo_500Medium" },
-  activeTabLabel: { fontSize: 10, maxWidth: 56, fontFamily: "Cairo_700Bold" },
+  tabLabel: { fontSize: 12, fontFamily: "Cairo_600SemiBold" },
+  activeTabLabel: { fontSize: 11.5, maxWidth: 62, fontFamily: "Cairo_700Bold" },
   badge: {
     position: "absolute",
     right: -10,

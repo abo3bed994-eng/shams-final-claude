@@ -430,6 +430,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   },
   yarnTypes: ["قطن", "بوليستر", "فيسكوز", "ليكرا", "صوف", "حرير", "كتان", "نايلون"],
   featuredProductIds: [],
+  branches: [],
   stats: { clients: "+500", products: "+50", years: "15+" },
   statLabels: { clients: "عميل", products: "خامة", years: "سنة خبرة" },
   companionMaterials: [],

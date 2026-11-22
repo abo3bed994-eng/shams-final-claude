@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Alert,
   Image,
   Linking,
   Platform,
@@ -23,6 +24,9 @@ export default function ContactScreen() {
   const { t } = useTranslation();
   const CONTACTS = settings.contacts;
   const SOCIAL = settings.social;
+  const branches = (settings.branches ?? []).filter(
+    (b) => b && typeof b.name === "string" && b.name.trim().length > 0
+  );
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
@@ -108,6 +112,101 @@ export default function ContactScreen() {
             </Pressable>
           ))}
         </View>
+
+        {branches.length > 0 && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeaderRow}>
+              <Icon name="map-pin" size={20} color={colors.gold} />
+              <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
+                {t("branches")}
+              </Text>
+            </View>
+
+            <View style={{ gap: 12 }}>
+              {branches.map((branch) => {
+                const phone = branch.phone?.trim();
+                const mapsUrl = branch.mapsUrl?.trim();
+
+                return (
+                  <View
+                    key={branch.id}
+                    style={[
+                      styles.branchCard,
+                      {
+                        backgroundColor: colors.card,
+                        borderColor: colors.border,
+                        borderRadius: colors.radius,
+                      },
+                      cardShadow(colors.isDark, "soft"),
+                    ]}
+                  >
+                    <View style={styles.branchHeader}>
+                      <View style={[styles.branchIconWrap, { backgroundColor: colors.gold + "18" }]}>
+                        <Icon name="home" size={20} color={colors.gold} />
+                      </View>
+                      <View style={styles.branchInfo}>
+                        <Text style={[styles.branchName, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
+                          {branch.name}
+                        </Text>
+                        {branch.address ? (
+                          <View style={styles.branchAddressRow}>
+                            <Icon name="map-pin" size={13} color={colors.mutedForeground} />
+                            <Text style={[styles.branchAddress, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
+                              {branch.address}
+                            </Text>
+                          </View>
+                        ) : null}
+                      </View>
+                    </View>
+
+                    {phone ? (
+                      <Pressable
+                        onPress={() => callNumber(phone)}
+                        style={({ pressed }) => [
+                          styles.branchPhoneBtn,
+                          {
+                            borderColor: colors.border,
+                            backgroundColor: colors.isDark ? colors.background + "99" : colors.background,
+                            opacity: pressed ? 0.75 : 1,
+                          },
+                        ]}
+                      >
+                        <Icon name="phone" size={14} color={colors.gold} />
+                        <Text style={[styles.branchPhoneText, { color: colors.gold, fontFamily: "Cairo_600SemiBold" }]}>
+                          {phone}
+                        </Text>
+                      </Pressable>
+                    ) : null}
+
+                    {mapsUrl ? (
+                      <Pressable
+                        onPress={() => {
+                          Linking.openURL(mapsUrl).catch(() => {
+                            Alert.alert("خطأ", "تعذّر فتح رابط الخريطة على هذا الجهاز");
+                          });
+                        }}
+                        style={({ pressed }) => [
+                          styles.branchMapBtn,
+                          {
+                            backgroundColor: colors.isDark ? "#3498DB22" : "#3498DB15",
+                            borderColor: "#3498DB44",
+                            borderRadius: Math.max(colors.radius - 6, 8),
+                            opacity: pressed ? 0.8 : 1,
+                          },
+                        ]}
+                      >
+                        <Icon name="map" size={15} color="#3498DB" />
+                        <Text style={{ color: "#3498DB", fontFamily: "Cairo_700Bold", fontSize: 13 }}>
+                          {t("openLocationInMaps")}
+                        </Text>
+                      </Pressable>
+                    ) : null}
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        )}
 
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
@@ -228,6 +327,11 @@ const styles = StyleSheet.create({
   section: {
     gap: 12,
   },
+  sectionHeaderRow: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 8,
+  },
   sectionTitle: {
     fontSize: 18,
     textAlign: "right",
@@ -256,6 +360,64 @@ const styles = StyleSheet.create({
     borderRadius: 21,
     alignItems: "center",
     justifyContent: "center",
+  },
+  branchCard: {
+    padding: 16,
+    borderWidth: 1,
+    gap: 12,
+  },
+  branchHeader: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 12,
+  },
+  branchIconWrap: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  branchInfo: {
+    flex: 1,
+    alignItems: "flex-end",
+    gap: 2,
+  },
+  branchName: {
+    fontSize: 16,
+    textAlign: "right",
+  },
+  branchAddressRow: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 2,
+  },
+  branchAddress: {
+    fontSize: 13,
+    textAlign: "right",
+  },
+  branchPhoneBtn: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 9,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderRadius: 8,
+  },
+  branchPhoneText: {
+    fontSize: 13,
+  },
+  branchMapBtn: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 10,
+    borderWidth: 1,
+    marginTop: 2,
   },
   socialRow: {
     flexDirection: "row-reverse",
