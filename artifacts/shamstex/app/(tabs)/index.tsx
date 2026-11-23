@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image as ExpoImage } from "expo-image";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -129,6 +130,59 @@ export default function HomeScreen() {
     router.push(path as any);
     setTimeout(() => { navGuard.current = false; }, 800);
   }, []);
+
+  const [showMerchantTip, setShowMerchantTip] = useState(false);
+  const tipAnim = useRef(new Animated.Value(0)).current;
+
+  const merchantTipKey = useMemo(() => {
+    if (user?.role !== "merchant") return null;
+    const idOrPhone = user.id || user.phone || "user";
+    return `@shamstex/merchant_price_tip_seen_${idOrPhone}`;
+  }, [user?.role, user?.id, user?.phone]);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (!merchantTipKey) {
+      setShowMerchantTip(false);
+      return;
+    }
+    AsyncStorage.getItem(merchantTipKey)
+      .then((val) => {
+        if (isMounted && val !== "true") {
+          setShowMerchantTip(true);
+          Animated.spring(tipAnim, {
+            toValue: 1,
+            friction: 6,
+            tension: 40,
+            useNativeDriver: true,
+          }).start();
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, [merchantTipKey, tipAnim]);
+
+  const dismissMerchantTip = useCallback(
+    (navigate = false) => {
+      if (merchantTipKey) {
+        AsyncStorage.setItem(merchantTipKey, "true").catch(() => {});
+      }
+      Animated.timing(tipAnim, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: true,
+      }).start(() => {
+        setShowMerchantTip(false);
+        if (navigate) {
+          safePush("/price-menu");
+        }
+      });
+    },
+    [merchantTipKey, tipAnim, safePush]
+  );
+
   const navigateToProducts = useCallback(() => {
     if (navGuard.current) return;
     navGuard.current = true;
@@ -251,7 +305,10 @@ export default function HomeScreen() {
           </Pressable>
           {canViewPriceMenu && (
             <Pressable
-              onPress={() => safePush("/price-menu")}
+              onPress={() => {
+                if (showMerchantTip) dismissMerchantTip(false);
+                safePush("/price-menu");
+              }}
               testID="home-price-menu"
               accessibilityLabel="قائمة الأسعار"
               style={({ pressed }) => [styles.iconBtn, { opacity: pressed ? 0.6 : 1 }]}
@@ -290,6 +347,97 @@ export default function HomeScreen() {
           </Text>
         </Pressable>
       </View>
+
+      {showMerchantTip && (
+        <Animated.View
+          style={[
+            styles.merchantBubbleWrap,
+            {
+              top: topPad + 56,
+              opacity: tipAnim,
+              transform: [
+                {
+                  translateY: tipAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-10, 0],
+                  }),
+                },
+                {
+                  scale: tipAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.94, 1],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          <View
+            style={[
+              styles.merchantBubbleArrow,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.gold,
+              },
+            ]}
+          />
+          <Pressable
+            onPress={() => dismissMerchantTip(true)}
+            style={({ pressed }) => [
+              styles.merchantBubbleCard,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.gold,
+                opacity: pressed ? 0.9 : 1,
+              },
+              cardShadow(colors.isDark, "soft"),
+            ]}
+          >
+            <View style={styles.merchantBubbleContent}>
+              <View
+                style={[
+                  styles.merchantBubbleIconBadge,
+                  { backgroundColor: colors.gold + "22" },
+                ]}
+              >
+                <Icon name="file-text" size={19} color={colors.gold} />
+              </View>
+              <View style={styles.merchantBubbleTextCol}>
+                <Text
+                  style={[
+                    styles.merchantBubbleTitle,
+                    { color: colors.gold, fontFamily: "Cairo_700Bold" },
+                  ]}
+                >
+                  مبروك، أصبحت تاجراً! 🎉
+                </Text>
+                <Text
+                  style={[
+                    styles.merchantBubbleSubtitle,
+                    { color: colors.foreground, fontFamily: "Cairo_600SemiBold" },
+                  ]}
+                >
+                  اضغط هنا لعرض وتحميل قائمة الأسعار
+                </Text>
+              </View>
+              <Pressable
+                onPress={(e) => {
+                  e.stopPropagation?.();
+                  dismissMerchantTip(false);
+                }}
+                hitSlop={10}
+                style={({ pressed }) => [
+                  styles.merchantBubbleCloseBtn,
+                  { opacity: pressed ? 0.5 : 0.8 },
+                ]}
+                accessibilityLabel="إغلاق التنبيه"
+              >
+                <Icon name="x" size={16} color={colors.mutedForeground} />
+              </Pressable>
+            </View>
+          </Pressable>
+        </Animated.View>
+      )}
 
       <FlatList
         data={featuredProducts}
@@ -518,6 +666,58 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  merchantBubbleWrap: {
+    position: "absolute",
+    left: 12,
+    right: 12,
+    zIndex: 9999,
+    elevation: 10,
+  },
+  merchantBubbleArrow: {
+    position: "absolute",
+    top: 0,
+    right: 146,
+    width: 14,
+    height: 14,
+    transform: [{ rotate: "45deg" }],
+    borderTopWidth: 1.5,
+    borderLeftWidth: 1.5,
+    zIndex: 10001,
+  },
+  merchantBubbleCard: {
+    marginTop: 6,
+    borderWidth: 1.5,
+    borderRadius: 14,
+    padding: 12,
+  },
+  merchantBubbleContent: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 10,
+  },
+  merchantBubbleIconBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  merchantBubbleTextCol: {
+    flex: 1,
+    alignItems: "flex-end",
+    gap: 2,
+  },
+  merchantBubbleTitle: {
+    fontSize: 14,
+    textAlign: "right",
+  },
+  merchantBubbleSubtitle: {
+    fontSize: 12,
+    textAlign: "right",
+  },
+  merchantBubbleCloseBtn: {
+    padding: 4,
+  },
   header: {
     flexDirection: "row-reverse",
     alignItems: "center",

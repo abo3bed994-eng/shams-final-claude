@@ -157,50 +157,49 @@ export default function ContactScreen() {
                           </View>
                         ) : null}
                       </View>
+
+                      {(phone || mapsUrl) ? (
+                        <View style={styles.branchActions}>
+                          {phone ? (
+                            <Pressable
+                              onPress={() => callNumber(phone)}
+                              accessibilityLabel={`اتصال بـ ${branch.name}`}
+                              style={({ pressed }) => [
+                                styles.branchActionCircle,
+                                {
+                                  backgroundColor: colors.gold + "18",
+                                  borderColor: colors.gold + "44",
+                                  opacity: pressed ? 0.7 : 1,
+                                },
+                              ]}
+                            >
+                              <Icon name="phone" size={17} color={colors.gold} />
+                            </Pressable>
+                          ) : null}
+
+                          {mapsUrl ? (
+                            <Pressable
+                              onPress={() => {
+                                Linking.openURL(mapsUrl).catch(() => {
+                                  Alert.alert("خطأ", "تعذّر فتح رابط الخريطة على هذا الجهاز");
+                                });
+                              }}
+                              accessibilityLabel={`موقع ${branch.name} على الخريطة`}
+                              style={({ pressed }) => [
+                                styles.branchActionCircle,
+                                {
+                                  backgroundColor: colors.isDark ? "#3498DB22" : "#3498DB15",
+                                  borderColor: "#3498DB55",
+                                  opacity: pressed ? 0.7 : 1,
+                                },
+                              ]}
+                            >
+                              <Icon name="map-pin" size={17} color="#3498DB" />
+                            </Pressable>
+                          ) : null}
+                        </View>
+                      ) : null}
                     </View>
-
-                    {phone ? (
-                      <Pressable
-                        onPress={() => callNumber(phone)}
-                        style={({ pressed }) => [
-                          styles.branchPhoneBtn,
-                          {
-                            borderColor: colors.border,
-                            backgroundColor: colors.isDark ? colors.background + "99" : colors.background,
-                            opacity: pressed ? 0.75 : 1,
-                          },
-                        ]}
-                      >
-                        <Icon name="phone" size={14} color={colors.gold} />
-                        <Text style={[styles.branchPhoneText, { color: colors.gold, fontFamily: "Cairo_600SemiBold" }]}>
-                          {phone}
-                        </Text>
-                      </Pressable>
-                    ) : null}
-
-                    {mapsUrl ? (
-                      <Pressable
-                        onPress={() => {
-                          Linking.openURL(mapsUrl).catch(() => {
-                            Alert.alert("خطأ", "تعذّر فتح رابط الخريطة على هذا الجهاز");
-                          });
-                        }}
-                        style={({ pressed }) => [
-                          styles.branchMapBtn,
-                          {
-                            backgroundColor: colors.isDark ? "#3498DB22" : "#3498DB15",
-                            borderColor: "#3498DB44",
-                            borderRadius: Math.max(colors.radius - 6, 8),
-                            opacity: pressed ? 0.8 : 1,
-                          },
-                        ]}
-                      >
-                        <Icon name="map" size={15} color="#3498DB" />
-                        <Text style={{ color: "#3498DB", fontFamily: "Cairo_700Bold", fontSize: 13 }}>
-                          {t("openLocationInMaps")}
-                        </Text>
-                      </Pressable>
-                    ) : null}
                   </View>
                 );
               })}
@@ -362,9 +361,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   branchCard: {
-    padding: 16,
+    padding: 14,
     borderWidth: 1,
-    gap: 12,
   },
   branchHeader: {
     flexDirection: "row-reverse",
@@ -397,27 +395,18 @@ const styles = StyleSheet.create({
     fontSize: 13,
     textAlign: "right",
   },
-  branchPhoneBtn: {
+  branchActions: {
     flexDirection: "row-reverse",
     alignItems: "center",
-    justifyContent: "center",
     gap: 8,
-    paddingVertical: 9,
-    paddingHorizontal: 12,
+  },
+  branchActionCircle: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     borderWidth: 1,
-    borderRadius: 8,
-  },
-  branchPhoneText: {
-    fontSize: 13,
-  },
-  branchMapBtn: {
-    flexDirection: "row-reverse",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
-    paddingVertical: 10,
-    borderWidth: 1,
-    marginTop: 2,
   },
   socialRow: {
     flexDirection: "row-reverse",
