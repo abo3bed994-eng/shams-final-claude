@@ -30,7 +30,7 @@ const VIEW_MODE_STORAGE_KEY = "@shamstex/products_view_mode";
 // -------------------------------------------------------------
 // Row View Card (Talabat-style: Image on the right, details on the left)
 // -------------------------------------------------------------
-function ProductRowCard({ product, onPress }: { product: Product; onPress: () => void }) {
+const ProductRowCard = React.memo(function ProductRowCard({ product, onPress }: { product: Product; onPress: () => void }) {
   const colors = useColors();
   const { effectivePriceMode, user, favorites, toggleFavorite, settings } = useApp();
   const fav = favorites.includes(product.id);
@@ -45,6 +45,7 @@ function ProductRowCard({ product, onPress }: { product: Product; onPress: () =>
   const onOffer = effectivePriceMode !== "wholesale" && isOnOffer(product);
   const offerPct = discountPercent(product);
   const isOutOfStock = !product.inStock;
+  const priceColor = colors.isDark ? colors.goldLight : colors.gold;
 
   return (
     <View
@@ -77,7 +78,7 @@ function ProductRowCard({ product, onPress }: { product: Product; onPress: () =>
               style={styles.rowImage}
               contentFit="cover"
               cachePolicy="memory-disk"
-              transition={150}
+              transition={0}
             />
           ) : (
             <View style={[styles.rowPlaceholderImage, { backgroundColor: colors.input }]}>
@@ -165,12 +166,12 @@ function ProductRowCard({ product, onPress }: { product: Product; onPress: () =>
               {onOffer ? (
                 <View style={styles.rowPriceCol}>
                   <Text style={styles.rowOldPrice}>{product.retailPrice}</Text>
-                  <Text style={[styles.rowPrice, { color: colors.goldLight }]}>
+                  <Text style={[styles.rowPrice, { color: priceColor }]}>
                     {displayPrice} ج.م
                   </Text>
                 </View>
               ) : (
-                <Text style={[styles.rowPrice, { color: colors.goldLight }]}>
+                <Text style={[styles.rowPrice, { color: priceColor }]}>
                   {displayPrice} ج.م
                 </Text>
               )}
@@ -180,12 +181,12 @@ function ProductRowCard({ product, onPress }: { product: Product; onPress: () =>
       </Pressable>
     </View>
   );
-}
+});
 
 // -------------------------------------------------------------
 // Grid View Card (2-column: Image on top, details below)
 // -------------------------------------------------------------
-function ProductGridCard({ product, onPress }: { product: Product; onPress: () => void }) {
+const ProductGridCard = React.memo(function ProductGridCard({ product, onPress }: { product: Product; onPress: () => void }) {
   const colors = useColors();
   const { effectivePriceMode, user, favorites, toggleFavorite, settings } = useApp();
   const fav = favorites.includes(product.id);
@@ -200,6 +201,7 @@ function ProductGridCard({ product, onPress }: { product: Product; onPress: () =
   const onOffer = effectivePriceMode !== "wholesale" && isOnOffer(product);
   const offerPct = discountPercent(product);
   const isOutOfStock = !product.inStock;
+  const priceColor = colors.isDark ? colors.goldLight : colors.gold;
 
   return (
     <View
@@ -232,7 +234,7 @@ function ProductGridCard({ product, onPress }: { product: Product; onPress: () =
               style={styles.gridImage}
               contentFit="cover"
               cachePolicy="memory-disk"
-              transition={150}
+              transition={0}
             />
           ) : (
             <View style={[styles.gridPlaceholderImage, { backgroundColor: colors.input }]}>
@@ -290,12 +292,12 @@ function ProductGridCard({ product, onPress }: { product: Product; onPress: () =
             {onOffer ? (
               <View style={styles.gridPriceCol}>
                 <Text style={styles.gridOldPrice}>{product.retailPrice}</Text>
-                <Text style={[styles.gridPrice, { color: colors.goldLight }]}>
+                <Text style={[styles.gridPrice, { color: priceColor }]}>
                   {displayPrice} ج.م
                 </Text>
               </View>
             ) : (
-              <Text style={[styles.gridPrice, { color: colors.goldLight }]}>
+              <Text style={[styles.gridPrice, { color: priceColor }]}>
                 {displayPrice} ج.م
               </Text>
             )}
@@ -326,7 +328,7 @@ function ProductGridCard({ product, onPress }: { product: Product; onPress: () =
       </Pressable>
     </View>
   );
-}
+});
 
 // -------------------------------------------------------------
 // Main ProductsScreen
@@ -668,10 +670,11 @@ export default function ProductsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.list, { paddingBottom: bottomPad + 100 }]}
         keyboardShouldPersistTaps="handled"
-        initialNumToRender={8}
-        maxToRenderPerBatch={8}
-        windowSize={7}
-        removeClippedSubviews={Platform.OS !== "web"}
+        initialNumToRender={6}
+        maxToRenderPerBatch={4}
+        windowSize={5}
+        updateCellsBatchingPeriod={50}
+        removeClippedSubviews={Platform.OS === "android"}
         ListEmptyComponent={
           <View style={styles.empty}>
             <Icon name="layers" size={48} color={colors.mutedForeground} />

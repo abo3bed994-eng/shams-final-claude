@@ -78,41 +78,6 @@ export default function ContactScreen() {
           </Text>
         </View>
 
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
-            {t("contactUs")}
-          </Text>
-          {CONTACTS.map((contact) => (
-            <Pressable
-              key={contact.id}
-              onPress={() => callNumber(contact.number)}
-              style={({ pressed }) => [
-                styles.contactCard,
-                {
-                  backgroundColor: colors.card,
-                  borderColor: colors.border,
-                  borderRadius: colors.radius,
-                  opacity: pressed ? 0.8 : 1,
-                },
-                cardShadow(colors.isDark, "soft"),
-              ]}
-            >
-              <Icon name="phone-call" size={18} color={colors.gold} />
-              <View style={styles.contactInfo}>
-                <Text style={[styles.contactLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
-                  {contact.label}
-                </Text>
-                <Text style={[styles.contactNumber, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
-                  {contact.number}
-                </Text>
-              </View>
-              <View style={[styles.contactIcon, { backgroundColor: colors.gold + "22" }]}>
-                <Icon name={contact.icon as any} size={20} color={colors.gold} />
-              </View>
-            </Pressable>
-          ))}
-        </View>
-
         {branches.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeaderRow}>
@@ -206,6 +171,41 @@ export default function ContactScreen() {
             </View>
           </View>
         )}
+
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>
+            {t("contactUs")}
+          </Text>
+          {CONTACTS.map((contact) => (
+            <Pressable
+              key={contact.id}
+              onPress={() => callNumber(contact.number)}
+              style={({ pressed }) => [
+                styles.contactCard,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                  borderRadius: colors.radius,
+                  opacity: pressed ? 0.8 : 1,
+                },
+                cardShadow(colors.isDark, "soft"),
+              ]}
+            >
+              <Icon name="phone-call" size={18} color={colors.gold} />
+              <View style={styles.contactInfo}>
+                <Text style={[styles.contactLabel, { color: colors.mutedForeground, fontFamily: "Cairo_400Regular" }]}>
+                  {contact.label}
+                </Text>
+                <Text style={[styles.contactNumber, { color: colors.foreground, fontFamily: "Cairo_600SemiBold" }]}>
+                  {contact.number}
+                </Text>
+              </View>
+              <View style={[styles.contactIcon, { backgroundColor: colors.gold + "22" }]}>
+                <Icon name={contact.icon as any} size={20} color={colors.gold} />
+              </View>
+            </Pressable>
+          ))}
+        </View>
 
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.foreground, fontFamily: "Cairo_700Bold" }]}>

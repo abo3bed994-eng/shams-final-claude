@@ -409,7 +409,7 @@ export default function HomeScreen() {
                     { color: colors.gold, fontFamily: "Cairo_700Bold" },
                   ]}
                 >
-                  مبروك، أصبحت تاجراً! 🎉
+                  (لقد أصبحت تاجراً)
                 </Text>
                 <Text
                   style={[
@@ -417,7 +417,7 @@ export default function HomeScreen() {
                     { color: colors.foreground, fontFamily: "Cairo_600SemiBold" },
                   ]}
                 >
-                  اضغط هنا لعرض وتحميل قائمة الأسعار
+                  اضغط هنا لعرض قائمة الأسعار
                 </Text>
               </View>
               <Pressable

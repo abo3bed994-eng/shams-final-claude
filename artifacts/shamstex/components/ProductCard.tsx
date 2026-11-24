@@ -65,7 +65,7 @@ export default React.memo(function ProductCard({ product, onPress }: ProductCard
               style={styles.image}
               contentFit="cover"
               cachePolicy="memory-disk"
-              transition={150}
+              transition={0}
             />
           ) : (
             <View style={styles.placeholderImage}>

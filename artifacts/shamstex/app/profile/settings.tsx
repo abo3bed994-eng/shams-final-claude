@@ -305,9 +305,9 @@ export default function SettingsScreen() {
           {card("shield", "إدارة الحساب", "تسجيل الخروج من هذا الجهاز أو حذف الحساب نهائياً", <>
             <GoldButton label="تسجيل الخروج" onPress={handleLogout} variant="outline" style={{ borderColor: colors.destructive + "88", marginTop: 8 }} />
             <View style={styles.deleteSection}>
-              <Pressable onPress={handleDeleteAccount} style={({ pressed }) => [styles.deleteBtn, { opacity: pressed ? 0.5 : 0.8 }]} hitSlop={{ top: 8, bottom: 8, left: 12, right: 12 }}>
-                <Icon name="trash-2" size={15} color={colors.destructive} />
-                <Text style={[styles.deleteBtnText, { color: colors.destructive }]}>حذف الحساب نهائياً</Text>
+              <Pressable onPress={handleDeleteAccount} style={({ pressed }) => [styles.deleteBtn, { opacity: pressed ? 0.4 : 0.7 }]} hitSlop={{ top: 8, bottom: 8, left: 12, right: 12 }}>
+                <Icon name="trash-2" size={14} color={colors.mutedForeground} />
+                <Text style={[styles.deleteBtnText, { color: colors.mutedForeground }]}>حذف الحساب نهائياً</Text>
               </Pressable>
             </View>
           </>)}

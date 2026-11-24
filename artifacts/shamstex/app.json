@@ -2,7 +2,7 @@
   "expo": {
     "name": "Shams Tex",
     "slug": "shamstex",
-    "version": "1.1.9",
+    "version": "1.1.10",
     "orientation": "portrait",
     "icon": "./assets/images/app-icon.png",
     "scheme": "shamstex",
@@ -52,7 +52,7 @@
         "android.permission.RECORD_AUDIO",
         "android.permission.POST_NOTIFICATIONS"
       ],
-      "versionCode": 23,
+      "versionCode": 24,
       "blockedPermissions": [
         "android.permission.READ_MEDIA_IMAGES",
         "android.permission.READ_MEDIA_VIDEO",

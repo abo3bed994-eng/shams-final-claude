@@ -182,7 +182,18 @@ export default function TabLayout() {
         paddingBottom: barPaddingBottom,
       }]}>
         {isIOS && (
-          <BlurView intensity={90} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFill} />
+          <>
+            {!isDark && (
+              <View
+                style={[
+                  StyleSheet.absoluteFill,
+                  { backgroundColor: "rgba(255, 255, 255, 0.95)" },
+                ]}
+                pointerEvents="none"
+              />
+            )}
+            <BlurView intensity={90} tint={isDark ? "dark" : "light"} style={StyleSheet.absoluteFill} />
+          </>
         )}
         <MovingTabBubble
           activeSlot={activeSlot}
