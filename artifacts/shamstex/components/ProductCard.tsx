@@ -1,11 +1,11 @@
-import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useMemo } from "react";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "@/components/Icon";
 import { cardShadow } from "@/constants/shadows";
 import { useColors } from "@/hooks/useColors";
-import { Product } from "@/context/AppContext";
+import { ColorOption, Product } from "@/context/AppContext";
 import { sortColorsByGlobal } from "@/lib/colorUtils";
 import { useApp } from "@/context/AppContext";
 import { discountPercent, displayPriceFor, isOnOffer } from "@/lib/pricing";
@@ -13,26 +13,66 @@ import { discountPercent, displayPriceFor, isOnOffer } from "@/lib/pricing";
 interface ProductCardProps {
   product: Product;
   onPress: () => void;
+  effectivePriceMode?: "wholesale" | "retail";
+  isFav?: boolean;
+  onToggleFavorite?: (id: string) => void;
+  hasUser?: boolean;
+  globalColors?: ColorOption[];
 }
 
-export default React.memo(function ProductCard({ product, onPress }: ProductCardProps) {
+function getCardShadow(isDark: boolean) {
+  if (Platform.OS === "ios") {
+    return {
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: isDark ? 0.3 : 0.08,
+      shadowRadius: 3.5,
+    };
+  }
+  return cardShadow(isDark, "strong");
+}
+
+export default React.memo(function ProductCard({
+  product,
+  onPress,
+  effectivePriceMode: propPriceMode,
+  isFav: propIsFav,
+  onToggleFavorite: propToggleFavorite,
+  hasUser: propHasUser,
+  globalColors: propGlobalColors,
+}: ProductCardProps) {
   const colors = useColors();
-  const { effectivePriceMode, user, favorites, toggleFavorite, settings } = useApp();
-  const fav = favorites.includes(product.id);
-  const specsText = [
-    product.width != null ? `عرض ${product.width}سم` : null,
-    product.gsm != null ? `${product.gsm} جم/م²` : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  const appContext = useApp();
+
+  const effectivePriceMode = propPriceMode ?? appContext.effectivePriceMode;
+  const user = propHasUser !== undefined ? (propHasUser ? appContext.user : null) : appContext.user;
+  const fav = propIsFav ?? appContext.favorites.includes(product.id);
+  const toggleFavorite = propToggleFavorite ?? appContext.toggleFavorite;
+  const globalColors = propGlobalColors ?? appContext.settings?.globalColors;
+
+  const specsText = useMemo(() => {
+    return [
+      product.width != null ? `عرض ${product.width}سم` : null,
+      product.gsm != null ? `${product.gsm} جم/م²` : null,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+  }, [product.width, product.gsm]);
+
+  const sortedColors = useMemo(() => {
+    return sortColorsByGlobal(product.colors, globalColors).slice(0, 4);
+  }, [product.colors, globalColors]);
 
   const displayPrice = displayPriceFor(product, effectivePriceMode);
   const onOffer = effectivePriceMode !== "wholesale" && isOnOffer(product);
   const offerPct = discountPercent(product);
 
   const priceLabel = effectivePriceMode === "wholesale" ? "سعر الجملة" : "السعر";
-
   const isOutOfStock = !product.inStock;
+
+  const handleToggleFav = useCallback(() => {
+    toggleFavorite(product.id);
+  }, [toggleFavorite, product.id]);
 
   return (
     <View
@@ -42,7 +82,7 @@ export default React.memo(function ProductCard({ product, onPress }: ProductCard
           backgroundColor: colors.surface,
           borderRadius: colors.radius,
         },
-        cardShadow(colors.isDark, "strong"),
+        getCardShadow(colors.isDark),
       ]}
     >
       <View
@@ -66,6 +106,7 @@ export default React.memo(function ProductCard({ product, onPress }: ProductCard
               contentFit="cover"
               cachePolicy="memory-disk"
               transition={0}
+              recyclingKey={product.images[0]}
             />
           ) : (
             <View style={styles.placeholderImage}>
@@ -145,7 +186,7 @@ export default React.memo(function ProductCard({ product, onPress }: ProductCard
               </View>
 
               <View style={styles.colorsRow}>
-                {sortColorsByGlobal(product.colors, settings?.globalColors).slice(0, 4).map((c, i) => (
+                {sortedColors.map((c, i) => (
                   <View
                     key={i}
                     style={[
@@ -166,9 +207,9 @@ export default React.memo(function ProductCard({ product, onPress }: ProductCard
           </View>
         </Pressable>
 
-        {user && (
+        {(user || propHasUser) && (
           <Pressable
-            onPress={() => toggleFavorite(product.id)}
+            onPress={handleToggleFav}
             hitSlop={8}
             style={({ pressed }) => [
               styles.favBtn,

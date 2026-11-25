@@ -409,7 +409,7 @@ export default function HomeScreen() {
                     { color: colors.gold, fontFamily: "Cairo_700Bold" },
                   ]}
                 >
-                  (لقد أصبحت تاجراً)
+                  لقد أصبحت تاجراً
                 </Text>
                 <Text
                   style={[

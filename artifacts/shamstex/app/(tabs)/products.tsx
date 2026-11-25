@@ -23,129 +23,373 @@ import { sortColorsByGlobal } from "@/lib/colorUtils";
 import { discountPercent, displayPriceFor, isOnOffer } from "@/lib/pricing";
 import { cardShadow } from "@/constants/shadows";
 import ProductCard from "@/components/ProductCard";
-import type { Product } from "@/context/AppContext";
+import type { ColorOption, Product } from "@/context/AppContext";
 
 const VIEW_MODE_STORAGE_KEY = "@shamstex/products_view_mode";
+
+function getListCardShadow(isDark: boolean, intensity: "soft" | "strong" = "soft") {
+  if (Platform.OS === "ios") {
+    return {
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 1.5 },
+      shadowOpacity: isDark ? 0.22 : 0.07,
+      shadowRadius: 3,
+    };
+  }
+  return cardShadow(isDark, intensity);
+}
+
+interface ProductItemProps {
+  product: Product;
+  onPress: (id: string) => void;
+  effectivePriceMode: "wholesale" | "retail";
+  isFav: boolean;
+  onToggleFavorite: (id: string) => void;
+  hasUser: boolean;
+  globalColors?: ColorOption[];
+  colors: ReturnType<typeof useColors>;
+}
 
 // -------------------------------------------------------------
 // Row View Card (Talabat-style: Image on the right, details on the left)
 // -------------------------------------------------------------
-const ProductRowCard = React.memo(function ProductRowCard({ product, onPress }: { product: Product; onPress: () => void }) {
-  const colors = useColors();
-  const { effectivePriceMode, user, favorites, toggleFavorite, settings } = useApp();
-  const fav = favorites.includes(product.id);
-  const specsText = [
-    product.width != null ? `عرض ${product.width}سم` : null,
-    product.gsm != null ? `${product.gsm} جم/م²` : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+const ProductRowCard = React.memo(
+  function ProductRowCard({
+    product,
+    onPress,
+    effectivePriceMode,
+    isFav,
+    onToggleFavorite,
+    hasUser,
+    globalColors,
+    colors,
+  }: ProductItemProps) {
+    const handlePress = useCallback(() => {
+      onPress(product.id);
+    }, [onPress, product.id]);
 
-  const displayPrice = displayPriceFor(product, effectivePriceMode);
-  const onOffer = effectivePriceMode !== "wholesale" && isOnOffer(product);
-  const offerPct = discountPercent(product);
-  const isOutOfStock = !product.inStock;
-  const priceColor = colors.isDark ? colors.goldLight : colors.gold;
+    const handleFav = useCallback(() => {
+      onToggleFavorite(product.id);
+    }, [onToggleFavorite, product.id]);
 
-  return (
-    <View
-      style={[
-        styles.rowCardShadow,
-        {
-          backgroundColor: colors.surface,
-          borderRadius: colors.radius,
-        },
-        cardShadow(colors.isDark, "soft"),
-      ]}
-    >
-      <Pressable
-        onPress={onPress}
-        style={({ pressed }) => [
-          styles.rowCard,
+    const specsText = useMemo(() => {
+      return [
+        product.width != null ? `عرض ${product.width}سم` : null,
+        product.gsm != null ? `${product.gsm} جم/م²` : null,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+    }, [product.width, product.gsm]);
+
+    const sortedColors = useMemo(() => {
+      return sortColorsByGlobal(product.colors, globalColors).slice(0, 4);
+    }, [product.colors, globalColors]);
+
+    const displayPrice = displayPriceFor(product, effectivePriceMode);
+    const onOffer = effectivePriceMode !== "wholesale" && isOnOffer(product);
+    const offerPct = discountPercent(product);
+    const isOutOfStock = !product.inStock;
+    const priceColor = colors.isDark ? colors.goldLight : colors.gold;
+
+    return (
+      <View
+        style={[
+          styles.rowCardShadow,
           {
             backgroundColor: colors.surface,
-            borderColor: isOutOfStock ? "#C0392B66" : colors.border,
             borderRadius: colors.radius,
-            opacity: pressed ? 0.9 : 1,
           },
+          getListCardShadow(colors.isDark, "soft"),
         ]}
       >
-        {/* Right side: Image thumbnail */}
-        <View style={styles.rowImageWrap}>
-          {product.images.length > 0 ? (
-            <Image
-              source={{ uri: product.images[0] }}
-              style={styles.rowImage}
-              contentFit="cover"
-              cachePolicy="memory-disk"
-              transition={0}
-            />
-          ) : (
-            <View style={[styles.rowPlaceholderImage, { backgroundColor: colors.input }]}>
-              <Icon name="layers" size={28} color={isOutOfStock ? "#C0392B88" : colors.goldDark} />
-            </View>
-          )}
+        <Pressable
+          onPress={handlePress}
+          style={({ pressed }) => [
+            styles.rowCard,
+            {
+              backgroundColor: colors.surface,
+              borderColor: isOutOfStock ? "#C0392B66" : colors.border,
+              borderRadius: colors.radius,
+              opacity: pressed ? 0.9 : 1,
+            },
+          ]}
+        >
+          {/* Right side: Image thumbnail */}
+          <View style={styles.rowImageWrap}>
+            {product.images.length > 0 ? (
+              <Image
+                source={{ uri: product.images[0] }}
+                style={styles.rowImage}
+                contentFit="cover"
+                cachePolicy="memory-disk"
+                transition={0}
+                recyclingKey={product.images[0]}
+              />
+            ) : (
+              <View style={[styles.rowPlaceholderImage, { backgroundColor: colors.input }]}>
+                <Icon name="layers" size={28} color={isOutOfStock ? "#C0392B88" : colors.goldDark} />
+              </View>
+            )}
 
-          {product.priceMenuNew && (
-            <View style={styles.rowNewBadge} pointerEvents="none">
-              <Text style={styles.rowNewBadgeText}>NEW</Text>
-            </View>
-          )}
+            {product.priceMenuNew && (
+              <View style={styles.rowNewBadge} pointerEvents="none">
+                <Text style={styles.rowNewBadgeText}>NEW</Text>
+              </View>
+            )}
 
-          {isOutOfStock && (
-            <View style={styles.rowOutOfStockBadge}>
-              <Text style={styles.rowOutOfStockText}>نفذ المخزون</Text>
-            </View>
-          )}
+            {isOutOfStock && (
+              <View style={styles.rowOutOfStockBadge}>
+                <Text style={styles.rowOutOfStockText}>نفذ المخزون</Text>
+              </View>
+            )}
 
-          {!isOutOfStock && onOffer && (
-            <View style={styles.rowOfferBadge} pointerEvents="none">
-              <Text style={styles.rowOfferText}>خصم {offerPct}%</Text>
-            </View>
-          )}
-        </View>
+            {!isOutOfStock && onOffer && (
+              <View style={styles.rowOfferBadge} pointerEvents="none">
+                <Text style={styles.rowOfferText}>خصم {offerPct}%</Text>
+              </View>
+            )}
+          </View>
 
-        {/* Left side: Product Info */}
-        <View style={styles.rowInfoWrap}>
-          {/* Top line: Category & Favorite */}
-          <View style={styles.rowTopLine}>
-            <View style={[styles.rowCatPill, { backgroundColor: colors.gold + "18" }]}>
-              <Text style={[styles.rowCatText, { color: colors.goldLight }]} numberOfLines={1}>
-                {product.category}
+          {/* Left side: Product Info */}
+          <View style={styles.rowInfoWrap}>
+            {/* Top line: Category & Favorite */}
+            <View style={styles.rowTopLine}>
+              <View style={[styles.rowCatPill, { backgroundColor: colors.gold + "18" }]}>
+                <Text style={[styles.rowCatText, { color: colors.goldLight }]} numberOfLines={1}>
+                  {product.category}
+                </Text>
+              </View>
+              {hasUser && (
+                <Pressable
+                  onPress={handleFav}
+                  hitSlop={10}
+                  style={styles.rowFavBtn}
+                >
+                  <Icon name="heart" size={18} color={isFav ? "#E74C3C" : colors.mutedForeground} />
+                </Pressable>
+              )}
+            </View>
+
+            {/* Name */}
+            <Text style={[styles.rowName, { color: colors.foreground }]} numberOfLines={2}>
+              {product.name}
+            </Text>
+
+            {/* Specs */}
+            {!!specsText && (
+              <Text style={[styles.rowSpecs, { color: colors.mutedForeground }]} numberOfLines={1}>
+                {specsText}
               </Text>
+            )}
+
+            {/* Bottom line: Colors & Price */}
+            <View style={styles.rowBottomLine}>
+              {/* Colors */}
+              <View style={styles.rowColorsWrap}>
+                {sortedColors.map((c, i) => (
+                  <View
+                    key={i}
+                    style={[
+                      styles.rowColorDot,
+                      {
+                        backgroundColor: c.hex,
+                        borderColor: "rgba(150,150,150,0.5)",
+                        borderWidth: c.hex === "#FFFFFF" || c.hex === "#FEFEFE" ? 1 : 0,
+                      },
+                    ]}
+                  />
+                ))}
+                {product.colors.length > 4 && (
+                  <Text style={[styles.rowMoreColors, { color: colors.mutedForeground }]}>
+                    +{product.colors.length - 4}
+                  </Text>
+                )}
+              </View>
+
+              {/* Price */}
+              <View style={styles.rowPriceWrap}>
+                {onOffer ? (
+                  <View style={styles.rowPriceCol}>
+                    <Text style={styles.rowOldPrice}>{product.retailPrice}</Text>
+                    <Text style={[styles.rowPrice, { color: priceColor }]}>
+                      {displayPrice} ج.م
+                    </Text>
+                  </View>
+                ) : (
+                  <Text style={[styles.rowPrice, { color: priceColor }]}>
+                    {displayPrice} ج.م
+                  </Text>
+                )}
+              </View>
             </View>
-            {user && (
+          </View>
+        </Pressable>
+      </View>
+    );
+  },
+  (prev, next) => {
+    return (
+      prev.product === next.product &&
+      prev.isFav === next.isFav &&
+      prev.effectivePriceMode === next.effectivePriceMode &&
+      prev.hasUser === next.hasUser &&
+      prev.globalColors === next.globalColors &&
+      prev.colors === next.colors &&
+      prev.onPress === next.onPress &&
+      prev.onToggleFavorite === next.onToggleFavorite
+    );
+  }
+);
+
+// -------------------------------------------------------------
+// Grid View Card (2-column: Image on top, details below)
+// -------------------------------------------------------------
+const ProductGridCard = React.memo(
+  function ProductGridCard({
+    product,
+    onPress,
+    effectivePriceMode,
+    isFav,
+    onToggleFavorite,
+    hasUser,
+    globalColors,
+    colors,
+  }: ProductItemProps) {
+    const handlePress = useCallback(() => {
+      onPress(product.id);
+    }, [onPress, product.id]);
+
+    const handleFav = useCallback(() => {
+      onToggleFavorite(product.id);
+    }, [onToggleFavorite, product.id]);
+
+    const specsText = useMemo(() => {
+      return [
+        product.width != null ? `عرض ${product.width}سم` : null,
+        product.gsm != null ? `${product.gsm} جم/م²` : null,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+    }, [product.width, product.gsm]);
+
+    const sortedColors = useMemo(() => {
+      return sortColorsByGlobal(product.colors, globalColors).slice(0, 4);
+    }, [product.colors, globalColors]);
+
+    const displayPrice = displayPriceFor(product, effectivePriceMode);
+    const onOffer = effectivePriceMode !== "wholesale" && isOnOffer(product);
+    const offerPct = discountPercent(product);
+    const isOutOfStock = !product.inStock;
+    const priceColor = colors.isDark ? colors.goldLight : colors.gold;
+
+    return (
+      <View
+        style={[
+          styles.gridCardShadow,
+          {
+            backgroundColor: colors.surface,
+            borderRadius: colors.radius,
+          },
+          getListCardShadow(colors.isDark, "soft"),
+        ]}
+      >
+        <Pressable
+          onPress={handlePress}
+          style={({ pressed }) => [
+            styles.gridCard,
+            {
+              backgroundColor: colors.surface,
+              borderColor: isOutOfStock ? "#C0392B66" : colors.border,
+              borderRadius: colors.radius,
+              opacity: pressed ? 0.9 : 1,
+            },
+          ]}
+        >
+          {/* Top: Image */}
+          <View style={styles.gridImageWrap}>
+            {product.images.length > 0 ? (
+              <Image
+                source={{ uri: product.images[0] }}
+                style={styles.gridImage}
+                contentFit="cover"
+                cachePolicy="memory-disk"
+                transition={0}
+                recyclingKey={product.images[0]}
+              />
+            ) : (
+              <View style={[styles.gridPlaceholderImage, { backgroundColor: colors.input }]}>
+                <Icon name="layers" size={32} color={isOutOfStock ? "#C0392B88" : colors.goldDark} />
+              </View>
+            )}
+
+            {product.priceMenuNew && (
+              <View style={styles.gridNewBadge} pointerEvents="none">
+                <Text style={styles.gridNewBadgeText}>NEW</Text>
+              </View>
+            )}
+
+            {isOutOfStock && (
+              <View style={styles.gridOutOfStockBadge}>
+                <Text style={styles.gridOutOfStockText}>نفذ المخزون</Text>
+              </View>
+            )}
+
+            {!isOutOfStock && onOffer && (
+              <View style={styles.gridOfferBadge} pointerEvents="none">
+                <Text style={styles.gridOfferText}>خصم {offerPct}%</Text>
+              </View>
+            )}
+
+            {hasUser && (
               <Pressable
-                onPress={() => toggleFavorite(product.id)}
-                hitSlop={10}
-                style={styles.rowFavBtn}
+                onPress={handleFav}
+                hitSlop={8}
+                style={styles.gridFavBtn}
               >
-                <Icon name="heart" size={18} color={fav ? "#E74C3C" : colors.mutedForeground} />
+                <Icon name="heart" size={17} color={isFav ? "#E74C3C" : "#fff"} />
               </Pressable>
             )}
           </View>
 
-          {/* Name */}
-          <Text style={[styles.rowName, { color: colors.foreground }]} numberOfLines={2}>
-            {product.name}
-          </Text>
-
-          {/* Specs */}
-          {!!specsText && (
-            <Text style={[styles.rowSpecs, { color: colors.mutedForeground }]} numberOfLines={1}>
-              {specsText}
+          {/* Bottom: Details */}
+          <View style={styles.gridInfoWrap}>
+            <Text style={[styles.gridCatText, { color: colors.goldLight }]} numberOfLines={1}>
+              {product.category}
             </Text>
-          )}
 
-          {/* Bottom line: Colors & Price */}
-          <View style={styles.rowBottomLine}>
+            <Text style={[styles.gridName, { color: colors.foreground }]} numberOfLines={2}>
+              {product.name}
+            </Text>
+
+            {!!specsText && (
+              <Text style={[styles.gridSpecs, { color: colors.mutedForeground }]} numberOfLines={1}>
+                {specsText}
+              </Text>
+            )}
+
+            {/* Price Line */}
+            <View style={styles.gridPriceLine}>
+              {onOffer ? (
+                <View style={styles.gridPriceCol}>
+                  <Text style={styles.gridOldPrice}>{product.retailPrice}</Text>
+                  <Text style={[styles.gridPrice, { color: priceColor }]}>
+                    {displayPrice} ج.م
+                  </Text>
+                </View>
+              ) : (
+                <Text style={[styles.gridPrice, { color: priceColor }]}>
+                  {displayPrice} ج.م
+                </Text>
+              )}
+            </View>
+
             {/* Colors */}
-            <View style={styles.rowColorsWrap}>
-              {sortColorsByGlobal(product.colors, settings?.globalColors).slice(0, 4).map((c, i) => (
+            <View style={styles.gridColorsRow}>
+              {sortedColors.map((c, i) => (
                 <View
                   key={i}
                   style={[
-                    styles.rowColorDot,
+                    styles.gridColorDot,
                     {
                       backgroundColor: c.hex,
                       borderColor: "rgba(150,150,150,0.5)",
@@ -155,180 +399,29 @@ const ProductRowCard = React.memo(function ProductRowCard({ product, onPress }: 
                 />
               ))}
               {product.colors.length > 4 && (
-                <Text style={[styles.rowMoreColors, { color: colors.mutedForeground }]}>
+                <Text style={[styles.gridMoreColors, { color: colors.mutedForeground }]}>
                   +{product.colors.length - 4}
                 </Text>
               )}
             </View>
-
-            {/* Price */}
-            <View style={styles.rowPriceWrap}>
-              {onOffer ? (
-                <View style={styles.rowPriceCol}>
-                  <Text style={styles.rowOldPrice}>{product.retailPrice}</Text>
-                  <Text style={[styles.rowPrice, { color: priceColor }]}>
-                    {displayPrice} ج.م
-                  </Text>
-                </View>
-              ) : (
-                <Text style={[styles.rowPrice, { color: priceColor }]}>
-                  {displayPrice} ج.م
-                </Text>
-              )}
-            </View>
           </View>
-        </View>
-      </Pressable>
-    </View>
-  );
-});
-
-// -------------------------------------------------------------
-// Grid View Card (2-column: Image on top, details below)
-// -------------------------------------------------------------
-const ProductGridCard = React.memo(function ProductGridCard({ product, onPress }: { product: Product; onPress: () => void }) {
-  const colors = useColors();
-  const { effectivePriceMode, user, favorites, toggleFavorite, settings } = useApp();
-  const fav = favorites.includes(product.id);
-  const specsText = [
-    product.width != null ? `عرض ${product.width}سم` : null,
-    product.gsm != null ? `${product.gsm} جم/م²` : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
-
-  const displayPrice = displayPriceFor(product, effectivePriceMode);
-  const onOffer = effectivePriceMode !== "wholesale" && isOnOffer(product);
-  const offerPct = discountPercent(product);
-  const isOutOfStock = !product.inStock;
-  const priceColor = colors.isDark ? colors.goldLight : colors.gold;
-
-  return (
-    <View
-      style={[
-        styles.gridCardShadow,
-        {
-          backgroundColor: colors.surface,
-          borderRadius: colors.radius,
-        },
-        cardShadow(colors.isDark, "soft"),
-      ]}
-    >
-      <Pressable
-        onPress={onPress}
-        style={({ pressed }) => [
-          styles.gridCard,
-          {
-            backgroundColor: colors.surface,
-            borderColor: isOutOfStock ? "#C0392B66" : colors.border,
-            borderRadius: colors.radius,
-            opacity: pressed ? 0.9 : 1,
-          },
-        ]}
-      >
-        {/* Top: Image */}
-        <View style={styles.gridImageWrap}>
-          {product.images.length > 0 ? (
-            <Image
-              source={{ uri: product.images[0] }}
-              style={styles.gridImage}
-              contentFit="cover"
-              cachePolicy="memory-disk"
-              transition={0}
-            />
-          ) : (
-            <View style={[styles.gridPlaceholderImage, { backgroundColor: colors.input }]}>
-              <Icon name="layers" size={32} color={isOutOfStock ? "#C0392B88" : colors.goldDark} />
-            </View>
-          )}
-
-          {product.priceMenuNew && (
-            <View style={styles.gridNewBadge} pointerEvents="none">
-              <Text style={styles.gridNewBadgeText}>NEW</Text>
-            </View>
-          )}
-
-          {isOutOfStock && (
-            <View style={styles.gridOutOfStockBadge}>
-              <Text style={styles.gridOutOfStockText}>نفذ المخزون</Text>
-            </View>
-          )}
-
-          {!isOutOfStock && onOffer && (
-            <View style={styles.gridOfferBadge} pointerEvents="none">
-              <Text style={styles.gridOfferText}>خصم {offerPct}%</Text>
-            </View>
-          )}
-
-          {user && (
-            <Pressable
-              onPress={() => toggleFavorite(product.id)}
-              hitSlop={8}
-              style={styles.gridFavBtn}
-            >
-              <Icon name="heart" size={17} color={fav ? "#E74C3C" : "#fff"} />
-            </Pressable>
-          )}
-        </View>
-
-        {/* Bottom: Details */}
-        <View style={styles.gridInfoWrap}>
-          <Text style={[styles.gridCatText, { color: colors.goldLight }]} numberOfLines={1}>
-            {product.category}
-          </Text>
-
-          <Text style={[styles.gridName, { color: colors.foreground }]} numberOfLines={2}>
-            {product.name}
-          </Text>
-
-          {!!specsText && (
-            <Text style={[styles.gridSpecs, { color: colors.mutedForeground }]} numberOfLines={1}>
-              {specsText}
-            </Text>
-          )}
-
-          {/* Price Line */}
-          <View style={styles.gridPriceLine}>
-            {onOffer ? (
-              <View style={styles.gridPriceCol}>
-                <Text style={styles.gridOldPrice}>{product.retailPrice}</Text>
-                <Text style={[styles.gridPrice, { color: priceColor }]}>
-                  {displayPrice} ج.م
-                </Text>
-              </View>
-            ) : (
-              <Text style={[styles.gridPrice, { color: priceColor }]}>
-                {displayPrice} ج.م
-              </Text>
-            )}
-          </View>
-
-          {/* Colors */}
-          <View style={styles.gridColorsRow}>
-            {sortColorsByGlobal(product.colors, settings?.globalColors).slice(0, 4).map((c, i) => (
-              <View
-                key={i}
-                style={[
-                  styles.gridColorDot,
-                  {
-                    backgroundColor: c.hex,
-                    borderColor: "rgba(150,150,150,0.5)",
-                    borderWidth: c.hex === "#FFFFFF" || c.hex === "#FEFEFE" ? 1 : 0,
-                  },
-                ]}
-              />
-            ))}
-            {product.colors.length > 4 && (
-              <Text style={[styles.gridMoreColors, { color: colors.mutedForeground }]}>
-                +{product.colors.length - 4}
-              </Text>
-            )}
-          </View>
-        </View>
-      </Pressable>
-    </View>
-  );
-});
+        </Pressable>
+      </View>
+    );
+  },
+  (prev, next) => {
+    return (
+      prev.product === next.product &&
+      prev.isFav === next.isFav &&
+      prev.effectivePriceMode === next.effectivePriceMode &&
+      prev.hasUser === next.hasUser &&
+      prev.globalColors === next.globalColors &&
+      prev.colors === next.colors &&
+      prev.onPress === next.onPress &&
+      prev.onToggleFavorite === next.onToggleFavorite
+    );
+  }
+);
 
 // -------------------------------------------------------------
 // Main ProductsScreen
@@ -336,7 +429,7 @@ const ProductGridCard = React.memo(function ProductGridCard({ product, onPress }
 export default function ProductsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { products, user, cart, settings, pricingView, setPricingView, canTogglePricing, effectivePriceMode, favorites } = useApp();
+  const { products, user, cart, settings, pricingView, setPricingView, canTogglePricing, effectivePriceMode, favorites, toggleFavorite } = useApp();
   const cartCount = cart.length;
   const cartPulse = useCartPulse(cartCount);
   const { t, isRTL } = useTranslation();
@@ -386,13 +479,28 @@ export default function ProductsScreen() {
     router.push(`/product/${productId}`);
   }, []);
 
+  const toggleFav = useCallback((id: string) => {
+    toggleFavorite(id);
+  }, [toggleFavorite]);
+
+  const globalColors = settings?.globalColors;
+  const hasUser = !!user;
+
   const renderProduct = useCallback(
     ({ item }: { item: Product }) => {
+      const isFav = favorites.includes(item.id);
+
       if (viewMode === "grid") {
         return (
           <ProductGridCard
             product={item}
-            onPress={() => handleProductPress(item.id)}
+            onPress={handleProductPress}
+            effectivePriceMode={effectivePriceMode}
+            isFav={isFav}
+            onToggleFavorite={toggleFav}
+            hasUser={hasUser}
+            globalColors={globalColors}
+            colors={colors}
           />
         );
       }
@@ -401,23 +509,229 @@ export default function ProductsScreen() {
           <ProductCard
             product={item}
             onPress={() => handleProductPress(item.id)}
+            effectivePriceMode={effectivePriceMode}
+            isFav={isFav}
+            onToggleFavorite={toggleFav}
+            hasUser={hasUser}
+            globalColors={globalColors}
           />
         );
       }
       return (
         <ProductRowCard
           product={item}
-          onPress={() => handleProductPress(item.id)}
+          onPress={handleProductPress}
+          effectivePriceMode={effectivePriceMode}
+          isFav={isFav}
+          onToggleFavorite={toggleFav}
+          hasUser={hasUser}
+          globalColors={globalColors}
+          colors={colors}
         />
       );
     },
-    [viewMode, handleProductPress]
+    [viewMode, handleProductPress, effectivePriceMode, favorites, toggleFav, hasUser, globalColors, colors]
   );
 
-  const handleCategoryPress = (cat: string) => {
+  const handleCategoryPress = useCallback((cat: string) => {
     setActiveCategory(cat);
     setActiveSubcategory(null);
-  };
+  }, []);
+
+  const listHeader = useMemo(() => {
+    return (
+      <View
+        style={[
+          styles.searchWrapper,
+          {
+            backgroundColor: colors.surface,
+            borderBottomColor: colors.border,
+            marginHorizontal: -16,
+            marginTop: -16,
+          },
+        ]}
+      >
+        {canTogglePricing && (
+          <View style={{ flexDirection: "row-reverse", gap: 6, paddingHorizontal: 16, paddingTop: 10, alignItems: "center" }}>
+            <Text style={{ color: colors.mutedForeground, fontSize: 11, fontFamily: "Cairo_500Medium" }}>
+              عرض الأسعار:
+            </Text>
+            {([
+              { v: "wholesale", l: "تجار" },
+              { v: "retail", l: "عملاء" },
+            ] as const).map((opt) => {
+              const active = effectivePriceMode === opt.v;
+              return (
+                <Pressable
+                  key={opt.v}
+                  onPress={() => setPricingView(opt.v)}
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 5,
+                    borderRadius: 14,
+                    borderWidth: 1,
+                    backgroundColor: active ? colors.gold + "33" : "transparent",
+                    borderColor: active ? colors.gold : colors.border,
+                  }}
+                >
+                  <Text style={{
+                    color: active ? colors.gold : colors.mutedForeground,
+                    fontFamily: active ? "Cairo_600SemiBold" : "Cairo_400Regular",
+                    fontSize: 12,
+                  }}>
+                    {opt.l}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
+
+        {/* Search row with view mode toggle button */}
+        <View style={styles.searchRow}>
+          <View
+            style={[
+              styles.searchBar,
+              {
+                backgroundColor: colors.input,
+                borderColor: colors.border,
+                borderRadius: colors.radius,
+              },
+            ]}
+          >
+            <Icon name="search" size={18} color={colors.mutedForeground} />
+            <AppTextInput
+              style={[styles.searchInput, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}
+              placeholder={t("searchProducts")}
+              placeholderTextColor={colors.mutedForeground}
+              value={search}
+              onChangeText={setSearch}
+              textAlign="right"
+            />
+          </View>
+          <Pressable
+            onPress={handleToggleViewMode}
+            style={({ pressed }) => [
+              styles.viewToggleBtn,
+              {
+                backgroundColor: colors.input,
+                borderColor: colors.border,
+                borderRadius: colors.radius,
+                opacity: pressed ? 0.7 : 1,
+              },
+            ]}
+            hitSlop={6}
+            accessibilityLabel="تغيير طريقة العرض"
+          >
+            <Icon
+              name={viewMode === "row" ? "grid" : viewMode === "grid" ? "card" : "list"}
+              size={20}
+              color={colors.gold}
+            />
+          </Pressable>
+        </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          directionalLockEnabled={true}
+          nestedScrollEnabled={true}
+          contentContainerStyle={styles.catScroll}
+        >
+          {CATEGORIES.map((cat) => (
+            <Pressable
+              key={cat}
+              onPress={() => handleCategoryPress(cat)}
+              style={({ pressed }) => [
+                styles.catChip,
+                {
+                  backgroundColor: activeCategory === cat ? colors.gold : colors.surface,
+                  borderColor: activeCategory === cat ? colors.gold : colors.border,
+                  opacity: pressed ? 0.8 : 1,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.catText,
+                  {
+                    color: activeCategory === cat ? colors.background : colors.foreground,
+                    fontFamily: activeCategory === cat ? "Cairo_600SemiBold" : "Cairo_400Regular",
+                  },
+                ]}
+              >
+                {cat}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+
+        {subcategoriesForActive.length > 0 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            directionalLockEnabled={true}
+            nestedScrollEnabled={true}
+            contentContainerStyle={styles.subCatScroll}
+          >
+            {subcategoriesForActive.map((sub) => (
+              <Pressable
+                key={sub}
+                onPress={() => setActiveSubcategory(sub)}
+                style={({ pressed }) => [
+                  styles.subCatChip,
+                  {
+                    backgroundColor: activeSubcategory === sub ? colors.gold + "33" : "transparent",
+                    borderColor: activeSubcategory === sub ? colors.gold : colors.border,
+                    opacity: pressed ? 0.8 : 1,
+                  },
+                ]}
+              >
+                <Text style={[styles.subCatText, {
+                  color: activeSubcategory === sub ? colors.gold : colors.mutedForeground,
+                  fontFamily: activeSubcategory === sub ? "Cairo_600SemiBold" : "Cairo_400Regular",
+                }]}>
+                  {sub}
+                </Text>
+              </Pressable>
+            ))}
+            <Pressable
+              onPress={() => setActiveSubcategory(null)}
+              style={({ pressed }) => [
+                styles.subCatChip,
+                {
+                  backgroundColor: !activeSubcategory ? colors.gold + "33" : "transparent",
+                  borderColor: !activeSubcategory ? colors.gold : colors.border,
+                  opacity: pressed ? 0.8 : 1,
+                },
+              ]}
+            >
+              <Text style={[styles.subCatText, {
+                color: !activeSubcategory ? colors.gold : colors.mutedForeground,
+                fontFamily: !activeSubcategory ? "Cairo_600SemiBold" : "Cairo_400Regular",
+              }]}>
+                {t("allCategories")}
+              </Text>
+            </Pressable>
+          </ScrollView>
+        )}
+      </View>
+    );
+  }, [
+    colors,
+    canTogglePricing,
+    effectivePriceMode,
+    setPricingView,
+    search,
+    t,
+    handleToggleViewMode,
+    viewMode,
+    CATEGORIES,
+    activeCategory,
+    handleCategoryPress,
+    subcategoriesForActive,
+    activeSubcategory,
+  ]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -493,186 +807,13 @@ export default function ProductsScreen() {
         data={filtered}
         renderItem={renderProduct}
         keyExtractor={(item) => item.id}
-        ListHeaderComponent={
-          <View
-            style={[
-              styles.searchWrapper,
-              {
-                backgroundColor: colors.surface,
-                borderBottomColor: colors.border,
-                marginHorizontal: -16,
-                marginTop: -16,
-              },
-            ]}
-          >
-            {canTogglePricing && (
-              <View style={{ flexDirection: "row-reverse", gap: 6, paddingHorizontal: 16, paddingTop: 10, alignItems: "center" }}>
-                <Text style={{ color: colors.mutedForeground, fontSize: 11, fontFamily: "Cairo_500Medium" }}>
-                  عرض الأسعار:
-                </Text>
-                {([
-                  { v: "wholesale", l: "تجار" },
-                  { v: "retail", l: "عملاء" },
-                ] as const).map((opt) => {
-                  const active = effectivePriceMode === opt.v;
-                  return (
-                    <Pressable
-                      key={opt.v}
-                      onPress={() => setPricingView(opt.v)}
-                      style={{
-                        paddingHorizontal: 12,
-                        paddingVertical: 5,
-                        borderRadius: 14,
-                        borderWidth: 1,
-                        backgroundColor: active ? colors.gold + "33" : "transparent",
-                        borderColor: active ? colors.gold : colors.border,
-                      }}
-                    >
-                      <Text style={{
-                        color: active ? colors.gold : colors.mutedForeground,
-                        fontFamily: active ? "Cairo_600SemiBold" : "Cairo_400Regular",
-                        fontSize: 12,
-                      }}>
-                        {opt.l}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            )}
-
-            {/* Search row with view mode toggle button */}
-            <View style={styles.searchRow}>
-              <View
-                style={[
-                  styles.searchBar,
-                  {
-                    backgroundColor: colors.input,
-                    borderColor: colors.border,
-                    borderRadius: colors.radius,
-                  },
-                ]}
-              >
-                <Icon name="search" size={18} color={colors.mutedForeground} />
-                <AppTextInput
-                  style={[styles.searchInput, { color: colors.foreground, fontFamily: "Cairo_400Regular" }]}
-                  placeholder={t("searchProducts")}
-                  placeholderTextColor={colors.mutedForeground}
-                  value={search}
-                  onChangeText={setSearch}
-                  textAlign="right"
-                />
-              </View>
-              <Pressable
-                onPress={handleToggleViewMode}
-                style={({ pressed }) => [
-                  styles.viewToggleBtn,
-                  {
-                    backgroundColor: colors.input,
-                    borderColor: colors.border,
-                    borderRadius: colors.radius,
-                    opacity: pressed ? 0.7 : 1,
-                  },
-                ]}
-                hitSlop={6}
-                accessibilityLabel="تغيير طريقة العرض"
-              >
-                <Icon
-                  name={viewMode === "row" ? "grid" : viewMode === "grid" ? "card" : "list"}
-                  size={20}
-                  color={colors.gold}
-                />
-              </Pressable>
-            </View>
-
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.catScroll}
-            >
-              {CATEGORIES.map((cat) => (
-                <Pressable
-                  key={cat}
-                  onPress={() => handleCategoryPress(cat)}
-                  style={({ pressed }) => [
-                    styles.catChip,
-                    {
-                      backgroundColor: activeCategory === cat ? colors.gold : colors.surface,
-                      borderColor: activeCategory === cat ? colors.gold : colors.border,
-                      opacity: pressed ? 0.8 : 1,
-                    },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.catText,
-                      {
-                        color: activeCategory === cat ? colors.background : colors.foreground,
-                        fontFamily: activeCategory === cat ? "Cairo_600SemiBold" : "Cairo_400Regular",
-                      },
-                    ]}
-                  >
-                    {cat}
-                  </Text>
-                </Pressable>
-              ))}
-            </ScrollView>
-
-            {subcategoriesForActive.length > 0 && (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.subCatScroll}
-              >
-                {subcategoriesForActive.map((sub) => (
-                  <Pressable
-                    key={sub}
-                    onPress={() => setActiveSubcategory(sub)}
-                    style={({ pressed }) => [
-                      styles.subCatChip,
-                      {
-                        backgroundColor: activeSubcategory === sub ? colors.gold + "33" : "transparent",
-                        borderColor: activeSubcategory === sub ? colors.gold : colors.border,
-                        opacity: pressed ? 0.8 : 1,
-                      },
-                    ]}
-                  >
-                    <Text style={[styles.subCatText, {
-                      color: activeSubcategory === sub ? colors.gold : colors.mutedForeground,
-                      fontFamily: activeSubcategory === sub ? "Cairo_600SemiBold" : "Cairo_400Regular",
-                    }]}>
-                      {sub}
-                    </Text>
-                  </Pressable>
-                ))}
-                <Pressable
-                  onPress={() => setActiveSubcategory(null)}
-                  style={({ pressed }) => [
-                    styles.subCatChip,
-                    {
-                      backgroundColor: !activeSubcategory ? colors.gold + "33" : "transparent",
-                      borderColor: !activeSubcategory ? colors.gold : colors.border,
-                      opacity: pressed ? 0.8 : 1,
-                    },
-                  ]}
-                >
-                  <Text style={[styles.subCatText, {
-                    color: !activeSubcategory ? colors.gold : colors.mutedForeground,
-                    fontFamily: !activeSubcategory ? "Cairo_600SemiBold" : "Cairo_400Regular",
-                  }]}>
-                    {t("allCategories")}
-                  </Text>
-                </Pressable>
-              </ScrollView>
-            )}
-          </View>
-        }
+        ListHeaderComponent={listHeader}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.list, { paddingBottom: bottomPad + 100 }]}
         keyboardShouldPersistTaps="handled"
-        initialNumToRender={6}
-        maxToRenderPerBatch={4}
-        windowSize={5}
+        initialNumToRender={8}
+        maxToRenderPerBatch={8}
+        windowSize={9}
         updateCellsBatchingPeriod={50}
         removeClippedSubviews={Platform.OS === "android"}
         ListEmptyComponent={
